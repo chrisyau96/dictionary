@@ -44,7 +44,7 @@ export interface InstallProgress {
   message: string;
 }
 
-const PACK_BASE = "/packs/foundation-50";
+const PACK_BASE = "/packs/chris-1000";
 
 export async function fetchManifest(): Promise<PackManifest> {
   const response = await fetch(`${PACK_BASE}/manifest.json`);
@@ -163,10 +163,12 @@ export async function installFoundationPack(
     "rw",
     [db.packs, db.entries, db.senses, db.forms, db.audio, db.audioBlobs, db.profile],
     async () => {
-      await db.entries.where("packId").equals(packId).delete();
-      await db.senses.where("packId").equals(packId).delete();
-      await db.forms.where("packId").equals(packId).delete();
-      await db.audio.where("packId").equals(packId).delete();
+      await db.entries.clear();
+      await db.senses.clear();
+      await db.forms.clear();
+      await db.audio.clear();
+      await db.audioBlobs.clear();
+      await db.packs.clear();
       await db.entries.bulkPut(entries);
       await db.senses.bulkPut(senses);
       await db.forms.bulkPut(forms);

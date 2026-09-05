@@ -13,8 +13,8 @@ export default defineConfig({
         short_name: "Vocab Coach",
         description:
           "Offline English vocabulary study with Traditional Chinese explanations.",
-        theme_color: "#1f5c4d",
-        background_color: "#f6f1e8",
+        theme_color: "#0f766e",
+        background_color: "#eef3f7",
         display: "standalone",
         start_url: "/",
         lang: "en",
@@ -35,8 +35,8 @@ export default defineConfig({
       },
       workbox: {
         cleanupOutdatedCaches: true,
-        globPatterns: ["**/*.{js,css,html,svg,png,json,webmanifest}"],
-        // Audio is installed into IndexedDB, not precached with the app shell.
+        globPatterns: ["**/*.{js,css,html,svg,png,webmanifest}"],
+        globIgnores: ["**/packs/**"],
         navigateFallback: "index.html",
         runtimeCaching: [
           {
@@ -44,7 +44,7 @@ export default defineConfig({
             handler: "CacheFirst",
             options: {
               cacheName: "content-packs",
-              expiration: { maxEntries: 80, maxAgeSeconds: 60 * 60 * 24 * 365 },
+              expiration: { maxEntries: 1500, maxAgeSeconds: 60 * 60 * 24 * 365 },
               cacheableResponse: { statuses: [0, 200] },
             },
           },

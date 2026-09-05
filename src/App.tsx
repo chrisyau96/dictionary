@@ -45,7 +45,7 @@ export function App() {
   if (!ready) return <p className="muted">Opening local records…</p>;
 
   const tab = currentTab(route);
-  const hideTabs = route.name === "review" || route.name === "install" || route.name === "diagnostic";
+  const hideTabs = route.name === "review" || route.name === "install" || route.name === "diagnostic" || route.name === "entry" || route.name === "settings";
 
   return (
     <div className="app">

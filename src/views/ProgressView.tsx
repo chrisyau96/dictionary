@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
+import { ScreenHeader } from "../components/ScreenHeader";
 import { db, ensureProfile } from "../db/database";
+import { go } from "../router";
 
 export function ProgressView() {
   const [stats, setStats] = useState<{
@@ -9,7 +11,6 @@ export function ProgressView() {
     recall: string;
     production: string;
     band: string;
-    scheduler: string;
   } | null>(null);
 
   useEffect(() => {
@@ -32,7 +33,6 @@ export function ProgressView() {
         recall: recognition.length ? `${recallOk}/${recognition.length} recognition` : "No recognition reviews yet",
         production: production.length ? `${prodOk}/${production.length} production` : "No production reviews yet",
         band: profile.estimatedBand ? `${profile.estimatedBand} estimate` : "No diagnostic yet",
-        scheduler: cards ? "ts-fsrs records stored per card" : "No cards yet",
       });
     })();
   }, []);
@@ -41,16 +41,20 @@ export function ProgressView() {
 
   return (
     <section className="stack">
-      <header className="topbar">
-        <h1>Progress</h1>
-      </header>
+      <ScreenHeader title="Progress" back={{ name: "today" }} />
+      <div className="stats-row">
+        <div className="stat"><b>{stats.words}</b><span className="tiny">saved meanings</span></div>
+        <div className="stat"><b>{stats.reviews}</b><span className="tiny">reviews logged</span></div>
+      </div>
       <div className="panel">
-        <p><strong>{stats.words}</strong> saved senses</p>
-        <p><strong>{stats.cards}</strong> cards · <strong>{stats.reviews}</strong> review events</p>
-        <p className="muted">{stats.recall}</p>
-        <p className="muted">{stats.production}</p>
-        <p className="tiny">{stats.band}. Small samples are shown as fractions, not percentages.</p>
-        <p className="tiny">{stats.scheduler}</p>
+        <p>{stats.recall}</p>
+        <p>{stats.production}</p>
+        <p className="tiny">{stats.band}. Small samples are shown as fractions, not percentages. Recognition is not the same as being able to use a word.</p>
+        <p className="tiny">{stats.cards} cards in the scheduler.</p>
+      </div>
+      <div className="center-actions">
+        <button type="button" className="primary block" onClick={() => go({ name: "words" })}>Open My Words</button>
+        <button type="button" className="ghost block" onClick={() => go({ name: "today" })}>Back to Today</button>
       </div>
     </section>
   );

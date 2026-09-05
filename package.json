@@ -11,6 +11,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "pack:foundation": "python3 scripts/build_foundation_pack.py",
+    "pack:chris": "python3 scripts/build_chris_pack.py",
     "icons": "python3 scripts/make_icons.py"
   },
   "dependencies": {

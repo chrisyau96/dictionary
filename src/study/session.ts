@@ -189,6 +189,40 @@ export async function setWordFeedback(
   }
 }
 
+export async function setWordNotes(senseId: string, notes: string): Promise<void> {
+  const word = await db.userWords.get(`word:${senseId}`);
+  if (!word) return;
+  await db.userWords.put({ ...word, notes });
+}
+
+export async function resumeLearning(senseId: string): Promise<void> {
+  const word = await db.userWords.get(`word:${senseId}`);
+  if (!word) return;
+  await db.userWords.put({ ...word, status: "learning", usefulness: null });
+  const cards = await db.cards.where("senseId").equals(senseId).toArray();
+  await db.cards.bulkPut(cards.map((card) => ({ ...card, paused: false })));
+}
+
+export async function studySavedWords(now = new Date()): Promise<number> {
+  const words = await db.userWords.where("status").equals("learning").toArray();
+  let ready = 0;
+  for (const word of words) {
+    const sense = await db.senses.get(word.senseId);
+    if (!sense) continue;
+    await introduceSense(sense, word.reason || "Saved by you", now);
+    ready += 1;
+  }
+  return ready;
+}
+
+export async function nextDueForSense(senseId: string, now = new Date()): Promise<string | null> {
+  const cards = (await db.cards.where("senseId").equals(senseId).toArray()).filter((card) => !card.paused);
+  if (!cards.length) return null;
+  const due = cards.map((card) => new Date(card.scheduler.due).getTime()).sort((a, b) => a - b)[0];
+  if (due <= now.getTime()) return "Due now";
+  return new Date(due).toLocaleString();
+}
+
 export function questionFor(task: CardTask, sense: SenseRecord): { prompt: string; hint: string } {
   if (task === "recognition") {
     return {

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { ScreenHeader } from "../components/ScreenHeader";
 import { fetchManifest, installFoundationPack, requestPersistentStorage, type InstallProgress, type PackManifest } from "../content/install";
 import { go } from "../router";
 
@@ -31,17 +32,15 @@ export function InstallView() {
 
   return (
     <section className="stack">
-      <header className="topbar">
-        <h1>Prepare offline use</h1>
-      </header>
+      <ScreenHeader title="Install pack" back={{ name: "today" }} />
       <p className="muted">
-        Opening the page is not a finished installation. Download the foundation pack, verify it, and store it on this device.
+        This is a vocabulary + dictionary pack for your work in Hong Kong: shop talk, project work, business messages, and everyday English. Opening the page is not a finished installation.
       </p>
       {manifest ? (
         <div className="panel">
           <strong>{manifest.name}</strong>
           <p className="muted">
-            {manifest.senseCount} senses · {manifest.entryCount} headwords · {manifest.audioCount} audio clips · about {kb} KB
+            {manifest.senseCount} meanings · {manifest.entryCount} headwords · {manifest.audioCount} audio clips · about {kb} KB
           </p>
           <p className="tiny">{manifest.completeness.notes}</p>
         </div>
@@ -51,18 +50,21 @@ export function InstallView() {
       {progress ? (
         <div className="panel">
           <div className="progress-bar" aria-label="Install progress">
-            <span style={{ width: `${Math.round((progress.current / progress.total) * 100)}%` }} />
+            <span style={{ width: `${Math.round((progress.current / Math.max(progress.total, 1)) * 100)}%` }} />
           </div>
           <p className="tiny">{progress.message}</p>
         </div>
       ) : null}
       {persisted === false ? (
-        <p className="muted">Persistent storage was not granted. Learning records can still be used, but the browser may evict data if space is low. Export a backup from Settings.</p>
+        <p className="muted">Persistent storage was not granted. You can still study. Export a backup from Settings.</p>
       ) : null}
       {error ? <p className="danger">{error}</p> : null}
-      <button type="button" className="primary block" onClick={run} disabled={!manifest || Boolean(progress)}>
-        Download and verify pack
-      </button>
+      <div className="center-actions">
+        <button type="button" className="primary block" onClick={run} disabled={!manifest || Boolean(progress)}>
+          Download and verify pack
+        </button>
+        <button type="button" className="ghost block" onClick={() => go({ name: "today" })}>Back to Today</button>
+      </div>
     </section>
   );
 }

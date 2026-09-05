@@ -1,26 +1,39 @@
 # Chris’s Offline Vocabulary Coach
 
-Mobile-first, offline-first progressive web app for learning English vocabulary with Hong Kong Traditional Chinese explanations. This repository is the first engineering slice: a real install → search → save → review → audio → backup path on a 50-sense foundation pack.
+A vocabulary-learning + dictionary PWA. Study English you can use, look up installed meanings offline, and keep Hong Kong Traditional Chinese next to the English.
 
-This is not a finished general dictionary. Absent words stay absent. The app does not call a dictionary API or invent definitions.
+The first pack is **Chris Workplace 1000**: about 1,000 meanings for shop/customer work, project talk, business messages, running a small business, everyday conversation, and practical technology. It is not a 20,000-word general dictionary. Absent words stay absent.
 
-## What works now (Gate 1)
+## Why this pack
+
+It is aimed at using English at work in Hong Kong, not collecting rare exam words. Mix (primary domain):
+
+- Everyday conversation ~220
+- Project management ~180
+- Business communication ~180
+- Shop / customer experience ~160
+- Entrepreneurship ~130
+- Practical technology ~130
+
+Each meaning has a 0–100 commonness score (wordfreq, scale v1), part of speech beside the word, 2–3 usage examples, collocations, and synonym notes when a real difference exists.
+
+## What works now
 
 - Four tabs: **Today**, **Dictionary**, **My Words**, **Progress**, plus Settings.
-- Visible **Prepare offline use** flow with counts, checksums, and IndexedDB import.
-- Dictionary search: exact forms, headwords/inflections, then prefixes. Ambiguous forms such as `saw` stay separate.
-- Sense pages with English + Traditional Chinese, IPA, packaged British English audio, commonness badge, examples, and synonym notes.
-- Local FSRS scheduling via pinned `ts-fsrs` (desired retention 0.90). Recognition and production are different cards.
-- Backup and restore of learning records. Content packs stay separate from user progress.
-- Short start check. Result is an estimate, not a CEFR score.
+- Dictionary cards in a learner-dictionary layout (Oxford-style POS + frequency, Quizlet/Anki study actions).
+- **My Words** as a study list: search, due/learning/known/paused filters, notes, study now, pause/resume.
+- Back on nested screens; primary actions can also return to Today.
+- Local FSRS scheduling via `ts-fsrs` (0.90 retention). Recognition and production are different cards.
+- Backup and restore of learning records.
 
 ## What is intentionally not here yet
 
-- A 500–20,000 entry dictionary.
+- A 20,000 entry general dictionary.
 - Cloud accounts, sync, or a paid API.
 - Typo-tolerant search.
 - Automatic grading of typed answers.
 - A second audio accent.
+
 
 ## Run locally
 

@@ -14,10 +14,10 @@ export function AudioButton({
   if (!allowed) return null;
 
   return (
-    <span>
+    <span className="audio-wrap">
       <button
         type="button"
-        className="icon-btn"
+        className="audio-btn"
         aria-label="Play pronunciation"
         onClick={async () => {
           const result = await playPackAudio(pronunciationId);

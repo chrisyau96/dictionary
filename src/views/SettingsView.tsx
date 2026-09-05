@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { downloadJson, exportBackup, previewBackup, restoreBackup } from "../backup/io";
+import { ScreenHeader } from "../components/ScreenHeader";
 import { db, ensureProfile } from "../db/database";
 import { storageSnapshot } from "../content/install";
 import { go } from "../router";
@@ -37,29 +38,15 @@ export function SettingsView() {
 
   return (
     <section className="stack">
-      <header className="topbar">
-        <h1>Settings</h1>
-      </header>
+      <ScreenHeader title="Settings" back={{ name: "today" }} />
       <div className="panel stack">
         <label>
           New senses each day
-          <input
-            type="number"
-            min={0}
-            max={20}
-            value={profile.dailyNewLimit}
-            onChange={(event) => save({ ...profile, dailyNewLimit: Number(event.target.value) })}
-          />
+          <input type="number" min={0} max={20} value={profile.dailyNewLimit} onChange={(event) => save({ ...profile, dailyNewLimit: Number(event.target.value) })} />
         </label>
         <label>
           Review capacity before pausing new words
-          <input
-            type="number"
-            min={5}
-            max={80}
-            value={profile.dailyReviewCapacity}
-            onChange={(event) => save({ ...profile, dailyReviewCapacity: Number(event.target.value) })}
-          />
+          <input type="number" min={5} max={80} value={profile.dailyReviewCapacity} onChange={(event) => save({ ...profile, dailyReviewCapacity: Number(event.target.value) })} />
         </label>
         <label>
           Study timezone
@@ -87,13 +74,14 @@ export function SettingsView() {
           ))}
         </div>
       </div>
-      <div className="panel stack">
-        <button type="button" className="primary" onClick={() => go({ name: "install" })}>Content installation</button>
-        <button type="button" className="ghost" onClick={() => go({ name: "diagnostic" })}>Repeat start check</button>
-        <p className="tiny">{storage}</p>
+      <div className="center-actions">
+        <button type="button" className="primary block" onClick={() => go({ name: "install" })}>Install or refresh pack</button>
+        <button type="button" className="ghost block" onClick={() => go({ name: "diagnostic" })}>Repeat start check</button>
+        <button type="button" className="ghost block" onClick={() => go({ name: "today" })}>Back to Today</button>
       </div>
+      <p className="tiny">{storage}</p>
       <div className="panel stack">
-        <p>Backup is part of the foundation. An internal database copy is not an independent backup.</p>
+        <p>Keep a copy outside this phone. An internal database copy is not an independent backup.</p>
         <button
           type="button"
           className="primary"
@@ -127,8 +115,7 @@ export function SettingsView() {
         {restoreNote ? <p className="tiny">{restoreNote}</p> : null}
       </div>
       <div className="panel tiny">
-        <p>Foundation 50 uses original teaching text, wordfreq 3.1.1 frequencies, and eSpeak NG British English audio. Licenses stay inside the installed pack.</p>
-        <p>No account, no cloud sync, no paid dictionary API. Hosting a static build can use a free HTTPS host later.</p>
+        <p>Chris Workplace 1000 is original teaching text for shop, project, business, and everyday English, with wordfreq 3.1.1 scores and eSpeak NG British English audio.</p>
       </div>
     </section>
   );

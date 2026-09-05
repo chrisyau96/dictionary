@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { ScreenHeader } from "../components/ScreenHeader";
 import { DIAGNOSTIC_ITEMS, saveDiagnostic } from "../study/diagnostic";
 import type { DiagnosticAnswer, DiagnosticResponse } from "../types";
 import { go } from "../router";
@@ -29,14 +30,14 @@ export function DiagnosticView() {
   if (doneBand) {
     return (
       <section className="stack">
-        <h1 className="screen-title">Starting estimate</h1>
+        <ScreenHeader title="Start check" back={{ name: "today" }} />
         <div className="panel">
           <p>This short check suggests a <strong>{doneBand}</strong> vocabulary band.</p>
-          <p className="muted">It is an estimate from {DIAGNOSTIC_ITEMS.length} items, not a formal English exam or CEFR result. Recognition is not the same as being able to use a word.</p>
+          <p className="muted">It is an estimate from {DIAGNOSTIC_ITEMS.length} items, not a formal English exam or CEFR result.</p>
         </div>
-        <button type="button" className="primary block" onClick={() => go({ name: "today" })}>
-          Start today
-        </button>
+        <div className="center-actions">
+          <button type="button" className="primary block" onClick={() => go({ name: "today" })}>Back to Today</button>
+        </div>
       </section>
     );
   }
@@ -45,10 +46,7 @@ export function DiagnosticView() {
 
   return (
     <section className="stack">
-      <header className="topbar">
-        <h1>Quick start check</h1>
-        <span className="tiny">{index + 1} / {DIAGNOSTIC_ITEMS.length}</span>
-      </header>
+      <ScreenHeader title="Start check" back={{ name: "today" }} right={<span className="tiny">{index + 1}/{DIAGNOSTIC_ITEMS.length}</span>} />
       <div className="panel">
         <p className="tiny">{item.kind === "recognition" ? "Do you understand this word?" : "Could you produce this English word?"}</p>
         <p className="prompt-word">{item.prompt}</p>
@@ -61,7 +59,9 @@ export function DiagnosticView() {
           <button type="button" className="rating again" onClick={() => choose("unknown")}>I do not know</button>
         </div>
       ) : null}
-      <button type="button" className="text-btn" onClick={() => go({ name: "today" })}>Skip for now</button>
+      <div className="center-actions">
+        <button type="button" className="ghost block" onClick={() => go({ name: "today" })}>Skip and go back</button>
+      </div>
     </section>
   );
 }
