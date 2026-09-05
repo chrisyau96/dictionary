@@ -1,0 +1,3873 @@
+{
+  "schemaVersion": 1,
+  "packId": "foundation-50",
+  "version": "1.0.0",
+  "name": "Foundation 50",
+  "description": "Audited 50-sense sample that proves search, study, audio, and backup.",
+  "accent": "en-GB",
+  "entries": [
+    {
+      "id": "e-saw",
+      "lemma": "saw",
+      "display": "saw",
+      "pos": [
+        "noun",
+        "verb"
+      ],
+      "searchableForms": [
+        "saw",
+        "saws"
+      ],
+      "domains": [
+        "everyday"
+      ]
+    },
+    {
+      "id": "e-see",
+      "lemma": "see",
+      "display": "see",
+      "pos": [
+        "verb"
+      ],
+      "searchableForms": [
+        "see",
+        "sees",
+        "saw",
+        "seen",
+        "seeing"
+      ],
+      "domains": [
+        "everyday"
+      ]
+    },
+    {
+      "id": "e-read",
+      "lemma": "read",
+      "display": "read",
+      "pos": [
+        "verb"
+      ],
+      "searchableForms": [
+        "read",
+        "reads",
+        "reading"
+      ],
+      "domains": [
+        "everyday"
+      ]
+    },
+    {
+      "id": "e-bank",
+      "lemma": "bank",
+      "display": "bank",
+      "pos": [
+        "noun"
+      ],
+      "searchableForms": [
+        "bank",
+        "banks"
+      ],
+      "domains": [
+        "business",
+        "everyday"
+      ]
+    },
+    {
+      "id": "e-close",
+      "lemma": "close",
+      "display": "close",
+      "pos": [
+        "verb",
+        "adjective"
+      ],
+      "searchableForms": [
+        "close",
+        "closes",
+        "closed",
+        "closing",
+        "closer",
+        "closest"
+      ],
+      "domains": [
+        "everyday",
+        "business"
+      ]
+    },
+    {
+      "id": "e-book",
+      "lemma": "book",
+      "display": "book",
+      "pos": [
+        "verb"
+      ],
+      "searchableForms": [
+        "book",
+        "books",
+        "booked",
+        "booking"
+      ],
+      "domains": [
+        "everyday",
+        "business"
+      ]
+    },
+    {
+      "id": "e-check",
+      "lemma": "check",
+      "display": "check",
+      "pos": [
+        "verb"
+      ],
+      "searchableForms": [
+        "check",
+        "checks",
+        "checked",
+        "checking"
+      ],
+      "domains": [
+        "everyday",
+        "project-management"
+      ]
+    },
+    {
+      "id": "e-address",
+      "lemma": "address",
+      "display": "address",
+      "pos": [
+        "verb"
+      ],
+      "searchableForms": [
+        "address",
+        "addresses",
+        "addressed",
+        "addressing"
+      ],
+      "domains": [
+        "business",
+        "project-management"
+      ]
+    },
+    {
+      "id": "e-current",
+      "lemma": "current",
+      "display": "current",
+      "pos": [
+        "adjective"
+      ],
+      "searchableForms": [
+        "current",
+        "currently"
+      ],
+      "domains": [
+        "everyday",
+        "business"
+      ]
+    },
+    {
+      "id": "e-i",
+      "lemma": "I",
+      "display": "I",
+      "pos": [
+        "pronoun"
+      ],
+      "searchableForms": [
+        "i",
+        "I"
+      ],
+      "domains": [
+        "everyday"
+      ],
+      "selection": "calibration"
+    },
+    {
+      "id": "e-you",
+      "lemma": "you",
+      "display": "you",
+      "pos": [
+        "pronoun"
+      ],
+      "searchableForms": [
+        "you"
+      ],
+      "domains": [
+        "everyday"
+      ],
+      "selection": "calibration"
+    },
+    {
+      "id": "e-we",
+      "lemma": "we",
+      "display": "we",
+      "pos": [
+        "pronoun"
+      ],
+      "searchableForms": [
+        "we",
+        "us"
+      ],
+      "domains": [
+        "everyday"
+      ],
+      "selection": "calibration"
+    },
+    {
+      "id": "e-they",
+      "lemma": "they",
+      "display": "they",
+      "pos": [
+        "pronoun"
+      ],
+      "searchableForms": [
+        "they",
+        "them"
+      ],
+      "domains": [
+        "everyday"
+      ],
+      "selection": "calibration"
+    },
+    {
+      "id": "e-streamline",
+      "lemma": "streamline",
+      "display": "streamline",
+      "pos": [
+        "verb"
+      ],
+      "searchableForms": [
+        "streamline",
+        "streamlines",
+        "streamlined",
+        "streamlining"
+      ],
+      "domains": [
+        "project-management",
+        "business"
+      ]
+    },
+    {
+      "id": "e-process",
+      "lemma": "process",
+      "display": "process",
+      "pos": [
+        "noun"
+      ],
+      "searchableForms": [
+        "process",
+        "processes"
+      ],
+      "domains": [
+        "project-management",
+        "business"
+      ]
+    },
+    {
+      "id": "e-approve",
+      "lemma": "approve",
+      "display": "approve",
+      "pos": [
+        "verb"
+      ],
+      "searchableForms": [
+        "approve",
+        "approves",
+        "approved",
+        "approving"
+      ],
+      "domains": [
+        "project-management",
+        "business"
+      ]
+    },
+    {
+      "id": "e-deadline",
+      "lemma": "deadline",
+      "display": "deadline",
+      "pos": [
+        "noun"
+      ],
+      "searchableForms": [
+        "deadline",
+        "deadlines"
+      ],
+      "domains": [
+        "project-management"
+      ]
+    },
+    {
+      "id": "e-stakeholder",
+      "lemma": "stakeholder",
+      "display": "stakeholder",
+      "pos": [
+        "noun"
+      ],
+      "searchableForms": [
+        "stakeholder",
+        "stakeholders"
+      ],
+      "domains": [
+        "project-management",
+        "business"
+      ]
+    },
+    {
+      "id": "e-scope",
+      "lemma": "scope",
+      "display": "scope",
+      "pos": [
+        "noun"
+      ],
+      "searchableForms": [
+        "scope",
+        "scopes"
+      ],
+      "domains": [
+        "project-management"
+      ]
+    },
+    {
+      "id": "e-risk",
+      "lemma": "risk",
+      "display": "risk",
+      "pos": [
+        "noun"
+      ],
+      "searchableForms": [
+        "risk",
+        "risks"
+      ],
+      "domains": [
+        "project-management",
+        "business"
+      ]
+    },
+    {
+      "id": "e-update",
+      "lemma": "update",
+      "display": "update",
+      "pos": [
+        "verb"
+      ],
+      "searchableForms": [
+        "update",
+        "updates",
+        "updated",
+        "updating"
+      ],
+      "domains": [
+        "project-management",
+        "technology"
+      ]
+    },
+    {
+      "id": "e-meeting",
+      "lemma": "meeting",
+      "display": "meeting",
+      "pos": [
+        "noun"
+      ],
+      "searchableForms": [
+        "meeting",
+        "meetings"
+      ],
+      "domains": [
+        "business",
+        "everyday"
+      ]
+    },
+    {
+      "id": "e-deliverable",
+      "lemma": "deliverable",
+      "display": "deliverable",
+      "pos": [
+        "noun"
+      ],
+      "searchableForms": [
+        "deliverable",
+        "deliverables"
+      ],
+      "domains": [
+        "project-management"
+      ]
+    },
+    {
+      "id": "e-customer",
+      "lemma": "customer",
+      "display": "customer",
+      "pos": [
+        "noun"
+      ],
+      "searchableForms": [
+        "customer",
+        "customers"
+      ],
+      "domains": [
+        "retail",
+        "business"
+      ]
+    },
+    {
+      "id": "e-invoice",
+      "lemma": "invoice",
+      "display": "invoice",
+      "pos": [
+        "noun"
+      ],
+      "searchableForms": [
+        "invoice",
+        "invoices"
+      ],
+      "domains": [
+        "business"
+      ]
+    },
+    {
+      "id": "e-revenue",
+      "lemma": "revenue",
+      "display": "revenue",
+      "pos": [
+        "noun"
+      ],
+      "searchableForms": [
+        "revenue",
+        "revenues"
+      ],
+      "domains": [
+        "business",
+        "entrepreneurship"
+      ]
+    },
+    {
+      "id": "e-proposal",
+      "lemma": "proposal",
+      "display": "proposal",
+      "pos": [
+        "noun"
+      ],
+      "searchableForms": [
+        "proposal",
+        "proposals"
+      ],
+      "domains": [
+        "business"
+      ]
+    },
+    {
+      "id": "e-feedback",
+      "lemma": "feedback",
+      "display": "feedback",
+      "pos": [
+        "noun"
+      ],
+      "searchableForms": [
+        "feedback"
+      ],
+      "domains": [
+        "business",
+        "retail"
+      ]
+    },
+    {
+      "id": "e-refund",
+      "lemma": "refund",
+      "display": "refund",
+      "pos": [
+        "noun"
+      ],
+      "searchableForms": [
+        "refund",
+        "refunds"
+      ],
+      "domains": [
+        "retail"
+      ]
+    },
+    {
+      "id": "e-queue",
+      "lemma": "queue",
+      "display": "queue",
+      "pos": [
+        "noun"
+      ],
+      "searchableForms": [
+        "queue",
+        "queues"
+      ],
+      "domains": [
+        "retail",
+        "everyday"
+      ]
+    },
+    {
+      "id": "e-experience",
+      "lemma": "experience",
+      "display": "experience",
+      "pos": [
+        "noun"
+      ],
+      "searchableForms": [
+        "experience",
+        "experiences"
+      ],
+      "domains": [
+        "retail",
+        "everyday"
+      ]
+    },
+    {
+      "id": "e-complaint",
+      "lemma": "complaint",
+      "display": "complaint",
+      "pos": [
+        "noun"
+      ],
+      "searchableForms": [
+        "complaint",
+        "complaints"
+      ],
+      "domains": [
+        "retail"
+      ]
+    },
+    {
+      "id": "e-launch",
+      "lemma": "launch",
+      "display": "launch",
+      "pos": [
+        "verb"
+      ],
+      "searchableForms": [
+        "launch",
+        "launches",
+        "launched",
+        "launching"
+      ],
+      "domains": [
+        "entrepreneurship",
+        "technology"
+      ]
+    },
+    {
+      "id": "e-pivot",
+      "lemma": "pivot",
+      "display": "pivot",
+      "pos": [
+        "verb"
+      ],
+      "searchableForms": [
+        "pivot",
+        "pivots",
+        "pivoted",
+        "pivoting"
+      ],
+      "domains": [
+        "entrepreneurship"
+      ]
+    },
+    {
+      "id": "e-cash-flow",
+      "lemma": "cash flow",
+      "display": "cash flow",
+      "pos": [
+        "noun"
+      ],
+      "searchableForms": [
+        "cash flow",
+        "cashflow"
+      ],
+      "domains": [
+        "entrepreneurship",
+        "business"
+      ],
+      "kind": "phrase"
+    },
+    {
+      "id": "e-automate",
+      "lemma": "automate",
+      "display": "automate",
+      "pos": [
+        "verb"
+      ],
+      "searchableForms": [
+        "automate",
+        "automates",
+        "automated",
+        "automating"
+      ],
+      "domains": [
+        "technology",
+        "project-management"
+      ]
+    },
+    {
+      "id": "e-deploy",
+      "lemma": "deploy",
+      "display": "deploy",
+      "pos": [
+        "verb"
+      ],
+      "searchableForms": [
+        "deploy",
+        "deploys",
+        "deployed",
+        "deploying"
+      ],
+      "domains": [
+        "technology"
+      ]
+    },
+    {
+      "id": "e-backup",
+      "lemma": "backup",
+      "display": "backup",
+      "pos": [
+        "noun"
+      ],
+      "searchableForms": [
+        "backup",
+        "backups",
+        "back-up",
+        "back up"
+      ],
+      "domains": [
+        "technology"
+      ]
+    },
+    {
+      "id": "e-offline",
+      "lemma": "offline",
+      "display": "offline",
+      "pos": [
+        "adjective"
+      ],
+      "searchableForms": [
+        "offline"
+      ],
+      "domains": [
+        "technology"
+      ]
+    },
+    {
+      "id": "e-schedule",
+      "lemma": "schedule",
+      "display": "schedule",
+      "pos": [
+        "verb"
+      ],
+      "searchableForms": [
+        "schedule",
+        "schedules",
+        "scheduled",
+        "scheduling"
+      ],
+      "domains": [
+        "project-management",
+        "everyday"
+      ]
+    },
+    {
+      "id": "e-confirm",
+      "lemma": "confirm",
+      "display": "confirm",
+      "pos": [
+        "verb"
+      ],
+      "searchableForms": [
+        "confirm",
+        "confirms",
+        "confirmed",
+        "confirming"
+      ],
+      "domains": [
+        "business",
+        "everyday"
+      ]
+    },
+    {
+      "id": "e-negotiate",
+      "lemma": "negotiate",
+      "display": "negotiate",
+      "pos": [
+        "verb"
+      ],
+      "searchableForms": [
+        "negotiate",
+        "negotiates",
+        "negotiated",
+        "negotiating"
+      ],
+      "domains": [
+        "business"
+      ]
+    },
+    {
+      "id": "e-follow-up",
+      "lemma": "follow up",
+      "display": "follow up",
+      "pos": [
+        "verb"
+      ],
+      "searchableForms": [
+        "follow up",
+        "followed up",
+        "following up",
+        "follow-up"
+      ],
+      "domains": [
+        "business",
+        "project-management"
+      ],
+      "kind": "phrase"
+    },
+    {
+      "id": "e-please",
+      "lemma": "please",
+      "display": "please",
+      "pos": [
+        "adverb"
+      ],
+      "searchableForms": [
+        "please"
+      ],
+      "domains": [
+        "everyday"
+      ]
+    },
+    {
+      "id": "e-thank",
+      "lemma": "thank",
+      "display": "thank",
+      "pos": [
+        "verb"
+      ],
+      "searchableForms": [
+        "thank",
+        "thanks",
+        "thanked",
+        "thanking"
+      ],
+      "domains": [
+        "everyday"
+      ]
+    },
+    {
+      "id": "e-help",
+      "lemma": "help",
+      "display": "help",
+      "pos": [
+        "verb"
+      ],
+      "searchableForms": [
+        "help",
+        "helps",
+        "helped",
+        "helping"
+      ],
+      "domains": [
+        "everyday"
+      ]
+    },
+    {
+      "id": "e-sorry",
+      "lemma": "sorry",
+      "display": "sorry",
+      "pos": [
+        "adjective"
+      ],
+      "searchableForms": [
+        "sorry"
+      ],
+      "domains": [
+        "everyday"
+      ]
+    }
+  ],
+  "senses": [
+    {
+      "id": "s-saw-tool",
+      "entryId": "e-saw",
+      "pos": "noun",
+      "ipa": "/sɔː/",
+      "pronunciationId": "p-saw",
+      "glossEn": "A hand tool with a toothed blade, used for cutting wood or other hard material.",
+      "glossTc": "有鋸齒的手工具，用來鋸開木材或其他硬物。",
+      "usageNote": "This is a tool. It is not the past of see.",
+      "domains": [
+        "everyday"
+      ],
+      "examples": [
+        {
+          "id": "ex-saw-tool-1",
+          "en": "He used a saw to cut the shelf to size.",
+          "tc": "他用鋸子把層板鋸成所需長度。",
+          "context": "everyday"
+        }
+      ],
+      "synonyms": [
+        {
+          "term": "handsaw",
+          "relation": "narrower",
+          "difference": "A handsaw is one common type of saw, not every cutting tool."
+        }
+      ],
+      "synonymStatus": "authored",
+      "collocations": [
+        "use a saw",
+        "a circular saw"
+      ],
+      "frequency": {
+        "form": "saw",
+        "zipf": 5.34,
+        "commonness": 74,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-see-past",
+      "entryId": "e-see",
+      "pos": "verb",
+      "ipa": "/sɔː/",
+      "pronunciationId": "p-saw",
+      "glossEn": "Past tense of see: noticed or looked at someone or something.",
+      "glossTc": "see 的過去式：看見或注意到某人或某物。",
+      "usageNote": "Same spelling as the tool. The headword is see.",
+      "domains": [
+        "everyday"
+      ],
+      "examples": [
+        {
+          "id": "ex-see-past-1",
+          "en": "I saw the email this morning but have not replied yet.",
+          "tc": "我今早看到那封電郵，但還未回覆。",
+          "context": "work"
+        }
+      ],
+      "synonyms": [],
+      "synonymStatus": "none-appropriate",
+      "collocations": [
+        "saw him",
+        "saw the problem"
+      ],
+      "frequency": {
+        "form": "saw",
+        "zipf": 5.34,
+        "commonness": 74,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-read-present",
+      "entryId": "e-read",
+      "pos": "verb",
+      "ipa": "/riːd/",
+      "pronunciationId": "p-read-present",
+      "glossEn": "To look at written words and understand their meaning.",
+      "glossTc": "看文字並理解其意思。",
+      "usageNote": null,
+      "domains": [
+        "everyday",
+        "business"
+      ],
+      "examples": [
+        {
+          "id": "ex-read-present-1",
+          "en": "Please read the contract before you sign it.",
+          "tc": "請先閱讀合約，再簽署。",
+          "context": "work"
+        }
+      ],
+      "synonyms": [
+        {
+          "term": "go through",
+          "relation": "near",
+          "difference": "Go through often means examine in detail, not only decode the words."
+        }
+      ],
+      "synonymStatus": "authored",
+      "collocations": [
+        "read the report",
+        "read carefully"
+      ],
+      "frequency": {
+        "form": "read",
+        "zipf": 5.54,
+        "commonness": 79,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-read-past",
+      "entryId": "e-read",
+      "pos": "verb",
+      "ipa": "/red/",
+      "pronunciationId": "p-read-past",
+      "glossEn": "Past tense of read: finished looking at and understanding a text.",
+      "glossTc": "read 的過去式：已經看過並理解某段文字。",
+      "usageNote": "Spelling matches the present verb; the vowel sound changes.",
+      "domains": [
+        "everyday"
+      ],
+      "examples": [
+        {
+          "id": "ex-read-past-1",
+          "en": "I read your proposal last night and marked two questions.",
+          "tc": "我昨晚已讀過你的建議書，並標了兩個問題。",
+          "context": "work"
+        }
+      ],
+      "synonyms": [],
+      "synonymStatus": "none-appropriate",
+      "collocations": [
+        "read it yesterday"
+      ],
+      "frequency": {
+        "form": "read",
+        "zipf": 5.54,
+        "commonness": 79,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-bank-finance",
+      "entryId": "e-bank",
+      "pos": "noun",
+      "ipa": "/bæŋk/",
+      "pronunciationId": "p-bank",
+      "glossEn": "A business that keeps money, makes payments, and lends money.",
+      "glossTc": "保管金錢、處理付款及借貸的機構。",
+      "usageNote": null,
+      "domains": [
+        "business",
+        "everyday"
+      ],
+      "examples": [
+        {
+          "id": "ex-bank-finance-1",
+          "en": "The shop pays takings into the bank every evening.",
+          "tc": "店舖每晚都會把營業額存入銀行。",
+          "context": "retail"
+        }
+      ],
+      "synonyms": [
+        {
+          "term": "lender",
+          "relation": "related",
+          "difference": "A lender may be a bank, but a bank also holds deposits and runs accounts."
+        }
+      ],
+      "synonymStatus": "authored",
+      "collocations": [
+        "open a bank account",
+        "go to the bank"
+      ],
+      "frequency": {
+        "form": "bank",
+        "zipf": 5.16,
+        "commonness": 70,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-bank-river",
+      "entryId": "e-bank",
+      "pos": "noun",
+      "ipa": "/bæŋk/",
+      "pronunciationId": "p-bank",
+      "glossEn": "The land along the side of a river or canal.",
+      "glossTc": "河或運河兩旁的岸邊土地。",
+      "usageNote": "Do not treat this as the financial institution.",
+      "domains": [
+        "everyday"
+      ],
+      "examples": [
+        {
+          "id": "ex-bank-river-1",
+          "en": "We walked along the river bank after lunch.",
+          "tc": "午飯後我們沿河岸散步。",
+          "context": "everyday"
+        }
+      ],
+      "synonyms": [
+        {
+          "term": "shore",
+          "relation": "near",
+          "difference": "Shore is more often used for a sea or lake than a river."
+        }
+      ],
+      "synonymStatus": "authored",
+      "collocations": [
+        "river bank"
+      ],
+      "frequency": {
+        "form": "bank",
+        "zipf": 5.16,
+        "commonness": 70,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-close-verb",
+      "entryId": "e-close",
+      "pos": "verb",
+      "ipa": "/kləʊz/",
+      "pronunciationId": "p-close-verb",
+      "glossEn": "To shut something, or to bring a matter to an end.",
+      "glossTc": "關上某物，或把一件事結束。",
+      "usageNote": null,
+      "domains": [
+        "everyday",
+        "business"
+      ],
+      "examples": [
+        {
+          "id": "ex-close-verb-1",
+          "en": "Please close the till before you leave the shop.",
+          "tc": "離開店舖前請關好收銀機。",
+          "context": "retail"
+        }
+      ],
+      "synonyms": [
+        {
+          "term": "shut",
+          "relation": "near",
+          "difference": "Shut is usually physical. Close can also end a deal or a file."
+        }
+      ],
+      "synonymStatus": "authored",
+      "collocations": [
+        "close the door",
+        "close the case"
+      ],
+      "frequency": {
+        "form": "close",
+        "zipf": 5.36,
+        "commonness": 75,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-close-adj",
+      "entryId": "e-close",
+      "pos": "adjective",
+      "ipa": "/kləʊs/",
+      "pronunciationId": "p-close-adj",
+      "glossEn": "Near in space, time, or relationship.",
+      "glossTc": "在距離、時間或關係上接近。",
+      "usageNote": "The vowel ending is /s/, not /z/.",
+      "domains": [
+        "everyday"
+      ],
+      "examples": [
+        {
+          "id": "ex-close-adj-1",
+          "en": "The warehouse is close to the MTR station.",
+          "tc": "貨倉鄰近港鐵站。",
+          "context": "everyday"
+        }
+      ],
+      "synonyms": [
+        {
+          "term": "near",
+          "relation": "near",
+          "difference": "Near is mainly about distance. Close can also describe a relationship."
+        }
+      ],
+      "synonymStatus": "authored",
+      "collocations": [
+        "close to",
+        "a close friend"
+      ],
+      "frequency": {
+        "form": "close",
+        "zipf": 5.36,
+        "commonness": 75,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-book-reserve",
+      "entryId": "e-book",
+      "pos": "verb",
+      "ipa": "/bʊk/",
+      "pronunciationId": "p-book",
+      "glossEn": "To arrange in advance to have a place, time, or service.",
+      "glossTc": "預先安排位置、時間或服務。",
+      "usageNote": null,
+      "domains": [
+        "everyday",
+        "business"
+      ],
+      "examples": [
+        {
+          "id": "ex-book-reserve-1",
+          "en": "Can you book a meeting room for Thursday morning?",
+          "tc": "你能否預訂星期四上午的會議室？",
+          "context": "work"
+        }
+      ],
+      "synonyms": [
+        {
+          "term": "reserve",
+          "relation": "near",
+          "difference": "Reserve is slightly more formal; both can mean hold a place."
+        }
+      ],
+      "synonymStatus": "authored",
+      "collocations": [
+        "book a room",
+        "book a slot"
+      ],
+      "frequency": {
+        "form": "book",
+        "zipf": 5.43,
+        "commonness": 76,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-check-verify",
+      "entryId": "e-check",
+      "pos": "verb",
+      "ipa": "/tʃek/",
+      "pronunciationId": "p-check",
+      "glossEn": "To examine something so you know it is correct or complete.",
+      "glossTc": "檢查某事物，確認它正確或齊全。",
+      "usageNote": null,
+      "domains": [
+        "everyday",
+        "project-management"
+      ],
+      "examples": [
+        {
+          "id": "ex-check-verify-1",
+          "en": "Check the stock count before we open tomorrow.",
+          "tc": "明天開店前先核對存貨數目。",
+          "context": "retail"
+        }
+      ],
+      "synonyms": [
+        {
+          "term": "verify",
+          "relation": "near",
+          "difference": "Verify stresses proving that something is true, not only looking at it."
+        }
+      ],
+      "synonymStatus": "authored",
+      "collocations": [
+        "check the figures",
+        "double-check"
+      ],
+      "frequency": {
+        "form": "check",
+        "zipf": 5.31,
+        "commonness": 74,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-address-deal",
+      "entryId": "e-address",
+      "pos": "verb",
+      "ipa": "/əˈdres/",
+      "pronunciationId": "p-address",
+      "glossEn": "To give attention to a problem and start dealing with it.",
+      "glossTc": "正視問題並着手處理。",
+      "usageNote": null,
+      "domains": [
+        "business",
+        "project-management"
+      ],
+      "examples": [
+        {
+          "id": "ex-address-deal-1",
+          "en": "We need to address the delay before it affects the launch.",
+          "tc": "我們要先處理延誤，以免影響推出時間。",
+          "context": "work"
+        }
+      ],
+      "synonyms": [
+        {
+          "term": "deal with",
+          "relation": "near",
+          "difference": "Deal with is more general. Address often names the issue first."
+        }
+      ],
+      "synonymStatus": "authored",
+      "collocations": [
+        "address the issue",
+        "address a concern"
+      ],
+      "frequency": {
+        "form": "address",
+        "zipf": 4.91,
+        "commonness": 65,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-current-present",
+      "entryId": "e-current",
+      "pos": "adjective",
+      "ipa": "/ˈkʌrənt/",
+      "pronunciationId": "p-current",
+      "glossEn": "Happening or being used now.",
+      "glossTc": "現正發生或現正使用的。",
+      "usageNote": null,
+      "domains": [
+        "everyday",
+        "business"
+      ],
+      "examples": [
+        {
+          "id": "ex-current-present-1",
+          "en": "The current price list replaces last month's version.",
+          "tc": "現行價目表已取代上個月的版本。",
+          "context": "work"
+        }
+      ],
+      "synonyms": [
+        {
+          "term": "present",
+          "relation": "near",
+          "difference": "Present can also mean in the room. Current usually means latest."
+        }
+      ],
+      "synonymStatus": "authored",
+      "collocations": [
+        "current version",
+        "current customer"
+      ],
+      "frequency": {
+        "form": "current",
+        "zipf": 5.27,
+        "commonness": 73,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-i",
+      "entryId": "e-i",
+      "pos": "pronoun",
+      "ipa": "/aɪ/",
+      "pronunciationId": "p-i",
+      "glossEn": "The speaker or writer; used to talk about yourself.",
+      "glossTc": "說話或書寫的人用來指自己。",
+      "usageNote": null,
+      "domains": [
+        "everyday"
+      ],
+      "examples": [
+        {
+          "id": "ex-i-1",
+          "en": "I will send the file after lunch.",
+          "tc": "我午飯後會把檔案寄出。",
+          "context": "work"
+        }
+      ],
+      "synonyms": [],
+      "synonymStatus": "none-appropriate",
+      "collocations": [
+        "I think",
+        "I will"
+      ],
+      "frequency": {
+        "form": "I",
+        "zipf": 7.09,
+        "commonness": 100,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "calibration",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-you",
+      "entryId": "e-you",
+      "pos": "pronoun",
+      "ipa": "/juː/",
+      "pronunciationId": "p-you",
+      "glossEn": "The person or people being spoken or written to.",
+      "glossTc": "指正在對話或收信的對方。",
+      "usageNote": null,
+      "domains": [
+        "everyday"
+      ],
+      "examples": [
+        {
+          "id": "ex-you-1",
+          "en": "Can you confirm the delivery time?",
+          "tc": "你能否確認送貨時間？",
+          "context": "work"
+        }
+      ],
+      "synonyms": [],
+      "synonymStatus": "none-appropriate",
+      "collocations": [
+        "thank you",
+        "you can"
+      ],
+      "frequency": {
+        "form": "you",
+        "zipf": 6.98,
+        "commonness": 100,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "calibration",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-we",
+      "entryId": "e-we",
+      "pos": "pronoun",
+      "ipa": "/wiː/",
+      "pronunciationId": "p-we",
+      "glossEn": "The speaker and at least one other person.",
+      "glossTc": "指自己連同至少另一人。",
+      "usageNote": null,
+      "domains": [
+        "everyday"
+      ],
+      "examples": [
+        {
+          "id": "ex-we-1",
+          "en": "We should test the till before Saturday.",
+          "tc": "我們應在星期六前先測試收銀機。",
+          "context": "retail"
+        }
+      ],
+      "synonyms": [],
+      "synonymStatus": "none-appropriate",
+      "collocations": [
+        "we should",
+        "we need"
+      ],
+      "frequency": {
+        "form": "we",
+        "zipf": 6.54,
+        "commonness": 100,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "calibration",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-they",
+      "entryId": "e-they",
+      "pos": "pronoun",
+      "ipa": "/ðeɪ/",
+      "pronunciationId": "p-they",
+      "glossEn": "People or things already known in the conversation, not you or me.",
+      "glossTc": "指對話中已知、但不是你或我的人或事物。",
+      "usageNote": null,
+      "domains": [
+        "everyday"
+      ],
+      "examples": [
+        {
+          "id": "ex-they-1",
+          "en": "They asked for a refund this afternoon.",
+          "tc": "他們今天下午要求退款。",
+          "context": "retail"
+        }
+      ],
+      "synonyms": [],
+      "synonymStatus": "none-appropriate",
+      "collocations": [
+        "they said",
+        "they asked"
+      ],
+      "frequency": {
+        "form": "they",
+        "zipf": 6.5,
+        "commonness": 100,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "calibration",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-streamline",
+      "entryId": "e-streamline",
+      "pos": "verb",
+      "ipa": "/ˈstriːmlaɪn/",
+      "pronunciationId": "p-streamline",
+      "glossEn": "To make a process simpler and faster by removing extra steps.",
+      "glossTc": "精簡流程，去掉多餘步驟，使其更快捷。",
+      "usageNote": null,
+      "domains": [
+        "project-management",
+        "business"
+      ],
+      "examples": [
+        {
+          "id": "ex-streamline-1",
+          "en": "We should streamline the approval process before automating it.",
+          "tc": "我們應先簡化審批流程，再將其自動化。",
+          "context": "work"
+        }
+      ],
+      "synonyms": [
+        {
+          "term": "simplify",
+          "relation": "near",
+          "difference": "Simplify can mean make easier to understand. Streamline usually means remove delay from a process."
+        }
+      ],
+      "synonymStatus": "authored",
+      "collocations": [
+        "streamline the process",
+        "streamline approval"
+      ],
+      "frequency": {
+        "form": "streamline",
+        "zipf": 3.18,
+        "commonness": 26,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-process",
+      "entryId": "e-process",
+      "pos": "noun",
+      "ipa": "/ˈprəʊses/",
+      "pronunciationId": "p-process",
+      "glossEn": "A series of steps used to get a result at work.",
+      "glossTc": "為達成結果而設的一連串步驟。",
+      "usageNote": null,
+      "domains": [
+        "project-management",
+        "business"
+      ],
+      "examples": [
+        {
+          "id": "ex-process-1",
+          "en": "The refund process takes two working days.",
+          "tc": "退款流程需時兩個工作天。",
+          "context": "retail"
+        }
+      ],
+      "synonyms": [
+        {
+          "term": "procedure",
+          "relation": "near",
+          "difference": "A procedure is often a written rule. A process is the work as it actually happens."
+        }
+      ],
+      "synonymStatus": "authored",
+      "collocations": [
+        "approval process",
+        "work process"
+      ],
+      "frequency": {
+        "form": "process",
+        "zipf": 5.26,
+        "commonness": 72,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-approve",
+      "entryId": "e-approve",
+      "pos": "verb",
+      "ipa": "/əˈpruːv/",
+      "pronunciationId": "p-approve",
+      "glossEn": "To officially agree that something may go ahead.",
+      "glossTc": "正式同意某事可以進行。",
+      "usageNote": null,
+      "domains": [
+        "project-management",
+        "business"
+      ],
+      "examples": [
+        {
+          "id": "ex-approve-1",
+          "en": "The manager will approve the discount if it stays under ten percent.",
+          "tc": "只要折扣不超過一成，經理便會批准。",
+          "context": "retail"
+        }
+      ],
+      "synonyms": [
+        {
+          "term": "authorise",
+          "relation": "near",
+          "difference": "Authorise stresses giving permission. Approve can also mean judge something as acceptable."
+        }
+      ],
+      "synonymStatus": "authored",
+      "collocations": [
+        "approve a request",
+        "approve the budget"
+      ],
+      "frequency": {
+        "form": "approve",
+        "zipf": 4.08,
+        "commonness": 46,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-deadline",
+      "entryId": "e-deadline",
+      "pos": "noun",
+      "ipa": "/ˈdedlaɪn/",
+      "pronunciationId": "p-deadline",
+      "glossEn": "The latest time by which work must be finished.",
+      "glossTc": "工作必須完成的最後期限。",
+      "usageNote": null,
+      "domains": [
+        "project-management"
+      ],
+      "examples": [
+        {
+          "id": "ex-deadline-1",
+          "en": "The report deadline is Friday at 5 p.m.",
+          "tc": "報告截止日期是星期五下午五時。",
+          "context": "work"
+        }
+      ],
+      "synonyms": [
+        {
+          "term": "due date",
+          "relation": "near",
+          "difference": "Due date is common for bills and homework. Deadline is common for work tasks."
+        }
+      ],
+      "synonymStatus": "authored",
+      "collocations": [
+        "meet the deadline",
+        "miss a deadline"
+      ],
+      "frequency": {
+        "form": "deadline",
+        "zipf": 4.12,
+        "commonness": 47,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-stakeholder",
+      "entryId": "e-stakeholder",
+      "pos": "noun",
+      "ipa": "/ˈsteɪkhəʊldə/",
+      "pronunciationId": "p-stakeholder",
+      "glossEn": "A person or group affected by a project and able to influence it.",
+      "glossTc": "受項目影響、亦能影響項目的人或團體。",
+      "usageNote": null,
+      "domains": [
+        "project-management",
+        "business"
+      ],
+      "examples": [
+        {
+          "id": "ex-stakeholder-1",
+          "en": "Shop staff are stakeholders in the new till system.",
+          "tc": "店舖同事也是新收銀系統的持份者。",
+          "context": "work"
+        }
+      ],
+      "synonyms": [
+        {
+          "term": "interested party",
+          "relation": "near",
+          "difference": "Interested party is legal wording. Stakeholder is everyday project language."
+        }
+      ],
+      "synonymStatus": "authored",
+      "collocations": [
+        "key stakeholder",
+        "stakeholder meeting"
+      ],
+      "frequency": {
+        "form": "stakeholder",
+        "zipf": 3.01,
+        "commonness": 22,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-scope",
+      "entryId": "e-scope",
+      "pos": "noun",
+      "ipa": "/skəʊp/",
+      "pronunciationId": "p-scope",
+      "glossEn": "What a project will and will not include.",
+      "glossTc": "項目包括和不包括的範圍。",
+      "usageNote": null,
+      "domains": [
+        "project-management"
+      ],
+      "examples": [
+        {
+          "id": "ex-scope-1",
+          "en": "Training videos are outside the scope of this week's work.",
+          "tc": "培訓影片不在本週工作範圍內。",
+          "context": "work"
+        }
+      ],
+      "synonyms": [
+        {
+          "term": "range",
+          "relation": "related",
+          "difference": "Range is general size. Scope names agreed project boundaries."
+        }
+      ],
+      "synonymStatus": "authored",
+      "collocations": [
+        "project scope",
+        "out of scope"
+      ],
+      "frequency": {
+        "form": "scope",
+        "zipf": 4.26,
+        "commonness": 50,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-risk",
+      "entryId": "e-risk",
+      "pos": "noun",
+      "ipa": "/rɪsk/",
+      "pronunciationId": "p-risk",
+      "glossEn": "A possible problem that could harm a plan if it happens.",
+      "glossTc": "一旦發生便可能損害計劃的潛在問題。",
+      "usageNote": null,
+      "domains": [
+        "project-management",
+        "business"
+      ],
+      "examples": [
+        {
+          "id": "ex-risk-1",
+          "en": "Late stock delivery is the main risk this month.",
+          "tc": "貨物遲送是本月的主要風險。",
+          "context": "retail"
+        }
+      ],
+      "synonyms": [
+        {
+          "term": "threat",
+          "relation": "related",
+          "difference": "A threat is often more hostile. A risk can be an ordinary delay or cost."
+        }
+      ],
+      "synonymStatus": "authored",
+      "collocations": [
+        "manage risk",
+        "high risk"
+      ],
+      "frequency": {
+        "form": "risk",
+        "zipf": 5.05,
+        "commonness": 68,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-update",
+      "entryId": "e-update",
+      "pos": "verb",
+      "ipa": "/ʌpˈdeɪt/",
+      "pronunciationId": "p-update",
+      "glossEn": "To give the latest information, or to change something so it is current.",
+      "glossTc": "提供最新資料，或把事物改成最新狀態。",
+      "usageNote": null,
+      "domains": [
+        "project-management",
+        "technology"
+      ],
+      "examples": [
+        {
+          "id": "ex-update-1",
+          "en": "Please update the team after you speak to the supplier.",
+          "tc": "與供應商談完後，請向團隊匯報最新情況。",
+          "context": "work"
+        }
+      ],
+      "synonyms": [
+        {
+          "term": "inform",
+          "relation": "related",
+          "difference": "Inform can be any news. Update means the news is newer than before."
+        }
+      ],
+      "synonymStatus": "authored",
+      "collocations": [
+        "update the team",
+        "update the file"
+      ],
+      "frequency": {
+        "form": "update",
+        "zipf": 4.69,
+        "commonness": 60,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-meeting",
+      "entryId": "e-meeting",
+      "pos": "noun",
+      "ipa": "/ˈmiːtɪŋ/",
+      "pronunciationId": "p-meeting",
+      "glossEn": "A planned time when people talk about work together.",
+      "glossTc": "預先安排、一起討論工作的時間。",
+      "usageNote": null,
+      "domains": [
+        "business",
+        "everyday"
+      ],
+      "examples": [
+        {
+          "id": "ex-meeting-1",
+          "en": "The supplier meeting starts at ten.",
+          "tc": "供應商會議十時開始。",
+          "context": "work"
+        }
+      ],
+      "synonyms": [
+        {
+          "term": "discussion",
+          "relation": "related",
+          "difference": "A discussion can be informal. A meeting is usually scheduled."
+        }
+      ],
+      "synonymStatus": "authored",
+      "collocations": [
+        "hold a meeting",
+        "meeting agenda"
+      ],
+      "frequency": {
+        "form": "meeting",
+        "zipf": 5.15,
+        "commonness": 70,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-deliverable",
+      "entryId": "e-deliverable",
+      "pos": "noun",
+      "ipa": "/dɪˈlɪvərəbl/",
+      "pronunciationId": "p-deliverable",
+      "glossEn": "A finished piece of work that you have promised to hand over.",
+      "glossTc": "已承諾要交出的完成工作成果。",
+      "usageNote": null,
+      "domains": [
+        "project-management"
+      ],
+      "examples": [
+        {
+          "id": "ex-deliverable-1",
+          "en": "The first deliverable is a one-page process map.",
+          "tc": "第一項交付成果是一頁流程圖。",
+          "context": "work"
+        }
+      ],
+      "synonyms": [
+        {
+          "term": "output",
+          "relation": "near",
+          "difference": "Output is any result. A deliverable is an agreed hand-over."
+        }
+      ],
+      "synonymStatus": "authored",
+      "collocations": [
+        "project deliverable",
+        "key deliverable"
+      ],
+      "frequency": {
+        "form": "deliverable",
+        "zipf": 2.43,
+        "commonness": 10,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-customer",
+      "entryId": "e-customer",
+      "pos": "noun",
+      "ipa": "/ˈkʌstəmə/",
+      "pronunciationId": "p-customer",
+      "glossEn": "A person who buys goods or services from a shop or business.",
+      "glossTc": "向店舖或公司購買貨品或服務的人。",
+      "usageNote": null,
+      "domains": [
+        "retail",
+        "business"
+      ],
+      "examples": [
+        {
+          "id": "ex-customer-1",
+          "en": "A regular customer asked about the new opening hours.",
+          "tc": "一位熟客詢問新的營業時間。",
+          "context": "retail"
+        }
+      ],
+      "synonyms": [
+        {
+          "term": "client",
+          "relation": "near",
+          "difference": "Client is more common for professional services. Customer is more common in shops."
+        }
+      ],
+      "synonymStatus": "authored",
+      "collocations": [
+        "customer service",
+        "regular customer"
+      ],
+      "frequency": {
+        "form": "customer",
+        "zipf": 4.61,
+        "commonness": 58,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-invoice",
+      "entryId": "e-invoice",
+      "pos": "noun",
+      "ipa": "/ˈɪnvɔɪs/",
+      "pronunciationId": "p-invoice",
+      "glossEn": "A bill that lists what was sold and how much must be paid.",
+      "glossTc": "列出已售項目及應付款額的帳單。",
+      "usageNote": null,
+      "domains": [
+        "business"
+      ],
+      "examples": [
+        {
+          "id": "ex-invoice-1",
+          "en": "Please send the invoice to the accounts email.",
+          "tc": "請把發票寄到會計電郵。",
+          "context": "work"
+        }
+      ],
+      "synonyms": [
+        {
+          "term": "bill",
+          "relation": "near",
+          "difference": "Bill is everyday. Invoice is the formal document used between businesses."
+        }
+      ],
+      "synonymStatus": "authored",
+      "collocations": [
+        "send an invoice",
+        "pay the invoice"
+      ],
+      "frequency": {
+        "form": "invoice",
+        "zipf": 3.27,
+        "commonness": 28,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-revenue",
+      "entryId": "e-revenue",
+      "pos": "noun",
+      "ipa": "/ˈrevənjuː/",
+      "pronunciationId": "p-revenue",
+      "glossEn": "Money a business receives from sales before costs are taken off.",
+      "glossTc": "扣除成本前，生意從銷售收到的金錢。",
+      "usageNote": null,
+      "domains": [
+        "business",
+        "entrepreneurship"
+      ],
+      "examples": [
+        {
+          "id": "ex-revenue-1",
+          "en": "Weekend revenue rose after we extended opening hours.",
+          "tc": "延長營業時間後，週末收入上升。",
+          "context": "retail"
+        }
+      ],
+      "synonyms": [
+        {
+          "term": "income",
+          "relation": "near",
+          "difference": "Income can include wages or rent. Revenue usually means sales money."
+        }
+      ],
+      "synonymStatus": "authored",
+      "collocations": [
+        "monthly revenue",
+        "revenue target"
+      ],
+      "frequency": {
+        "form": "revenue",
+        "zipf": 4.64,
+        "commonness": 59,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-proposal",
+      "entryId": "e-proposal",
+      "pos": "noun",
+      "ipa": "/prəˈpəʊzl/",
+      "pronunciationId": "p-proposal",
+      "glossEn": "A written plan offered for other people to accept or reject.",
+      "glossTc": "供對方接受或拒絕的書面計劃。",
+      "usageNote": null,
+      "domains": [
+        "business"
+      ],
+      "examples": [
+        {
+          "id": "ex-proposal-1",
+          "en": "Her proposal explains how the shop can cut waiting time.",
+          "tc": "她的建議書說明店舖如何縮短等候時間。",
+          "context": "work"
+        }
+      ],
+      "synonyms": [
+        {
+          "term": "plan",
+          "relation": "related",
+          "difference": "A plan can stay internal. A proposal is offered to someone else."
+        }
+      ],
+      "synonymStatus": "authored",
+      "collocations": [
+        "write a proposal",
+        "accept a proposal"
+      ],
+      "frequency": {
+        "form": "proposal",
+        "zipf": 4.47,
+        "commonness": 55,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-feedback",
+      "entryId": "e-feedback",
+      "pos": "noun",
+      "ipa": "/ˈfiːdbæk/",
+      "pronunciationId": "p-feedback",
+      "glossEn": "Comments on how well something worked, used to improve it.",
+      "glossTc": "關於效果好壞的意見，用來改進。",
+      "usageNote": null,
+      "domains": [
+        "business",
+        "retail"
+      ],
+      "examples": [
+        {
+          "id": "ex-feedback-1",
+          "en": "Customer feedback said the queue felt too long.",
+          "tc": "顧客意見指排隊時間令人覺得太長。",
+          "context": "retail"
+        }
+      ],
+      "synonyms": [
+        {
+          "term": "comments",
+          "relation": "near",
+          "difference": "Comments can be any remarks. Feedback is given so work can improve."
+        }
+      ],
+      "synonymStatus": "authored",
+      "collocations": [
+        "give feedback",
+        "customer feedback"
+      ],
+      "frequency": {
+        "form": "feedback",
+        "zipf": 4.32,
+        "commonness": 52,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-refund",
+      "entryId": "e-refund",
+      "pos": "noun",
+      "ipa": "/ˈriːfʌnd/",
+      "pronunciationId": "p-refund",
+      "glossEn": "Money paid back to a customer.",
+      "glossTc": "退回給顧客的金錢。",
+      "usageNote": null,
+      "domains": [
+        "retail"
+      ],
+      "examples": [
+        {
+          "id": "ex-refund-1",
+          "en": "We issued a refund after the item arrived damaged.",
+          "tc": "貨品送達時已損壞，我們已辦理退款。",
+          "context": "retail"
+        }
+      ],
+      "synonyms": [
+        {
+          "term": "reimbursement",
+          "relation": "related",
+          "difference": "Reimbursement often pays back a cost someone already spent. A refund returns a purchase price."
+        }
+      ],
+      "synonymStatus": "authored",
+      "collocations": [
+        "issue a refund",
+        "ask for a refund"
+      ],
+      "frequency": {
+        "form": "refund",
+        "zipf": 3.94,
+        "commonness": 43,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-queue",
+      "entryId": "e-queue",
+      "pos": "noun",
+      "ipa": "/kjuː/",
+      "pronunciationId": "p-queue",
+      "glossEn": "A line of people waiting for their turn.",
+      "glossTc": "輪候的一排人。",
+      "usageNote": null,
+      "domains": [
+        "retail",
+        "everyday"
+      ],
+      "examples": [
+        {
+          "id": "ex-queue-1",
+          "en": "The lunch queue reached the door by twelve.",
+          "tc": "中午十二時，午膳排隊已排到門口。",
+          "context": "everyday"
+        }
+      ],
+      "synonyms": [
+        {
+          "term": "line",
+          "relation": "near",
+          "difference": "Line is more common in American English. Queue is the usual British and Hong Kong word."
+        }
+      ],
+      "synonymStatus": "authored",
+      "collocations": [
+        "join the queue",
+        "a long queue"
+      ],
+      "frequency": {
+        "form": "queue",
+        "zipf": 3.78,
+        "commonness": 40,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-experience",
+      "entryId": "e-experience",
+      "pos": "noun",
+      "ipa": "/ɪkˈspɪəriəns/",
+      "pronunciationId": "p-experience",
+      "glossEn": "How something feels to a person while they use a shop or service.",
+      "glossTc": "顧客使用店舖或服務時的感受。",
+      "usageNote": null,
+      "domains": [
+        "retail",
+        "everyday"
+      ],
+      "examples": [
+        {
+          "id": "ex-experience-1",
+          "en": "A slow queue can spoil an otherwise good shopping experience.",
+          "tc": "排隊太慢，即使其他環節不錯，購物體驗也會變差。",
+          "context": "retail"
+        }
+      ],
+      "synonyms": [
+        {
+          "term": "impression",
+          "relation": "related",
+          "difference": "An impression is a first judgment. Experience covers the whole visit."
+        }
+      ],
+      "synonymStatus": "authored",
+      "collocations": [
+        "customer experience",
+        "shopping experience"
+      ],
+      "frequency": {
+        "form": "experience",
+        "zipf": 5.27,
+        "commonness": 73,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-complaint",
+      "entryId": "e-complaint",
+      "pos": "noun",
+      "ipa": "/kəmˈpleɪnt/",
+      "pronunciationId": "p-complaint",
+      "glossEn": "A statement that something is wrong or not good enough.",
+      "glossTc": "指某事有問題或未達標準的陳述。",
+      "usageNote": null,
+      "domains": [
+        "retail"
+      ],
+      "examples": [
+        {
+          "id": "ex-complaint-1",
+          "en": "We logged the complaint and offered a replacement the same day.",
+          "tc": "我們已記錄投訴，並在當日提供更換。",
+          "context": "retail"
+        }
+      ],
+      "synonyms": [
+        {
+          "term": "objection",
+          "relation": "related",
+          "difference": "An objection is often raised in a meeting. A complaint is usually about service or a product."
+        }
+      ],
+      "synonymStatus": "authored",
+      "collocations": [
+        "make a complaint",
+        "handle a complaint"
+      ],
+      "frequency": {
+        "form": "complaint",
+        "zipf": 4.32,
+        "commonness": 52,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-launch",
+      "entryId": "e-launch",
+      "pos": "verb",
+      "ipa": "/lɔːntʃ/",
+      "pronunciationId": "p-launch",
+      "glossEn": "To start selling or offering something new in public.",
+      "glossTc": "公開推出新產品或新服務。",
+      "usageNote": null,
+      "domains": [
+        "entrepreneurship",
+        "technology"
+      ],
+      "examples": [
+        {
+          "id": "ex-launch-1",
+          "en": "We will launch the new loyalty card in October.",
+          "tc": "我們將於十月推出新的會員卡。",
+          "context": "work"
+        }
+      ],
+      "synonyms": [
+        {
+          "term": "release",
+          "relation": "near",
+          "difference": "Release is common for software. Launch often includes the public start."
+        }
+      ],
+      "synonymStatus": "authored",
+      "collocations": [
+        "launch a product",
+        "launch date"
+      ],
+      "frequency": {
+        "form": "launch",
+        "zipf": 4.69,
+        "commonness": 60,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-pivot",
+      "entryId": "e-pivot",
+      "pos": "verb",
+      "ipa": "/ˈpɪvət/",
+      "pronunciationId": "p-pivot",
+      "glossEn": "To change the main direction of a business when the first plan is not working.",
+      "glossTc": "原計劃行不通時，改變生意的主要方向。",
+      "usageNote": null,
+      "domains": [
+        "entrepreneurship"
+      ],
+      "examples": [
+        {
+          "id": "ex-pivot-1",
+          "en": "They pivoted from a food stall to weekend catering.",
+          "tc": "他們由小吃攤轉向週末到會。",
+          "context": "work"
+        }
+      ],
+      "synonyms": [
+        {
+          "term": "change course",
+          "relation": "near",
+          "difference": "Change course is ordinary English. Pivot is business slang for a planned turn."
+        }
+      ],
+      "synonymStatus": "authored",
+      "collocations": [
+        "pivot the business",
+        "pivot to"
+      ],
+      "frequency": {
+        "form": "pivot",
+        "zipf": 3.5,
+        "commonness": 33,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-cash-flow",
+      "entryId": "e-cash-flow",
+      "pos": "noun",
+      "ipa": "/ˈkæʃ fləʊ/",
+      "pronunciationId": "p-cash-flow",
+      "glossEn": "The money moving in and out of a business over a period.",
+      "glossTc": "一段時間內流入和流出生意的現金。",
+      "usageNote": "Phrase frequency is not manufactured from cash + flow.",
+      "domains": [
+        "entrepreneurship",
+        "business"
+      ],
+      "examples": [
+        {
+          "id": "ex-cash-flow-1",
+          "en": "Slow cash flow made it hard to pay the supplier early.",
+          "tc": "現金流偏慢，難以提早支付供應商。",
+          "context": "work"
+        }
+      ],
+      "synonyms": [
+        {
+          "term": "liquidity",
+          "relation": "related",
+          "difference": "Liquidity is a finance term for how easily assets become cash. Cash flow is the actual movement of money."
+        }
+      ],
+      "synonymStatus": "authored",
+      "collocations": [
+        "positive cash flow",
+        "cash flow problem"
+      ],
+      "frequency": {
+        "form": "",
+        "zipf": null,
+        "commonness": null,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "unmeasured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-automate",
+      "entryId": "e-automate",
+      "pos": "verb",
+      "ipa": "/ˈɔːtəmeɪt/",
+      "pronunciationId": "p-automate",
+      "glossEn": "To make a machine or program do work that people used to do by hand.",
+      "glossTc": "改由機器或程式完成以往人手做的工作。",
+      "usageNote": null,
+      "domains": [
+        "technology",
+        "project-management"
+      ],
+      "examples": [
+        {
+          "id": "ex-automate-1",
+          "en": "Do not automate a messy process; clean it first.",
+          "tc": "不要先把混亂流程自動化；應先理順。",
+          "context": "work"
+        }
+      ],
+      "synonyms": [
+        {
+          "term": "computerise",
+          "relation": "related",
+          "difference": "Computerise means put work on a computer. Automate means the computer then does the steps."
+        }
+      ],
+      "synonymStatus": "authored",
+      "collocations": [
+        "automate the process",
+        "automate invoices"
+      ],
+      "frequency": {
+        "form": "automate",
+        "zipf": 3.08,
+        "commonness": 24,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-deploy",
+      "entryId": "e-deploy",
+      "pos": "verb",
+      "ipa": "/dɪˈplɔɪ/",
+      "pronunciationId": "p-deploy",
+      "glossEn": "To put a system or update into real use.",
+      "glossTc": "把系統或更新正式投入使用。",
+      "usageNote": null,
+      "domains": [
+        "technology"
+      ],
+      "examples": [
+        {
+          "id": "ex-deploy-1",
+          "en": "We will deploy the till update after closing time.",
+          "tc": "我們會在關門後部署收銀系統更新。",
+          "context": "work"
+        }
+      ],
+      "synonyms": [
+        {
+          "term": "roll out",
+          "relation": "near",
+          "difference": "Roll out often means introduce to users in stages. Deploy is the technical put-live step."
+        }
+      ],
+      "synonymStatus": "authored",
+      "collocations": [
+        "deploy an update",
+        "deploy to production"
+      ],
+      "frequency": {
+        "form": "deploy",
+        "zipf": 3.7,
+        "commonness": 38,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-backup",
+      "entryId": "e-backup",
+      "pos": "noun",
+      "ipa": "/ˈbækʌp/",
+      "pronunciationId": "p-backup",
+      "glossEn": "A copy of files kept so work can be restored if the original is lost.",
+      "glossTc": "另存的檔案副本，以便原本遺失時還原。",
+      "usageNote": null,
+      "domains": [
+        "technology"
+      ],
+      "examples": [
+        {
+          "id": "ex-backup-1",
+          "en": "Keep a backup of your study file outside this phone.",
+          "tc": "請在這部手機以外另存學習檔備份。",
+          "context": "everyday"
+        }
+      ],
+      "synonyms": [
+        {
+          "term": "copy",
+          "relation": "related",
+          "difference": "Any copy is a copy. A backup exists specifically for recovery."
+        }
+      ],
+      "synonymStatus": "authored",
+      "collocations": [
+        "make a backup",
+        "restore from backup"
+      ],
+      "frequency": {
+        "form": "backup",
+        "zipf": 4.21,
+        "commonness": 49,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-offline",
+      "entryId": "e-offline",
+      "pos": "adjective",
+      "ipa": "/ˌɒfˈlaɪn/",
+      "pronunciationId": "p-offline",
+      "glossEn": "Not connected to the internet, but still able to use saved material.",
+      "glossTc": "未連接互聯網，但仍可使用已儲存的資料。",
+      "usageNote": "No useful interchangeable synonym. Opposite of online.",
+      "domains": [
+        "technology"
+      ],
+      "examples": [
+        {
+          "id": "ex-offline-1",
+          "en": "The installed pack works offline after you prepare it.",
+          "tc": "完成準備後，已安裝的內容可離線使用。",
+          "context": "everyday"
+        }
+      ],
+      "synonyms": [],
+      "synonymStatus": "none-appropriate",
+      "collocations": [
+        "work offline",
+        "offline mode"
+      ],
+      "frequency": {
+        "form": "offline",
+        "zipf": 3.74,
+        "commonness": 39,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-schedule",
+      "entryId": "e-schedule",
+      "pos": "verb",
+      "ipa": "/ˈʃedjuːl/",
+      "pronunciationId": "p-schedule",
+      "glossEn": "To arrange for something to happen at a particular time.",
+      "glossTc": "安排某事在指定時間發生。",
+      "usageNote": null,
+      "domains": [
+        "project-management",
+        "everyday"
+      ],
+      "examples": [
+        {
+          "id": "ex-schedule-1",
+          "en": "Let's schedule the staff briefing for Monday morning.",
+          "tc": "我們把員工簡介安排在星期一上午。",
+          "context": "work"
+        }
+      ],
+      "synonyms": [
+        {
+          "term": "arrange",
+          "relation": "near",
+          "difference": "Arrange is broader. Schedule always sets a time."
+        }
+      ],
+      "synonymStatus": "authored",
+      "collocations": [
+        "schedule a meeting",
+        "schedule a review"
+      ],
+      "frequency": {
+        "form": "schedule",
+        "zipf": 4.67,
+        "commonness": 59,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-confirm",
+      "entryId": "e-confirm",
+      "pos": "verb",
+      "ipa": "/kənˈfɜːm/",
+      "pronunciationId": "p-confirm",
+      "glossEn": "To say that something is true or definitely arranged.",
+      "glossTc": "表明某事屬實，或已確定安排。",
+      "usageNote": null,
+      "domains": [
+        "business",
+        "everyday"
+      ],
+      "examples": [
+        {
+          "id": "ex-confirm-1",
+          "en": "Please confirm that the Saturday shift is covered.",
+          "tc": "請確認星期六的更期已有人頂。",
+          "context": "work"
+        }
+      ],
+      "synonyms": [
+        {
+          "term": "verify",
+          "relation": "related",
+          "difference": "Verify checks evidence. Confirm can also mean give a definite yes."
+        }
+      ],
+      "synonymStatus": "authored",
+      "collocations": [
+        "confirm the time",
+        "please confirm"
+      ],
+      "frequency": {
+        "form": "confirm",
+        "zipf": 4.4,
+        "commonness": 53,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-negotiate",
+      "entryId": "e-negotiate",
+      "pos": "verb",
+      "ipa": "/nɪˈɡəʊʃieɪt/",
+      "pronunciationId": "p-negotiate",
+      "glossEn": "To discuss terms until both sides can accept an agreement.",
+      "glossTc": "雙方商討條件，直至可以接受協議。",
+      "usageNote": null,
+      "domains": [
+        "business"
+      ],
+      "examples": [
+        {
+          "id": "ex-negotiate-1",
+          "en": "We negotiated a longer payment period with the supplier.",
+          "tc": "我們與供應商談妥較長的付款期。",
+          "context": "work"
+        }
+      ],
+      "synonyms": [
+        {
+          "term": "bargain",
+          "relation": "related",
+          "difference": "Bargain often means argue over price. Negotiate can cover time, scope, or terms."
+        }
+      ],
+      "synonymStatus": "authored",
+      "collocations": [
+        "negotiate a price",
+        "negotiate terms"
+      ],
+      "frequency": {
+        "form": "negotiate",
+        "zipf": 3.99,
+        "commonness": 44,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-follow-up",
+      "entryId": "e-follow-up",
+      "pos": "verb",
+      "ipa": "/ˌfɒləʊ ˈʌp/",
+      "pronunciationId": "p-follow-up",
+      "glossEn": "To contact someone again about a matter that is not finished.",
+      "glossTc": "就尚未完成的事情再次聯絡對方。",
+      "usageNote": "Phrase frequency is not manufactured from follow + up.",
+      "domains": [
+        "business",
+        "project-management"
+      ],
+      "examples": [
+        {
+          "id": "ex-follow-up-1",
+          "en": "I will follow up with the supplier if we have no reply by noon.",
+          "tc": "若中午前仍未回覆，我會再跟供應商跟進。",
+          "context": "work"
+        }
+      ],
+      "synonyms": [
+        {
+          "term": "chase",
+          "relation": "near",
+          "difference": "Chase is informal and can sound impatient. Follow up is the usual workplace wording."
+        }
+      ],
+      "synonymStatus": "authored",
+      "collocations": [
+        "follow up with",
+        "follow up by email"
+      ],
+      "frequency": {
+        "form": "",
+        "zipf": null,
+        "commonness": null,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "unmeasured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-please",
+      "entryId": "e-please",
+      "pos": "adverb",
+      "ipa": "/pliːz/",
+      "pronunciationId": "p-please",
+      "glossEn": "A polite word used when asking for something.",
+      "glossTc": "提出要求時表示禮貌的用語。",
+      "usageNote": null,
+      "domains": [
+        "everyday"
+      ],
+      "examples": [
+        {
+          "id": "ex-please-1",
+          "en": "Please wait here while I check the stockroom.",
+          "tc": "請在這裏稍候，我去貨倉查看。",
+          "context": "retail"
+        }
+      ],
+      "synonyms": [],
+      "synonymStatus": "none-appropriate",
+      "collocations": [
+        "please wait",
+        "yes, please"
+      ],
+      "frequency": {
+        "form": "please",
+        "zipf": 5.66,
+        "commonness": 81,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-thank",
+      "entryId": "e-thank",
+      "pos": "verb",
+      "ipa": "/θæŋk/",
+      "pronunciationId": "p-thank",
+      "glossEn": "To tell someone you are grateful.",
+      "glossTc": "向對方表示感謝。",
+      "usageNote": null,
+      "domains": [
+        "everyday"
+      ],
+      "examples": [
+        {
+          "id": "ex-thank-1",
+          "en": "Thank the customer before you hand over the bag.",
+          "tc": "把袋子交給顧客前，先向對方道謝。",
+          "context": "retail"
+        }
+      ],
+      "synonyms": [],
+      "synonymStatus": "none-appropriate",
+      "collocations": [
+        "thank you",
+        "thank the team"
+      ],
+      "frequency": {
+        "form": "thank",
+        "zipf": 5.48,
+        "commonness": 77,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-help",
+      "entryId": "e-help",
+      "pos": "verb",
+      "ipa": "/help/",
+      "pronunciationId": "p-help",
+      "glossEn": "To make it easier for someone to do something.",
+      "glossTc": "協助別人，使事情較容易完成。",
+      "usageNote": null,
+      "domains": [
+        "everyday"
+      ],
+      "examples": [
+        {
+          "id": "ex-help-1",
+          "en": "I can help you find a smaller size.",
+          "tc": "我可以幫你找細一碼。",
+          "context": "retail"
+        }
+      ],
+      "synonyms": [
+        {
+          "term": "assist",
+          "relation": "near",
+          "difference": "Assist is more formal. Help is the ordinary word."
+        }
+      ],
+      "synonymStatus": "authored",
+      "collocations": [
+        "help you",
+        "help with"
+      ],
+      "frequency": {
+        "form": "help",
+        "zipf": 5.75,
+        "commonness": 83,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "s-sorry",
+      "entryId": "e-sorry",
+      "pos": "adjective",
+      "ipa": "/ˈsɒri/",
+      "pronunciationId": "p-sorry",
+      "glossEn": "Used to apologise or to show you regret a problem.",
+      "glossTc": "用來道歉，或表示對問題感到抱歉。",
+      "usageNote": null,
+      "domains": [
+        "everyday"
+      ],
+      "examples": [
+        {
+          "id": "ex-sorry-1",
+          "en": "Sorry for the wait; the next till is opening now.",
+          "tc": "抱歉讓你等候；下一個收銀櫃位現正開放。",
+          "context": "retail"
+        }
+      ],
+      "synonyms": [],
+      "synonymStatus": "none-appropriate",
+      "collocations": [
+        "sorry for the wait",
+        "I am sorry"
+      ],
+      "frequency": {
+        "form": "sorry",
+        "zipf": 5.18,
+        "commonness": 71,
+        "source": "wordfreq",
+        "sourceVersion": "3.1.1",
+        "scaleVersion": "v1",
+        "status": "measured"
+      },
+      "selection": "learn",
+      "provenance": {
+        "gloss": "original-teaching",
+        "examples": "original-teaching",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    }
+  ],
+  "audio": [
+    {
+      "id": "p-saw",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-saw.mp3",
+      "hash": "6ee91cccae8bc52902bb6680b50a7b6c5ba3bf9e55aa224879007e5b6dafe009",
+      "bytes": 4302,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-read-present",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-read-present.mp3",
+      "hash": "c7048d31486a9f88386ababd7b0d4e8ec64dd90c3e69e6f293c4d06259375fdb",
+      "bytes": 4302,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-read-past",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-read-past.mp3",
+      "hash": "74e24b5a80adc0f5cae19602751e1ce79c05fb6eda571744638dac4f903a9ce9",
+      "bytes": 4093,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-bank",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-bank.mp3",
+      "hash": "f2c5b9a7a2fe3dd0f2b2425717b24a0476905a9cd12cafe74b9e032babd70672",
+      "bytes": 4302,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-close-verb",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-close-verb.mp3",
+      "hash": "29326537caa7e5804096581e0b2754ac377657248f74793ba99c0df4ba36a275",
+      "bytes": 5034,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-close-adj",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-close-adj.mp3",
+      "hash": "e07b6bab5b4963f578f1ac7a3893cf2b2fa19eb00848c06228cd07cdd406c4dd",
+      "bytes": 4720,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-book",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-book.mp3",
+      "hash": "409b59cb2e50ddd2c22e55314e0f25f89a1c31383bc2d80fc3fa9477192f0cfc",
+      "bytes": 3884,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-check",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-check.mp3",
+      "hash": "28545e3c9a25bc0f49889c96862bfe31f12eb967a96009929e4b4433c38c46fc",
+      "bytes": 4093,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-address",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-address.mp3",
+      "hash": "2a76ea70ce0715af9ce722e73b61e5eae536a151709b03e6283e6f52eebea76b",
+      "bytes": 4511,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-current",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-current.mp3",
+      "hash": "07a5f8bdb562f9186b4838190b3b2e65b4a1e343ea77886fda0a7393dff7a96d",
+      "bytes": 4720,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-i",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-i.mp3",
+      "hash": "2f27de059f93bb310ef2d43f307a1de3ea9a9cd9677cc3ab1285f25bc2261311",
+      "bytes": 3884,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-you",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-you.mp3",
+      "hash": "bd407b6d4b88ffc7763c298c727c3aee0df1e8b1ae4a8e9f588ce8eabb16f5c2",
+      "bytes": 4198,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-we",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-we.mp3",
+      "hash": "79f7e393bde558829820a112613d0a26ad904cf087302033f14aa9ac51044fb1",
+      "bytes": 4093,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-they",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-they.mp3",
+      "hash": "051ee04dea4bb1ee67ed08cbb0fb4de69835a08ed396c1f7e3c3c9e5ac4401c4",
+      "bytes": 4198,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-streamline",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-streamline.mp3",
+      "hash": "4bc9ffdf5114e4f79eaef705cdc117bc88751c3d4da4de49a0961ac7bc184a80",
+      "bytes": 5869,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-process",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-process.mp3",
+      "hash": "6ee2884574d011650424a55dbdfea53fde42b4e0d6abaaf58aa10202550da172",
+      "bytes": 5347,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-approve",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-approve.mp3",
+      "hash": "1552ec48cf33c8db4d1c2a36a3d9c60804442f02eebfaf03618ab818a04da1f4",
+      "bytes": 5138,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-deadline",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-deadline.mp3",
+      "hash": "7dea94272eecc30070ffa8bd6f7f33b5dfa1da3e8c2a5eef27f16ec94fdfc8f5",
+      "bytes": 4720,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-stakeholder",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-stakeholder.mp3",
+      "hash": "d254504384d583c0ba65f0fd1cb110c497ca96ec29b2d2b96b7787f1ddeb1107",
+      "bytes": 6078,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-scope",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-scope.mp3",
+      "hash": "03256e4d30f12f920a5a8f23a7c3f764eb139ae3ae379ece22b47d0de669ad4f",
+      "bytes": 4616,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-risk",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-risk.mp3",
+      "hash": "9ff4a980aa8b93cfbb6804c2287bb529b982c31d5ec7dd0cfc78a11ad80945cd",
+      "bytes": 4198,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-update",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-update.mp3",
+      "hash": "99aa9c80ac86851c1159a2ac4a30a1aad8b732372455a5c9f3e641f7d3962b31",
+      "bytes": 4929,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-meeting",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-meeting.mp3",
+      "hash": "65ef5b3373ec9cfb8497c9821d73e4bf024f69d5589cc1deab2d9a14cba734da",
+      "bytes": 4825,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-deliverable",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-deliverable.mp3",
+      "hash": "7e2c26ec72503491bca8f754fe90998697a4cfacaf57dd97f3c9ed47eadd90d0",
+      "bytes": 5765,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-customer",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-customer.mp3",
+      "hash": "70a5451e20afbddd3e704aa3067c269e35c80dc5704df5e6b763130acc8e79f4",
+      "bytes": 5347,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-invoice",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-invoice.mp3",
+      "hash": "424f188b5b92d68aad4b42298c4bb64ba6daba4ae58155bab88b46f5a6a42cfa",
+      "bytes": 4929,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-revenue",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-revenue.mp3",
+      "hash": "a1c76ecb9a53d8811583f9c07c9755e7d983070dcc63c02a1c422fd550a5272b",
+      "bytes": 5347,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-proposal",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-proposal.mp3",
+      "hash": "62629aa4a63f1845ac136781b92774b3c6479ff68dd2d9a3e62cc89c4447f342",
+      "bytes": 5660,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-feedback",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-feedback.mp3",
+      "hash": "ba256ab7d09b71f2e3623101915fd3ad0b3b54f62dd06e14e2aecda9358f101f",
+      "bytes": 5243,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-refund",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-refund.mp3",
+      "hash": "fbd9d69c213b4037aed96c776de20240547fe5bcc6b316fa15aa6d0fb76433b9",
+      "bytes": 4929,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-queue",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-queue.mp3",
+      "hash": "893edc17dc2c2b89725d6333981cd9605287677d2c79f39f74aac10a39c22e53",
+      "bytes": 4511,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-experience",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-experience.mp3",
+      "hash": "26aa1137a3ed9adac151693d37eaf39467a3c8211aab874421109bccc96b484a",
+      "bytes": 6287,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-complaint",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-complaint.mp3",
+      "hash": "0e10875a526fb2099e08fd5e6c66b62c97d23c4f7d2d7b95cec8cd415658b727",
+      "bytes": 5765,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-launch",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-launch.mp3",
+      "hash": "58d8f2be6a9561f9066ad85c569d1d071b67e4a54d6fc045b7ef38e6163556a9",
+      "bytes": 4825,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-pivot",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-pivot.mp3",
+      "hash": "e232b95bd0a7d538e4b35d1c6493e1638d0f561eeeeee2b0b7c90d0245198460",
+      "bytes": 4616,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-cash-flow",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-cash-flow.mp3",
+      "hash": "cfeb8543042e976fd9e1685ba8f793fa5df6bd2482e111fdaf1ba93b92fbb265",
+      "bytes": 5974,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-automate",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-automate.mp3",
+      "hash": "310138537e6aa5a9a263915a61106c184d580266b9a749acfac451aaad191d3d",
+      "bytes": 5451,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-deploy",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-deploy.mp3",
+      "hash": "fabddd281abc8dd12825ccf1d09a5b4c029beb5ba26ecc7f2c508019a284c827",
+      "bytes": 5138,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-backup",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-backup.mp3",
+      "hash": "2536ab36873e72a4c97acf65ceef28d2bf8481db2acb89690ddd36ef29f367a6",
+      "bytes": 4825,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-offline",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-offline.mp3",
+      "hash": "3c73ed3cb8e745daee20b2c4bfbef98ccb151912e3065464212084a6f87da014",
+      "bytes": 4720,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-schedule",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-schedule.mp3",
+      "hash": "3c46eea68477084faa9aeab05c44aa5270485e651bf9f965698d7e953ec4ae0d",
+      "bytes": 5034,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-confirm",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-confirm.mp3",
+      "hash": "e75accba6e744b7f785e8d773afd7eebb0847b8ccd3a27c0bd6eaef3584dec3c",
+      "bytes": 5660,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-negotiate",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-negotiate.mp3",
+      "hash": "b0946676d17d8e26e82061ee54d1be4022b109835e4c231e0d96dfd827f52f5d",
+      "bytes": 6183,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-follow-up",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-follow-up.mp3",
+      "hash": "4eb224dd6ab3157b8a953879988fbaf9205f0be8b00fab562e176086b3f6c218",
+      "bytes": 5347,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-please",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-please.mp3",
+      "hash": "07564b2a69b368d1866538421a92d241f7beb73af8982bae1dff902801cbc7d1",
+      "bytes": 4825,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-thank",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-thank.mp3",
+      "hash": "9b0b211779029194ed9baaf2824a74460e0ba8694621441623a59d7f4678b0b6",
+      "bytes": 4616,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-help",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-help.mp3",
+      "hash": "2a44b334b3ffe29a8034ea7fbb3c4a3cda81a047bfbc6878ebe1c2f22b972204",
+      "bytes": 4511,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    },
+    {
+      "id": "p-sorry",
+      "accent": "en-GB",
+      "mediaKey": "audio/p-sorry.mp3",
+      "hash": "2afdf9d0bc05fb8420ce3ec30bb2ada21a2849b1a5eb90c1a0ebe03954ec9d53",
+      "bytes": 4198,
+      "mime": "audio/mpeg",
+      "provenance": {
+        "generator": "espeak-ng",
+        "voice": "en-gb",
+        "reviewed": true,
+        "reviewDate": "2026-09-05"
+      }
+    }
+  ]
+}

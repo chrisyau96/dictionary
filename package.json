@@ -1,0 +1,34 @@
+{
+  "name": "offline-vocabulary-coach",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Offline-first English vocabulary coach with Traditional Chinese explanations.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview --host 0.0.0.0 --port 4173",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "pack:foundation": "python3 scripts/build_foundation_pack.py",
+    "icons": "python3 scripts/make_icons.py"
+  },
+  "dependencies": {
+    "dexie": "^4.2.1",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "ts-fsrs": "^5.2.3"
+  },
+  "devDependencies": {
+    "@testing-library/react": "^16.3.0",
+    "@types/react": "^19.1.12",
+    "@types/react-dom": "^19.1.9",
+    "@vitejs/plugin-react": "^5.0.2",
+    "fake-indexeddb": "^6.2.2",
+    "jsdom": "^26.1.0",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.5",
+    "vite-plugin-pwa": "^1.0.3",
+    "vitest": "^3.2.4"
+  }
+}
