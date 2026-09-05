@@ -35,10 +35,11 @@ export function App() {
   }, []);
 
   useEffect(() => {
-    void db.packs.where("status").equals("installed").first().then((pack) => {
-      setInstalled(Boolean(pack));
+    void db.packs.get("chris-1000").then((pack) => {
+      const ok = pack?.status === "installed";
+      setInstalled(ok);
       setReady(true);
-      if (!pack && route.name !== "install") go({ name: "install" });
+      if (!ok && route.name !== "install") go({ name: "install" });
     });
   }, [route.name]);
 
