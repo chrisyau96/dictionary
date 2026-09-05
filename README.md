@@ -24,10 +24,21 @@ This is not a finished general dictionary. Absent words stay absent. The app doe
 
 ## Run locally
 
+Run these commands **inside the cloned project folder** (the folder that contains `package.json`), not from `C:\Users\User`.
+
 ```bash
+git clone https://github.com/chrisyau96/dictionary.git
+cd dictionary
+git checkout cursor/offline-vocabulary-coach-1506
+git pull
 npm install
-npm test
 npm run dev
+```
+
+Then open the URL printed in the terminal, usually `http://localhost:5173`, and tap **Download and verify pack**. A “persistent storage was not granted” note on localhost is a warning, not a failed install.
+
+```bash
+npm test
 ```
 
 Production build and HTTPS-style preview:

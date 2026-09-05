@@ -16,12 +16,14 @@ export function InstallView() {
 
   async function run() {
     setError("");
+    setProgress(null);
     try {
-      setPersisted(await requestPersistentStorage());
       await installFoundationPack(setProgress);
+      setPersisted(await requestPersistentStorage());
       go({ name: "diagnostic" });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Install failed.");
+      setProgress(null);
     }
   }
 
@@ -58,7 +60,7 @@ export function InstallView() {
         <p className="muted">Persistent storage was not granted. Learning records can still be used, but the browser may evict data if space is low. Export a backup from Settings.</p>
       ) : null}
       {error ? <p className="danger">{error}</p> : null}
-      <button type="button" className="primary block" onClick={run} disabled={!manifest || Boolean(progress && progress.phase !== "ready")}>
+      <button type="button" className="primary block" onClick={run} disabled={!manifest || Boolean(progress)}>
         Download and verify pack
       </button>
     </section>

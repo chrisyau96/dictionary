@@ -1,5 +1,5 @@
 import { db, ensureProfile } from "../db/database";
-import { sha256Hex } from "./hash";
+import { sha256OfPackFile } from "./hash";
 import { normalizeQuery } from "../search/normalize";
 import type {
   AudioRecord,
@@ -60,7 +60,7 @@ async function fetchChecked(path: string, expected: string): Promise<ArrayBuffer
   const response = await fetch(`${PACK_BASE}/${path}`);
   if (!response.ok) throw new Error(`Missing pack file: ${path}`);
   const buffer = await response.arrayBuffer();
-  const digest = await sha256Hex(buffer);
+  const digest = await sha256OfPackFile(path, buffer);
   if (digest !== expected) {
     throw new Error(`Checksum failed for ${path}. The download is incomplete or altered.`);
   }
