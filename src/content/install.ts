@@ -1,6 +1,7 @@
 import { db, ensureProfile } from "../db/database";
 import { sha256OfPackFile } from "./hash";
 import { normalizeQuery } from "../search/normalize";
+import { normalizeSenseSynonyms } from "./synonyms";
 import type {
   AudioRecord,
   ContentPackRecord,
@@ -33,7 +34,7 @@ export interface PackFile {
   name: string;
   accent: string;
   entries: Array<Omit<EntryRecord, "packId">>;
-  senses: Array<Omit<SenseRecord, "packId">>;
+  senses: Array<Omit<SenseRecord, "packId" | "synonymStatus"> & { synonymStatus?: string }>;
   audio: Array<Omit<AudioRecord, "packId">>;
 }
 
@@ -140,7 +141,7 @@ export async function installFoundationPack(
 
   const packId = pack.packId;
   const entries: EntryRecord[] = pack.entries.map((entry) => ({ ...entry, packId }));
-  const senses: SenseRecord[] = pack.senses.map((sense) => ({ ...sense, packId }));
+  const senses: SenseRecord[] = pack.senses.map((sense) => normalizeSenseSynonyms({ ...sense, packId }));
   const audio: AudioRecord[] = pack.audio.map((item) => ({ ...item, packId }));
   const forms = entries.flatMap(formsForEntry);
 

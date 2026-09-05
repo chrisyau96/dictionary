@@ -20,18 +20,23 @@ Each meaning has a 0–100 commonness score (wordfreq, scale v1), part of speech
 ## What works now
 
 - Four tabs: **Today**, **Dictionary**, **My Words**, **Progress**, plus Settings.
-- Dictionary cards in a learner-dictionary layout (Oxford-style POS + frequency, Quizlet/Anki study actions).
-- **My Words** as a study list: search, due/learning/known/paused filters, notes, study now, pause/resume.
-- Back on nested screens; primary actions can also return to Today.
+- A short adaptive vocabulary check (recognition and production separately). It is a starting hint, not a CEFR certificate.
+- Today keeps a persisted daily plan (default 5 new senses). Reopening the app does not mint a new batch. Use Already know / Not useful / Replace.
+- Review is Cue → Recall → Reveal → Again/Hard/Good/Easy, with FSRS, undo, and a double-tap guard.
+- Compact dictionary cards: speaker icon, English + Traditional Chinese, combinations, bilingual examples, sense-aware synonyms. IPA is hidden by default.
+- **My Words** tabs: All / Learning / Known. Remove keeps the dictionary entry and the learning history.
+- Progress KPI cards and charts from real review events. Saved words and retries are not counted as newly learned.
 - Local FSRS scheduling via `ts-fsrs` (0.90 retention). Recognition and production are different cards.
-- Backup and restore of learning records.
+- Backup and restore of learning records (v1 backups still restore).
 
 ## What is intentionally not here yet
 
 - A 20,000 entry general dictionary.
 - Cloud accounts, sync, or a paid API.
+- Dumping all 1,000 candidate words into Today at once.
+- A calibrated CEFR or vocabulary-size certificate.
 - Typo-tolerant search.
-- Automatic grading of typed answers.
+- Automatic grading of free-form sentences.
 - A second audio accent.
 
 

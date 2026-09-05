@@ -77,3 +77,21 @@ export function applyRating(
 export function isDue(record: CardRecord, now = new Date()): boolean {
   return !record.paused && new Date(record.scheduler.due).getTime() <= now.getTime();
 }
+
+export function formatInterval(from: Date, dueIso: string): string {
+  const ms = new Date(dueIso).getTime() - from.getTime();
+  const minutes = Math.max(1, Math.round(ms / 60000));
+  if (minutes < 60) return `${minutes} min`;
+  const hours = Math.round(minutes / 60);
+  if (hours < 24) return `${hours} h`;
+  return `${Math.round(hours / 24)} d`;
+}
+
+export function previewRatingIntervals(record: CardRecord, now = new Date()): Record<1 | 2 | 3 | 4, string> {
+  return {
+    1: formatInterval(now, applyRating(record, 1, now).next.scheduler.due),
+    2: formatInterval(now, applyRating(record, 2, now).next.scheduler.due),
+    3: formatInterval(now, applyRating(record, 3, now).next.scheduler.due),
+    4: formatInterval(now, applyRating(record, 4, now).next.scheduler.due),
+  };
+}

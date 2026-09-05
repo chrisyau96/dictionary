@@ -201,7 +201,7 @@ def main() -> None:
                 "domains": row["domains"],
                 "examples": examples,
                 "synonyms": synonyms,
-                "synonymStatus": "authored" if synonyms else "none-appropriate",
+                "synonymStatus": "available" if synonyms else ("none_appropriate" if pos == "pronoun" else "not_prepared"),
                 "collocations": row.get("collocations") or [],
                 "frequency": frequency_for(lemma),
                 "selection": row.get("selection", "learn"),
@@ -264,7 +264,8 @@ Audio: eSpeak NG en-GB, 32 kbit/s MP3. IPA is always kept.
     notices_path.write_text(notices, encoding="utf-8")
     checksums["NOTICES.md"] = sha256(notices_path)
 
-    synonym_none = sum(1 for item in senses if item["synonymStatus"] == "none-appropriate")
+    synonym_none = sum(1 for item in senses if item["synonymStatus"] == "none_appropriate")
+    synonym_gap = sum(1 for item in senses if item["synonymStatus"] == "not_prepared")
     short_examples = sum(1 for item in senses if len(item["examples"]) < 2)
     manifest = {
         "packId": "chris-1000",
@@ -287,7 +288,7 @@ Audio: eSpeak NG en-GB, 32 kbit/s MP3. IPA is always kept.
             "frequency": "measured-single-words",
             "notes": (
                 "Pack mix: everyday, projects, shop/CX, business, start-up, and practical tech. "
-                f"{synonym_none} senses have no interchangeable synonym. Phrases are unmeasured."
+                f"{synonym_none} senses have no close substitute; {synonym_gap} still need synonym review. Phrases are unmeasured."
             ),
         },
         "licenses": [

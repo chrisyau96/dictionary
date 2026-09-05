@@ -52,7 +52,7 @@ export function DictionaryView({ initialQuery }: { initialQuery: string }) {
 
   return (
     <section className="stack">
-      <ScreenHeader title="Dictionary" back={{ name: "today" }} />
+      <ScreenHeader title="Dictionary" />
       <input
         className="search-box"
         value={query}

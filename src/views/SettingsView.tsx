@@ -76,7 +76,9 @@ export function SettingsView() {
       </div>
       <div className="center-actions">
         <button type="button" className="primary block" onClick={() => go({ name: "install" })}>Install or refresh pack</button>
-        <button type="button" className="ghost block" onClick={() => go({ name: "diagnostic" })}>Repeat start check</button>
+        <button type="button" className="ghost block" onClick={() => go({ name: "diagnostic" })}>
+          Retake vocabulary check
+        </button>
         <button type="button" className="ghost block" onClick={() => go({ name: "today" })}>Back to Today</button>
       </div>
       <p className="tiny">{storage}</p>

@@ -18,10 +18,25 @@ export type FrequencyStatus = "measured" | "unmeasured";
 export type SelectionPolicy = "learn" | "calibration";
 export type CardTask = "recognition" | "production";
 export type UserWordStatus = "learning" | "known" | "paused";
-export type UsefulnessFeedback = "already-know" | "not-useful" | "too-easy" | null;
+export type UsefulnessFeedback = "already-know" | "not-useful" | "too-easy" | "replace" | null;
+export type MembershipState = "active" | "removed";
+export type KnownEvidence = "self-declared" | "review-verified" | null;
+export type RecommendPreference = "include" | "exclude";
+export type SynonymStatus = "available" | "none_appropriate" | "not_prepared";
 export type DiagnosticAnswer = "know" | "familiar" | "unknown";
-export type EstimatedBand = "emerging" | "developing" | "independent";
+export type AssessmentOutcome = "correct" | "incorrect" | "unknown";
+export type EditorialBand = "everyday" | "workplace" | "professional" | "specialist";
+/** @deprecated Use EditorialBand. Kept as an alias for older comments. */
+export type EstimatedBand = EditorialBand;
 export type PackInstallStatus = "absent" | "staging" | "installed" | "failed";
+export type DailyItemStatus = "not-started" | "started" | "practised" | "replaced" | "already-know" | "not-useful";
+export type ReviewSessionType = "scheduled" | "learn-new";
+export type AssessmentCoverage = "adequate" | "provisional";
+export type DifficultyPreference = "none" | "easier" | "harder";
+
+export const REVIEW_VERIFIED_RULE_VERSION = "rv-1";
+export const ASSESSMENT_BANK_VERSION = "v1";
+export const BACKUP_VERSION = 2;
 
 export interface FrequencyRecord {
   form: string;
@@ -59,7 +74,7 @@ export interface SenseRecord {
   domains: DomainId[];
   examples: Example[];
   synonyms: SynonymNote[];
-  synonymStatus: "authored" | "none-appropriate";
+  synonymStatus: SynonymStatus;
   collocations: string[];
   frequency: FrequencyRecord;
   selection: SelectionPolicy;
@@ -127,6 +142,10 @@ export interface UserWordRecord {
   notes: string;
   usefulness: UsefulnessFeedback;
   reason: string;
+  membership: MembershipState;
+  removedAt: string | null;
+  knownEvidence: KnownEvidence;
+  recommend: RecommendPreference;
 }
 
 export interface SchedulerSnapshot {
@@ -160,10 +179,13 @@ export interface ReviewEventRecord {
   senseId: string;
   task: CardTask;
   ratedAt: string;
+  studyDay: string;
   rating: 1 | 2 | 3 | 4;
   prior: SchedulerSnapshot;
   next: SchedulerSnapshot;
   undone: boolean;
+  sessionType: ReviewSessionType;
+  hinted: boolean;
 }
 
 export interface DiagnosticResponse {
@@ -171,6 +193,70 @@ export interface DiagnosticResponse {
   senseId: string;
   kind: "recognition" | "production";
   answer: DiagnosticAnswer;
+}
+
+export interface AssessmentResponse {
+  itemId: string;
+  itemVersion: string;
+  senseId: string | null;
+  band: EditorialBand;
+  skill: CardTask;
+  outcome: AssessmentOutcome;
+  answer: string;
+  optionOrder?: string[];
+  ratedAt: string;
+}
+
+export interface AssessmentResult {
+  recommendedBand: EditorialBand;
+  recognitionBand: EditorialBand;
+  productionBand: EditorialBand;
+  coverage: AssessmentCoverage;
+  recognitionCorrect: number;
+  recognitionTotal: number;
+  productionCorrect: number;
+  productionTotal: number;
+  sampledByBand: Record<EditorialBand, { correct: number; total: number }>;
+  note: string;
+}
+
+export interface AssessmentSessionRecord {
+  id: string;
+  version: string;
+  startedAt: string;
+  completedAt: string | null;
+  itemIds: string[];
+  currentIndex: number;
+  routingBand: EditorialBand;
+  responses: AssessmentResponse[];
+  result: AssessmentResult | null;
+}
+
+export interface DailyPlanItem {
+  senseId: string;
+  entryId: string;
+  reason: string;
+  source: "saved" | "gap" | "replacement";
+  status: DailyItemStatus;
+}
+
+export interface DailySessionState {
+  cardIds: string[];
+  index: number;
+  sessionType: ReviewSessionType;
+  startedAt: string;
+  completedAt: string | null;
+}
+
+export interface DailyPlanRecord {
+  id: string;
+  dayKey: string;
+  createdAt: string;
+  timezone: string;
+  newLimit: number;
+  pauseNew: boolean;
+  items: DailyPlanItem[];
+  session: DailySessionState | null;
 }
 
 export interface ProfileRecord {
@@ -181,11 +267,18 @@ export interface ProfileRecord {
   dailyReviewCapacity: number;
   desiredRetention: number;
   domains: DomainId[];
-  estimatedBand: EstimatedBand | null;
+  estimatedBand: EditorialBand | null;
+  recognitionBand: EditorialBand | null;
+  productionBand: EditorialBand | null;
+  assessmentCoverage: AssessmentCoverage | null;
+  assessmentVersion: string | null;
   diagnosticCompletedAt: string | null;
   diagnosticResponses: DiagnosticResponse[];
   lastStudyDay: string | null;
   newIntroducedOnStudyDay: number;
+  difficultyPreference: DifficultyPreference;
+  seenReviewHelp: boolean;
+  showPhonetics: boolean;
 }
 
 export interface LocalRequestRecord {
@@ -202,7 +295,7 @@ export interface MetaRecord {
 
 export interface BackupFile {
   kind: "vocab-coach-backup";
-  version: 1;
+  version: 1 | 2;
   exportedAt: string;
   appVersion: string;
   contentRefs: { packId: string; version: string }[];
@@ -211,4 +304,6 @@ export interface BackupFile {
   reviewEvents: ReviewEventRecord[];
   profile: ProfileRecord;
   localRequests: LocalRequestRecord[];
+  dailyPlans?: DailyPlanRecord[];
+  assessmentSessions?: AssessmentSessionRecord[];
 }
