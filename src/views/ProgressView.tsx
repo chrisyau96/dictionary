@@ -14,16 +14,12 @@ export function ProgressView() {
 
   useEffect(() => {
     void (async () => {
-      const [words, cards, events, profile] = await Promise.all([
+      const [words, cards, reviews, profile] = await Promise.all([
         db.userWords.count(),
         db.cards.count(),
-        db.reviewEvents.where("undone").equals(0).count().catch(async () => {
-          const all = await db.reviewEvents.toArray();
-          return all.filter((event) => !event.undone).length;
-        }),
+        db.reviewEvents.toArray(),
         ensureProfile(),
       ]);
-      const reviews = await db.reviewEvents.toArray();
       const live = reviews.filter((event) => !event.undone);
       const recognition = live.filter((event) => event.task === "recognition");
       const production = live.filter((event) => event.task === "production");
@@ -32,7 +28,7 @@ export function ProgressView() {
       setStats({
         words,
         cards,
-        reviews: events,
+        reviews: live.length,
         recall: recognition.length ? `${recallOk}/${recognition.length} recognition` : "No recognition reviews yet",
         production: production.length ? `${prodOk}/${production.length} production` : "No production reviews yet",
         band: profile.estimatedBand ? `${profile.estimatedBand} estimate` : "No diagnostic yet",
