@@ -74,7 +74,7 @@ export function MyWordsView() {
       {visible.length === 0 ? (
         <div className="panel">
           <p>No words in this list.</p>
-          <p className="muted">Swipe a card left to remove it. Notes save when you finish typing.</p>
+          <p className="muted">Swipe a card left to remove it. Notes save when you finish typing or press Enter.</p>
         </div>
       ) : null}
       {visible.map(({ word, sense, due, tab }) => {

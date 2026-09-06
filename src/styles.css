@@ -449,28 +449,27 @@ input, textarea, select {
 .note-field input { min-height: 2.55rem; }
 
 .swipe-row {
+  position: relative;
   overflow: hidden;
   border-radius: 1.35rem;
 }
-.swipe-track {
-  display: flex;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
-}
-.swipe-track::-webkit-scrollbar { display: none; }
 .swipe-front {
-  flex: 0 0 100%;
-  scroll-snap-align: start;
+  position: relative;
+  z-index: 1;
+  transition: transform 0.2s ease;
+  touch-action: pan-y;
 }
+.swipe-front.is-dragging { transition: none; }
 .swipe-front .word-card { box-shadow: var(--shadow); }
 .swipe-remove {
-  flex: 0 0 5.6rem;
-  scroll-snap-align: end;
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: 5.6rem;
   border-radius: 0 1.35rem 1.35rem 0;
   background: var(--danger);
   color: #fff;
   font-weight: 800;
+  z-index: 0;
 }
 
 .choice {
