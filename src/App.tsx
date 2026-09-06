@@ -3,6 +3,7 @@ import { useRegisterSW } from "virtual:pwa-register/react";
 import { db, ensureProfile } from "./db/database";
 import { parseHash, type Route, go } from "./router";
 import { applyAccent, DEFAULT_ACCENT } from "./theme/accents";
+import { TabBar } from "./components/TabBar";
 import { DiagnosticView } from "./views/DiagnosticView";
 import { DictionaryView } from "./views/DictionaryView";
 import { EntryView } from "./views/EntryView";
@@ -70,14 +71,7 @@ export function App() {
       {route.name === "review" && <ReviewView />}
       {route.name === "install" && <InstallView />}
       {route.name === "diagnostic" && <DiagnosticView />}
-      {hideTabs || !installed ? null : (
-        <nav className="tabs" aria-label="Main">
-          <button type="button" className={tab === "today" ? "active" : ""} onClick={() => go({ name: "today" })}>Today</button>
-          <button type="button" className={tab === "dictionary" ? "active" : ""} onClick={() => go({ name: "dictionary", q: "" })}>Dictionary</button>
-          <button type="button" className={tab === "words" ? "active" : ""} onClick={() => go({ name: "words" })}>My Words</button>
-          <button type="button" className={tab === "progress" ? "active" : ""} onClick={() => go({ name: "progress" })}>Progress</button>
-        </nav>
-      )}
+      {hideTabs || !installed ? null : <TabBar current={tab} />}
     </div>
   );
 }

@@ -56,7 +56,13 @@ export function DiagnosticView() {
     const result = session.result;
     return (
       <section className="stack compact">
-        <ScreenHeader title="Starting level" back={{ name: "today" }} />
+        <ScreenHeader
+          eyebrow="Local vocabulary check"
+          title="Starting level"
+          subtitle="This is a placement, not a certificate."
+          back={{ name: "today" }}
+          backLabel="Back to Today"
+        />
         <LevelMeter band={result.recommendedBand} correct={result.overallCorrect} total={result.overallTotal} />
         <div className="panel">
           <p>
@@ -79,15 +85,12 @@ export function DiagnosticView() {
   return (
     <section className="stack compact">
       <ScreenHeader
-        title="Starting level"
+        eyebrow={`Starting check · ${Math.min(number, total)}/${total}`}
+        title="Choose before you continue."
+        subtitle="This checks vocabulary understanding and use. It is not an official certificate."
         back={{ name: "today" }}
-        right={
-          <span className="tiny">
-            {Math.min(number, total)}/{total}
-          </span>
-        }
+        backLabel="Pause"
       />
-      <p className="tiny">This checks vocabulary understanding and use. It is not an official English proficiency certificate.</p>
       <div className="panel">
         <p className="tiny">{item.skill === "recognition" ? "Choose the meaning" : "Choose the word"}</p>
         <p className="prompt-word">{item.stem || item.prompt}</p>

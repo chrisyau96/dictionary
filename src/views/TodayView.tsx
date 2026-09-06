@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { SettingsIcon } from "../components/icons";
 import { ScreenHeader } from "../components/ScreenHeader";
 import { WordListCard } from "../components/WordListCard";
 import { db, ensureProfile } from "../db/database";
@@ -45,6 +46,7 @@ export function TodayView() {
     (item) => item.status === "not-started" || item.status === "started" || item.status === "practised",
   );
   const introducedCount = visibleItems.filter((item) => item.status !== "not-started").length;
+  const waitingCount = visibleItems.filter((item) => item.status === "not-started").length;
   const primary = summary.unfinishedSession
     ? { label: "Continue review", action: async () => go({ name: "review" }) }
     : summary.dueCount > 0
@@ -68,24 +70,26 @@ export function TodayView() {
   return (
     <section className="stack compact">
       <ScreenHeader
+        eyebrow={`${summary.dayLabel} · daily workspace`}
         title="Today"
+        subtitle="A little learning. Deliberate practice."
         right={
           <button type="button" className="icon-btn" aria-label="Settings" onClick={() => go({ name: "settings" })}>
-            ⚙
+            <SettingsIcon />
           </button>
         }
       />
-      <p className="tiny">{summary.dayLabel}</p>
       <div className="stats-row">
         <div className="stat">
           <b>
-            {introducedCount}/{summary.newLimit}
+            {introducedCount}
+            <span className="stat-over">/{summary.newLimit}</span>
           </b>
-          <span className="tiny">New today</span>
+          <span className="stat-label">New senses introduced today</span>
         </div>
         <div className="stat">
           <b>{summary.dueCount}</b>
-          <span className="tiny">Reviews due</span>
+          <span className="stat-label">Reviews due</span>
         </div>
       </div>
       {needsCheck ? (
@@ -108,11 +112,21 @@ export function TodayView() {
           {primary.label}
         </button>
       ) : (
-        <div className="panel muted">Today’s planned work is done. More study is optional.</div>
+        <div className="empty-state">Today’s planned work is done. More study is optional.</div>
       )}
-      <h2 className="section-label">New today</h2>
+      {waitingCount ? (
+        <p className="tiny helper-copy">
+          {waitingCount} new {waitingCount === 1 ? "sense is" : "senses are"} still waiting on this list. This is not a
+          due-review count.
+        </p>
+      ) : summary.dueCount > 0 ? (
+        <p className="tiny helper-copy">Due reviews are counted separately from words you have only saved.</p>
+      ) : null}
+      <h2 className="section-label">Your learning queue</h2>
       {visibleItems.length === 0 ? (
-        <p className="muted">{summary.pauseNew ? "Review first today." : "No new words were selected for today."}</p>
+        <div className="empty-state">
+          {summary.pauseNew ? "Review first today." : "No new words were selected for today. Save a meaning from Dictionary if you need something specific."}
+        </div>
       ) : (
         visibleItems.map((item) => {
           const sense = senses.get(item.senseId);
@@ -125,51 +139,58 @@ export function TodayView() {
               onOpen={() => go({ name: "entry", entryId: sense.entryId, senseId: sense.id })}
               actions={
                 item.status === "not-started" ? (
-                  <div className="card-actions">
-                    <button
-                      type="button"
-                      className="primary"
-                      onClick={async () => {
-                        await saveSense(sense, item.reason);
-                        await markPlanSense(sense.id, "started");
-                        go({ name: "entry", entryId: sense.entryId, senseId: sense.id });
-                      }}
-                    >
-                      Learn
-                    </button>
-                    <button
-                      type="button"
-                      className="ghost"
-                      onClick={async () => {
-                        await saveSense(sense, "Already know");
-                        await markSenseKnown(sense.id);
-                        await replacePlanItem(sense.id, "already-know");
-                        await refresh();
-                      }}
-                    >
-                      Already know
-                    </button>
-                    <button
-                      type="button"
-                      className="ghost"
-                      onClick={async () => {
-                        await replacePlanItem(sense.id, "replaced");
-                        await refresh();
-                      }}
-                    >
-                      Skip
-                    </button>
-                  </div>
+                  <>
+                    <div className="card-actions">
+                      <button
+                        type="button"
+                        className="primary"
+                        onClick={async () => {
+                          await saveSense(sense, item.reason);
+                          await markPlanSense(sense.id, "started");
+                          go({ name: "entry", entryId: sense.entryId, senseId: sense.id });
+                        }}
+                      >
+                        Learn
+                      </button>
+                    </div>
+                    <div className="subtle-row">
+                      <button
+                        type="button"
+                        className="text-btn"
+                        onClick={async () => {
+                          await saveSense(sense, "Already know");
+                          await markSenseKnown(sense.id);
+                          await replacePlanItem(sense.id, "already-know");
+                          await refresh();
+                        }}
+                      >
+                        Already know
+                      </button>
+                      <button
+                        type="button"
+                        className="text-btn"
+                        onClick={async () => {
+                          await replacePlanItem(sense.id, "replaced");
+                          await refresh();
+                        }}
+                      >
+                        Skip
+                      </button>
+                    </div>
+                  </>
                 ) : null
               }
             />
           );
         })
       )}
-      <h2 className="section-label">Reviewed today</h2>
-      <p className="tiny">
+      <div className="insight-card">
+        <p className="example-index">Useful words, not random words</p>
+        <p>Start with meanings you save. Today only adds a small batch when the workload still fits.</p>
+      </div>
+      <p className="tiny reviewed-note">
         {summary.reviewedSensesToday
-          ? `${summary.reviewedSensesToday} word senses / ${summary.reviewedCardsToday} cards practised`
+          ? `Reviewed today: ${summary.reviewedSensesToday} word senses / ${summary.reviewedCardsToday} cards`
           : "No scheduled reviews completed yet today."}
         {summary.reviewAttemptsToday > summary.reviewedCardsToday
           ? ` · ${summary.reviewAttemptsToday} attempts including retries`

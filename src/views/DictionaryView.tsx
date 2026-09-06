@@ -25,8 +25,15 @@ export function DictionaryView({ initialQuery }: { initialQuery: string }) {
   const [savedRequest, setSavedRequest] = useState("");
   const [browse, setBrowse] = useState<DomainId | null>(null);
   const [topicSenses, setTopicSenses] = useState<SenseRecord[]>([]);
+  const [packLabel, setPackLabel] = useState("Installed offline pack");
 
   const normalized = useMemo(() => normalizeQuery(query), [query]);
+
+  useEffect(() => {
+    void db.packs.where("status").equals("installed").first().then((pack) => {
+      if (pack) setPackLabel(`${pack.name} · installed`);
+    });
+  }, []);
 
   useEffect(() => {
     const handle = window.setTimeout(async () => {
@@ -54,7 +61,7 @@ export function DictionaryView({ initialQuery }: { initialQuery: string }) {
 
   return (
     <section className="stack">
-      <ScreenHeader title="Dictionary" />
+      <ScreenHeader eyebrow={packLabel} title="Dictionary" subtitle="Find the meaning you need." />
       <input
         className="search-box"
         value={query}
@@ -62,11 +69,12 @@ export function DictionaryView({ initialQuery }: { initialQuery: string }) {
           setQuery(event.target.value);
           go({ name: "dictionary", q: event.target.value });
         }}
-        placeholder="Search a word, form, or phrase"
+        placeholder="Try a workplace word, like address"
         autoCapitalize="none"
         autoCorrect="off"
         aria-label="Search installed words"
       />
+      <p className="tiny helper-copy">Searches this device only. Separate noun and verb senses stay separate.</p>
       {!normalized && !browse ? (
         <div className="browse-grid">
           {TOPICS.map((topic) => (
@@ -81,7 +89,9 @@ export function DictionaryView({ initialQuery }: { initialQuery: string }) {
         <div className="stack">
           <div className="row">
             <strong>{TOPICS.find((topic) => topic.id === browse)?.label}</strong>
-            <button type="button" className="text-btn" onClick={() => setBrowse(null)}>Back</button>
+            <button type="button" className="text-btn" onClick={() => setBrowse(null)}>
+              Back
+            </button>
           </div>
           {topicSenses.map((sense) => (
             <WordListCard
@@ -102,9 +112,14 @@ export function DictionaryView({ initialQuery }: { initialQuery: string }) {
         )),
       )}
       {missing ? (
+        <div className="empty-state">
+          <strong>Not in this offline pack.</strong>
+          <br />
+          No online lookup has been made.
+        </div>
+      ) : null}
+      {missing ? (
         <div className="panel">
-          <p><strong>Not in this offline pack</strong></p>
-          <p className="muted">The app will not invent a definition or call a hidden dictionary service.</p>
           <label>
             Save a local request
             <input value={requestNote} onChange={(event) => setRequestNote(event.target.value)} placeholder="Optional note" />
@@ -126,7 +141,9 @@ export function DictionaryView({ initialQuery }: { initialQuery: string }) {
             >
               Save request
             </button>
-            <button type="button" className="ghost block" onClick={() => go({ name: "today" })}>Back to Today</button>
+            <button type="button" className="ghost block" onClick={() => go({ name: "today" })}>
+              Back to Today
+            </button>
           </div>
           {savedRequest ? <p className="tiny">Saved local request for “{savedRequest}”.</p> : null}
         </div>

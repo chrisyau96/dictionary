@@ -30,7 +30,7 @@ function BarChart({ values, labels }: { values: number[]; labels: string[] }) {
   );
 }
 
-function LineChart({ values }: { values: Array<number | null>; labels: string[] }) {
+function LineChart({ values }: { values: Array<number | null> }) {
   const width = 320;
   const height = 92;
   const points = values
@@ -41,15 +41,12 @@ function LineChart({ values }: { values: Array<number | null>; labels: string[] 
       return `${x},${y}`;
     })
     .filter((item): item is string => Boolean(item));
+  if (points.length < 2) {
+    return <div className="empty-state compact-empty">Not enough eligible delayed-recall events yet. No invented retention score.</div>;
+  }
   return (
     <svg viewBox={`0 0 ${width} ${height}`} className="chart" role="img" aria-label="Delayed recall trend">
-      {points.length >= 2 ? (
-        <polyline fill="none" stroke="currentColor" strokeWidth="2.5" points={points.join(" ")} />
-      ) : (
-        <text x="8" y="48" fontSize="12" fill="currentColor">
-          Not enough review history
-        </text>
-      )}
+      <polyline fill="none" stroke="currentColor" strokeWidth="2.5" points={points.join(" ")} />
     </svg>
   );
 }
@@ -63,13 +60,17 @@ function HorizonBars({ rows }: { rows: ProgressSnapshot["coverage"] }) {
         const learning = row.total ? (row.learning / row.total) * 100 : 0;
         const verified = row.total ? (row.reviewVerified / row.total) * 100 : 0;
         const declared = row.total ? (row.selfDeclared / row.total) * 100 : 0;
+        const idle = row.total ? (row.notStarted / row.total) * 100 : 0;
         return (
           <div key={row.domain} className="horizon-row">
-            <span className="tiny">{DOMAIN_LABELS[row.domain]} · {row.total}</span>
+            <span className="tiny">
+              {DOMAIN_LABELS[row.domain]} · {row.total}
+            </span>
             <div className="horizon-track" style={{ width }}>
               <span style={{ width: `${verified}%` }} className="seg verified" />
               <span style={{ width: `${learning}%` }} className="seg learning" />
               <span style={{ width: `${declared}%` }} className="seg declared" />
+              <span style={{ width: `${idle}%` }} className="seg idle" />
             </div>
           </div>
         );
@@ -79,9 +80,9 @@ function HorizonBars({ rows }: { rows: ProgressSnapshot["coverage"] }) {
 }
 
 function delayedLabel(stats: ProgressSnapshot["delayedRecall"]): string {
-  if (stats.total === 0) return "Not enough review history";
+  if (stats.total === 0) return "—";
   const text = `${stats.success}/${stats.total}`;
-  if (stats.total < 20) return `${text} · Limited evidence`;
+  if (stats.total < 20) return `${text}`;
   return text;
 }
 
@@ -108,40 +109,42 @@ export function ProgressView() {
 
   return (
     <section className="stack compact">
-      <ScreenHeader title="Progress" />
+      <ScreenHeader eyebrow="This device · recorded activity" title="Progress" subtitle="Count what actually happened." />
       <div className="kpi-grid">
         <div className="stat">
           <b>{stats.newVocabulary7d}</b>
-          <span className="tiny">New vocabulary · 7 days</span>
+          <span className="stat-label">New vocabulary · 7 days</span>
+          <span className="stat-desc">First introductions only</span>
         </div>
         <div className="stat">
           <b>{stats.reviewsCompletedToday}</b>
-          <span className="tiny">Reviews completed today</span>
-          {stats.reviewAttemptsToday !== stats.reviewsCompletedToday ? (
-            <span className="tiny">{stats.reviewAttemptsToday} attempts</span>
-          ) : null}
+          <span className="stat-label">Reviews completed today</span>
+          <span className="stat-desc">
+            {stats.reviewAttemptsToday !== stats.reviewsCompletedToday
+              ? `${stats.reviewAttemptsToday} attempts including retries`
+              : "Distinct cards, not extra saves"}
+          </span>
         </div>
         <div className="stat">
           <b>{delayedLabel(stats.delayedRecall)}</b>
-          <span className="tiny">Delayed recall · 7 days</span>
+          <span className="stat-label">Delayed recall · 7 days</span>
+          <span className="stat-desc">{stats.delayedRecall.total < 20 ? "Limited evidence" : "Failures included"}</span>
         </div>
         <div className="stat">
           <b>{stats.rememberedThroughReview}</b>
-          <span className="tiny">Remembered through review</span>
+          <span className="stat-label">Remembered through review</span>
+          <span className="stat-desc">
+            {stats.selfDeclaredKnown ? `${stats.selfDeclaredKnown} self-declared known listed separately` : "Not inflated by saving"}
+          </span>
         </div>
       </div>
-      <p className="tiny">
-        New vocabulary counts first introductions only. Saved words and retries are not extra learned words. Marking Known does not invent review history.
-        {stats.selfDeclaredKnown ? ` ${stats.selfDeclaredKnown} self-declared known ${stats.selfDeclaredKnown === 1 ? "sense is" : "senses are"} listed separately. ` : " "}
-        Rule {stats.ruleVersion}.
-      </p>
       <div className="panel">
-        <p className="example-index">NEW WORDS BY DAY</p>
+        <p className="example-index">New words by day</p>
         <BarChart values={stats.introductionsByDay.slice(-30).map((row) => row.count)} labels={stats.introductionsByDay.slice(-30).map((row) => row.day)} />
       </div>
       <div className="panel">
         <div className="row">
-          <p className="example-index">DELAYED RECALL</p>
+          <p className="example-index">Delayed recall</p>
           <div className="wrap">
             {([7, 30, 90] as const).map((item) => (
               <button key={item} type="button" className={range === item ? "chip active" : "chip"} onClick={() => setRange(item)}>
@@ -150,19 +153,41 @@ export function ProgressView() {
             ))}
           </div>
         </div>
-        <LineChart values={delayedValues} labels={delayedSlice.map((row) => row.day)} />
+        <LineChart values={delayedValues} />
         <p className="tiny">
           {stats.delayedRecall.recognition.total || stats.delayedRecall.production.total
             ? `Recognition ${stats.delayedRecall.recognition.success}/${stats.delayedRecall.recognition.total} · Production ${stats.delayedRecall.production.success}/${stats.delayedRecall.production.total}`
-            : "Not enough review history"}
+            : "A delayed score needs eligible events after a real gap. First learning is not delayed recall."}
         </p>
       </div>
       <div className="panel">
-        <p className="example-index">COVERAGE BY TOPIC</p>
+        <p className="example-index">Coverage by topic</p>
         <HorizonBars rows={stats.coverage} />
-        <p className="tiny">Green = verified by review · teal = still learning · grey = marked known</p>
+        <p className="legend">
+          <span>
+            <i className="dot verified" /> Verified
+          </span>
+          <span>
+            <i className="dot learning" /> Learning
+          </span>
+          <span>
+            <i className="dot declared" /> Marked known
+          </span>
+          <span>
+            <i className="dot idle" /> Saved, not started
+          </span>
+        </p>
       </div>
-      {stats.takeaway ? <p className="muted">{stats.takeaway}</p> : null}
+      {stats.takeaway ? (
+        <div className="insight-card">
+          <p className="example-index">What the charts can say</p>
+          <p>{stats.takeaway}</p>
+        </div>
+      ) : (
+        <p className="tiny helper-copy">
+          Saving is not learning. Streaks stay secondary. Rule {stats.ruleVersion}.
+        </p>
+      )}
       <button type="button" className="ghost block" onClick={() => go({ name: "words" })}>
         Open My Words
       </button>

@@ -32,7 +32,13 @@ export function InstallView() {
 
   return (
     <section className="stack">
-      <ScreenHeader title="Install pack" back={{ name: "today" }} />
+      <ScreenHeader
+        eyebrow="Offline pack"
+        title="Install pack"
+        subtitle="Download once. Study without a network after that."
+        back={{ name: "today" }}
+        backLabel="Back to Today"
+      />
       <p className="muted">
         This is a vocabulary + dictionary pack for your work in Hong Kong: shop talk, project work, business messages, and everyday English. Opening the page is not a finished installation.
       </p>

@@ -42,7 +42,7 @@ export function SettingsView() {
 
   return (
     <section className="stack">
-      <ScreenHeader title="Settings" back={{ name: "today" }} />
+      <ScreenHeader title="Settings" back={{ name: "today" }} backLabel="Back to Today" />
       <div className="panel stack">
         <p>Accent colour</p>
         <div className="accent-row">

@@ -7,10 +7,10 @@ import { previewRatingIntervals } from "../scheduler/schedule";
 import { buildToday, persistSessionIndex, productionBlank, questionFor, rateCard, undoLastReview, type QueueItem } from "../study/session";
 
 const GRADE_HELP = [
-  { rating: 1 as const, key: "again", label: "Again", hint: "Forgot" },
-  { rating: 2 as const, key: "hard", label: "Hard", hint: "Recalled with difficulty" },
-  { rating: 3 as const, key: "good", label: "Good", hint: "Recalled" },
-  { rating: 4 as const, key: "easy", label: "Easy", hint: "Effortless" },
+  { rating: 1 as const, key: "again", label: "Again", hint: "Could not recall" },
+  { rating: 2 as const, key: "hard", label: "Hard", hint: "Correct, with effort" },
+  { rating: 3 as const, key: "good", label: "Good", hint: "Correct" },
+  { rating: 4 as const, key: "easy", label: "Easy", hint: "Correct, effortless" },
 ];
 
 export function ReviewView() {
@@ -54,10 +54,11 @@ export function ReviewView() {
   if (!item) {
     return (
       <section className="stack compact">
-        <ScreenHeader title="Review" back={{ name: "today" }} />
-        <div className="panel">
-          <p>Session complete.</p>
-          <p className="muted">This batch is finished. Any cards that became due again are shown separately on Today.</p>
+        <ScreenHeader title="Session complete" back={{ name: "today" }} backLabel="Exit practice" />
+        <div className="empty-state">
+          <strong>Session complete.</strong>
+          <br />
+          This batch is finished. Any cards that became due again are shown separately on Today.
         </div>
         <button type="button" className="primary block" onClick={() => go({ name: "today" })}>
           Back to Today
@@ -70,101 +71,99 @@ export function ReviewView() {
   const showWord = item.card.task === "recognition";
   const previews = revealed ? previewRatingIntervals(item.card) : null;
   const word = item.sense.frequency.form || item.sense.id;
+  const blank = productionBlank(item.sense);
 
   return (
     <section className="stack compact">
       <ScreenHeader
-        title={item.card.task === "recognition" ? "Recall meaning" : "Produce word"}
+        eyebrow={`Contextual recall · ${index + 1}/${queue.length}`}
+        title={item.card.task === "recognition" ? "Retrieve the meaning." : "Retrieve the word."}
+        subtitle="Think or say it before revealing."
         back={{ name: "today" }}
-        right={
-          <span className="tiny">
-            {index + 1}/{queue.length}
-          </span>
-        }
+        backLabel="Exit practice"
       />
       <div className="progress-bar" aria-label="Session progress">
         <span style={{ width: `${Math.round((index / queue.length) * 100)}%` }} />
       </div>
-      <div className="panel">
-        <p className="tiny">{question.prompt}</p>
+      <div className="review-cue">
         {showWord ? (
-          <p className="prompt-word">
-            {word}
-            <span className="pos-inline">{item.sense.pos}</span>
-          </p>
-        ) : (
           <>
-            <p className="prompt-word">{item.sense.glossTc}</p>
-            <p className="muted">{productionBlank(item.sense)}</p>
-          </>
-        )}
-        <p className="tiny">{question.hint}</p>
-      </div>
-      {!revealed ? (
-        <button type="button" className="primary block" onClick={() => setRevealed(true)}>
-          Reveal answer
-        </button>
-      ) : (
-        <div className="panel stack tight">
-          {!showWord ? (
             <p className="prompt-word">
               {word}
               <span className="pos-inline">{item.sense.pos}</span>
             </p>
-          ) : null}
-          <p>{item.sense.glossEn}</p>
-          <p>{item.sense.glossTc}</p>
-          {item.sense.collocations.slice(0, 3).map((col) => (
-            <span className="chip collocation" key={col}>
-              {col}
-            </span>
-          ))}
-          {item.sense.examples.slice(0, 2).map((example) => (
-            <p className="muted" key={example.id}>
-              {example.en}
-              <br />
-              {example.tc}
-            </p>
-          ))}
-          <AudioButton pronunciationId={item.sense.pronunciationId} fallbackText={word} allowed={revealed} />
-        </div>
-      )}
-      {revealed ? (
-        <div className="rating-row">
-          {GRADE_HELP.map((grade) => (
-            <button
-              key={grade.key}
-              type="button"
-              className={`rating ${grade.key}`}
-              disabled={busy}
-              onClick={() => rate(grade.rating)}
-            >
-              {grade.label}
-              <span className="tiny">
-                {grade.hint}
-                {previews ? ` · ${previews[grade.rating]}` : ""}
-              </span>
-            </button>
-          ))}
-        </div>
-      ) : null}
-      {revealed ? (
-        <button
-          type="button"
-          className="text-btn"
-          onClick={async () => {
-            const ok = await undoLastReview();
-            if (ok) {
-              const nextIndex = Math.max(0, index - 1);
-              await persistSessionIndex(nextIndex, false);
-              setIndex(nextIndex);
-              setRevealed(false);
-            }
-          }}
-        >
-          Undo last rating
+            <p>{question.prompt}</p>
+          </>
+        ) : (
+          <>
+            <p className="cue-sentence">{blank}</p>
+            <p>{item.sense.glossTc}</p>
+          </>
+        )}
+        <span className="mini">Several expressions may be valid. The answer shows the intended teaching target.</span>
+      </div>
+      {!revealed ? (
+        <button type="button" className="primary block" onClick={() => setRevealed(true)}>
+          Reveal the intended answer
         </button>
-      ) : null}
+      ) : (
+        <>
+          <div className="review-answer">
+            {!showWord ? (
+              <h2 className="prompt-word">
+                {word}
+                <span className="pos-inline">{item.sense.pos}</span>
+              </h2>
+            ) : null}
+            <p>{item.sense.glossEn}</p>
+            <p>{item.sense.glossTc}</p>
+            {item.sense.collocations.slice(0, 3).map((col) => (
+              <span className="phrase" key={col}>
+                {col}
+              </span>
+            ))}
+            {item.sense.examples.slice(0, 1).map((example) => (
+              <p className="example-line" key={example.id}>
+                {example.en}
+                <br />
+                <span className="muted">{example.tc}</span>
+              </p>
+            ))}
+            <AudioButton pronunciationId={item.sense.pronunciationId} fallbackText={word} allowed={revealed} />
+          </div>
+          <p className="tiny helper-copy">Rate your recall from before you revealed—not how familiar it looks now.</p>
+          <div className="rating-row">
+            {GRADE_HELP.map((grade) => (
+              <button
+                key={grade.key}
+                type="button"
+                className={`rating ${grade.key}`}
+                disabled={busy}
+                onClick={() => rate(grade.rating)}
+              >
+                {grade.label}
+                <small>{grade.hint}</small>
+                {previews ? <span className="rating-interval">{previews[grade.rating]}</span> : null}
+              </button>
+            ))}
+          </div>
+          <button
+            type="button"
+            className="text-btn"
+            onClick={async () => {
+              const ok = await undoLastReview();
+              if (ok) {
+                const nextIndex = Math.max(0, index - 1);
+                await persistSessionIndex(nextIndex, false);
+                setIndex(nextIndex);
+                setRevealed(false);
+              }
+            }}
+          >
+            Undo last rating
+          </button>
+        </>
+      )}
     </section>
   );
 }

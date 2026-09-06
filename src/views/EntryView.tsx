@@ -42,43 +42,59 @@ function synonymCopy(sense: SenseRecord): ReactNode {
   return <p className="muted">Similar words for this sense are not prepared yet.</p>;
 }
 
+function savedStatus(word: UserWordRecord | null, started: boolean): string {
+  if (!word || word.membership !== "active") return "";
+  if (word.status === "known" && word.knownEvidence === "self-declared") return "Saved · marked known";
+  if (word.status === "known") return "Saved · known";
+  if (started) return "Saved · learning";
+  return "Saved · not started";
+}
+
 export function EntryView({ entryId, senseId }: { entryId: string; senseId?: string }) {
   const [entry, setEntry] = useState<EntryRecord | null>(null);
   const [senses, setSenses] = useState<SenseRecord[]>([]);
   const [selected, setSelected] = useState<string | null>(senseId ?? null);
   const [saved, setSaved] = useState<UserWordRecord | null>(null);
+  const [started, setStarted] = useState(false);
   const [message, setMessage] = useState("");
+  const [showMoreExamples, setShowMoreExamples] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
 
-  async function load() {
+  async function load(nextId?: string) {
     const [found, list] = await Promise.all([db.entries.get(entryId), db.senses.where("entryId").equals(entryId).toArray()]);
     setEntry(found ?? null);
     setSenses(list);
-    const currentId = selected ?? senseId ?? list[0]?.id ?? null;
+    const currentId = nextId ?? selected ?? senseId ?? list[0]?.id ?? null;
     setSelected(currentId);
     if (currentId) {
-      const word = await db.userWords.get(`word:${currentId}`);
-      setSaved(word?.membership === "active" ? word : word ?? null);
+      const [word, card] = await Promise.all([db.userWords.get(`word:${currentId}`), db.cards.get(`card:recognition:${currentId}`)]);
+      setSaved(word ?? null);
+      setStarted(Boolean(card));
     }
   }
 
   useEffect(() => {
-    void load();
+    void load(senseId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [entryId, senseId]);
 
   useEffect(() => {
     if (!selected) return;
-    void db.userWords.get(`word:${selected}`).then((word) => setSaved(word ?? null));
+    void Promise.all([db.userWords.get(`word:${selected}`), db.cards.get(`card:recognition:${selected}`)]).then(([word, card]) => {
+      setSaved(word ?? null);
+      setStarted(Boolean(card));
+    });
   }, [selected]);
 
   const sense = senses.find((item) => item.id === selected) ?? null;
   const membershipActive = saved?.membership === "active";
+  const featured = sense?.examples[0] ?? null;
+  const extraExamples = sense?.examples.slice(1) ?? [];
 
   if (!entry) {
     return (
       <section className="stack compact">
-        <ScreenHeader title="Word" back="history" />
+        <ScreenHeader back="history" backLabel="Back to Dictionary" />
         <p className="muted">Entry not found in the installed pack.</p>
       </section>
     );
@@ -86,14 +102,17 @@ export function EntryView({ entryId, senseId }: { entryId: string; senseId?: str
 
   return (
     <section className="stack compact">
-      <ScreenHeader title="Dictionary" back="history" />
+      <ScreenHeader back="history" backLabel="Back to Dictionary" />
       {sense ? (
         <div className="panel entry-hero">
           <div className="entry-top">
-            <h1 className="headword">
-              {entry.display}
-              <span className="pos-inline">{sense.pos}</span>
-            </h1>
+            <div>
+              <h1 className="headword">
+                {entry.display}
+                <span className="pos-inline">{sense.pos}</span>
+              </h1>
+              <p className="sense-kicker">{(sense.domains[0] ?? "workplace").replaceAll("-", " ")}</p>
+            </div>
             <div className="word-card-meta">
               <ScoreBadge score={sense.frequency.commonness} />
               <AudioButton
@@ -111,99 +130,123 @@ export function EntryView({ entryId, senseId }: { entryId: string; senseId?: str
         </div>
       ) : null}
       {senses.length > 1 ? (
-        <div className="wrap">
+        <div className="sense-switch" role="list">
           {senses.map((item) => (
-            <button key={item.id} type="button" className={item.id === selected ? "chip active" : "chip"} onClick={() => setSelected(item.id)}>
-              {item.pos}
+            <button
+              key={item.id}
+              type="button"
+              className={item.id === selected ? "sense-choice active" : "sense-choice"}
+              onClick={() => setSelected(item.id)}
+            >
+              <span className="pos-inline">{item.pos}</span>
+              <span>{item.glossEn}</span>
             </button>
           ))}
         </div>
       ) : null}
       {sense ? (
         <>
-          <div className="panel">
-            <p className="example-index">COMMON COMBINATIONS</p>
-            {sense.collocations.length ? (
-              <div className="wrap">
-                {sense.collocations.slice(0, 3).map((item) => (
-                  <span className="chip collocation" key={item}>
-                    {item}
-                  </span>
-                ))}
-              </div>
-            ) : (
-              <p className="muted">No strong combination is listed for this sense.</p>
-            )}
-          </div>
-          <div className="panel">
-            <p className="example-index">EXAMPLES</p>
-            {sense.examples.slice(0, 3).map((example) => (
-              <div className="example" key={example.id}>
-                <p>{emphasize(example.en, sense.collocations)}</p>
-                <p className="muted">{example.tc}</p>
-              </div>
-            ))}
-          </div>
-          <div className="panel">
-            <p className="example-index">SIMILAR WORDS</p>
+          {sense.collocations.length ? (
+            <div>
+              {sense.collocations.slice(0, 3).map((item) => (
+                <span className="phrase" key={item}>
+                  {item}
+                </span>
+              ))}
+            </div>
+          ) : (
+            <p className="muted">No strong combination is listed for this sense.</p>
+          )}
+          {featured ? (
+            <blockquote className="featured-example">
+              {emphasize(featured.en, sense.collocations)}
+              <br />
+              <span className="muted">{featured.tc}</span>
+            </blockquote>
+          ) : null}
+          {extraExamples.length ? (
+            <button type="button" className="text-btn" onClick={() => setShowMoreExamples((value) => !value)}>
+              {showMoreExamples ? "Hide extra examples" : "More examples"}
+            </button>
+          ) : null}
+          {showMoreExamples
+            ? extraExamples.map((example) => (
+                <div className="example" key={example.id}>
+                  <p>{emphasize(example.en, sense.collocations)}</p>
+                  <p className="muted">{example.tc}</p>
+                </div>
+              ))
+            : null}
+          <div className="insight-card">
+            <p className="example-index">Similar words · different use</p>
             {synonymCopy(sense)}
           </div>
-          <button type="button" className="text-btn" onClick={() => setShowDetails((value) => !value)}>
-            {showDetails ? "Hide extra detail" : "Usage note"}
-          </button>
-          {showDetails && sense.usageNote ? (
-            <p className="tiny">{sense.usageNote}</p>
+          {sense.usageNote ? (
+            <>
+              <button type="button" className="text-btn" onClick={() => setShowDetails((value) => !value)}>
+                {showDetails ? "Hide usage note" : "Usage note"}
+              </button>
+              {showDetails ? <p className="tiny">{sense.usageNote}</p> : null}
+            </>
           ) : null}
           <div className="center-actions">
             {membershipActive ? (
-              <button
-                type="button"
-                className="ghost block"
-                onClick={async () => {
-                  await removeFromMyWords(sense.id);
-                  setMessage("Removed from My Words. Dictionary entry kept.");
-                  await load();
-                }}
-              >
-                Remove from My Words
-              </button>
+              <>
+                <div className="saved-banner">{savedStatus(saved, started)}. Saving is not learning.</div>
+                <button
+                  type="button"
+                  className="primary block"
+                  onClick={async () => {
+                    await saveSense(sense, "Saved by you");
+                    await introduceSense(sense, "Saved by you");
+                    setMessage("Queued to practise. It counts as introduced after you recall it.");
+                    go({ name: "review" });
+                  }}
+                >
+                  Practise this meaning
+                </button>
+                <div className="subtle-row">
+                  <button
+                    type="button"
+                    className="text-btn"
+                    onClick={async () => {
+                      await saveSense(sense, "Already know");
+                      await markSenseKnown(sense.id);
+                      setMessage("Marked known. This does not invent a successful review history.");
+                      await load(sense.id);
+                    }}
+                  >
+                    Mark known
+                  </button>
+                  <button
+                    type="button"
+                    className="text-btn"
+                    onClick={async () => {
+                      await removeFromMyWords(sense.id);
+                      setMessage("Removed from My Words. Dictionary entry kept.");
+                      await load(sense.id);
+                    }}
+                  >
+                    Remove
+                  </button>
+                </div>
+              </>
             ) : (
-              <button
-                type="button"
-                className="primary block"
-                onClick={async () => {
-                  await saveSense(sense, "Saved by you");
-                  setMessage("Saved. This is not yet counted as learned.");
-                  await load();
-                }}
-              >
-                Save this meaning
-              </button>
+              <>
+                <button
+                  type="button"
+                  className="primary block"
+                  onClick={async () => {
+                    await saveSense(sense, "Saved by you");
+                    setMessage("Saved this meaning only. It remains Not started until a learning attempt.");
+                    await load(sense.id);
+                  }}
+                >
+                  Save this meaning
+                </button>
+                <p className="tiny helper-copy">Saving alone does not count as learning.</p>
+              </>
             )}
-            <button
-              type="button"
-              className="ghost block"
-              onClick={async () => {
-                await saveSense(sense, "Saved by you");
-                await introduceSense(sense, "Saved by you");
-                setMessage("Queued to learn next. It counts as introduced after you recall it.");
-                go({ name: "review" });
-              }}
-            >
-              Learn next
-            </button>
-            <button
-              type="button"
-              className="ghost block"
-              onClick={async () => {
-                await saveSense(sense, "Already know");
-                await markSenseKnown(sense.id);
-                setMessage("Marked known. This does not invent a successful review history.");
-                await load();
-              }}
-            >
-              Mark known
-            </button>
             {message ? <p className="tiny">{message}</p> : null}
           </div>
         </>

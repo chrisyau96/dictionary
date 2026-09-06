@@ -62,7 +62,7 @@ export function MyWordsView() {
 
   return (
     <section className="stack compact words-page">
-      <ScreenHeader title="My Words" />
+      <ScreenHeader eyebrow="Your personal library" title="My Words" subtitle="Saved is not the same as learned." />
       <div className="segmented" role="tablist" aria-label="My Words filters">
         {(["all", "learning", "known"] as Filter[]).map((item) => (
           <button key={item} type="button" className={filter === item ? "active" : ""} onClick={() => setFilter(item)}>
@@ -71,10 +71,14 @@ export function MyWordsView() {
         ))}
       </div>
       <input className="search-box" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search your list" />
+      <p className="tiny helper-copy">
+        {visible.length} active {visible.length === 1 ? "sense" : "senses"} in this view. Swipe a card left to remove it.
+      </p>
       {visible.length === 0 ? (
-        <div className="panel">
-          <p>No words in this list.</p>
-          <p className="muted">Swipe a card left to remove it. Notes save when you finish typing or press Enter.</p>
+        <div className="empty-state">
+          Nothing here yet.
+          <br />
+          Known is not automatically earned by saving.
         </div>
       ) : null}
       {visible.map(({ word, sense, due, tab }) => {
@@ -82,8 +86,8 @@ export function MyWordsView() {
         const status =
           tab === "known"
             ? word.knownEvidence === "self-declared"
-              ? "Marked known"
-              : "Verified"
+              ? "Known · self-declared"
+              : "Known · verified"
             : due === "Due now"
               ? "Due"
               : word.status === "learning" && due === null
@@ -116,6 +120,10 @@ export function MyWordsView() {
           </SwipeRemove>
         );
       })}
+      <div className="insight-card">
+        <p className="example-index">Keep the evidence visible</p>
+        <p>Self-declared Known differs from review-verified knowledge. Marking Known does not invent a successful review.</p>
+      </div>
       {undo ? (
         <div className="toast">
           Removed. Dictionary entry kept.
