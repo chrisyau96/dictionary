@@ -93,7 +93,7 @@ export function TodayView() {
         </div>
       </div>
       {needsCheck ? (
-        <button type="button" className="ghost block" onClick={() => go({ name: "diagnostic" })}>
+        <button type="button" className="text-btn" onClick={() => go({ name: "diagnostic" })}>
           Find your starting vocabulary level
         </button>
       ) : null}

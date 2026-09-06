@@ -85,36 +85,36 @@ export function ReviewView() {
       <div className="progress-bar" aria-label="Session progress">
         <span style={{ width: `${Math.round((index / queue.length) * 100)}%` }} />
       </div>
-      <div className="review-cue">
-        {showWord ? (
-          <>
-            <p className="prompt-word">
-              {word}
-              <span className="pos-inline">{item.sense.pos}</span>
-            </p>
-            <p>{question.prompt}</p>
-          </>
-        ) : (
-          <>
-            <p className="cue-sentence">{blank}</p>
-            <p>{item.sense.glossTc}</p>
-          </>
-        )}
-        <span className="mini">Several expressions may be valid. The answer shows the intended teaching target.</span>
-      </div>
       {!revealed ? (
-        <button type="button" className="primary block" onClick={() => setRevealed(true)}>
-          Reveal the intended answer
-        </button>
+        <>
+          <div className="review-cue">
+            {showWord ? (
+              <>
+                <p className="prompt-word">
+                  {word}
+                  <span className="pos-inline">{item.sense.pos}</span>
+                </p>
+                <p>{question.prompt}</p>
+              </>
+            ) : (
+              <>
+                <p className="cue-sentence">{blank}</p>
+                <p>{item.sense.glossTc}</p>
+              </>
+            )}
+            <span className="mini">Several expressions may be valid. The answer shows the intended teaching target.</span>
+          </div>
+          <button type="button" className="primary block" onClick={() => setRevealed(true)}>
+            Reveal the intended answer
+          </button>
+        </>
       ) : (
         <>
           <div className="review-answer">
-            {!showWord ? (
-              <h2 className="prompt-word">
-                {word}
-                <span className="pos-inline">{item.sense.pos}</span>
-              </h2>
-            ) : null}
+            <h2 className="prompt-word">
+              {word}
+              <span className="pos-inline">{item.sense.pos}</span>
+            </h2>
             <p>{item.sense.glossEn}</p>
             <p>{item.sense.glossTc}</p>
             {item.sense.collocations.slice(0, 3).map((col) => (
