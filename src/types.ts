@@ -34,8 +34,11 @@ export type ReviewSessionType = "scheduled" | "learn-new";
 export type AssessmentCoverage = "adequate" | "provisional";
 export type DifficultyPreference = "none" | "easier" | "harder";
 
+export type AccentId = "purple" | "indigo" | "blue" | "teal" | "green" | "orange" | "rose";
+
 export const REVIEW_VERIFIED_RULE_VERSION = "rv-1";
-export const ASSESSMENT_BANK_VERSION = "v1";
+export const ASSESSMENT_BANK_VERSION = "v2";
+export const ASSESSMENT_LENGTH = 20;
 export const BACKUP_VERSION = 2;
 
 export interface FrequencyRecord {
@@ -218,6 +221,8 @@ export interface AssessmentResult {
   productionTotal: number;
   sampledByBand: Record<EditorialBand, { correct: number; total: number }>;
   note: string;
+  overallCorrect: number;
+  overallTotal: number;
 }
 
 export interface AssessmentSessionRecord {
@@ -279,6 +284,7 @@ export interface ProfileRecord {
   difficultyPreference: DifficultyPreference;
   seenReviewHelp: boolean;
   showPhonetics: boolean;
+  accentId: AccentId;
 }
 
 export interface LocalRequestRecord {

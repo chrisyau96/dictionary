@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { ScreenHeader } from "../components/ScreenHeader";
+import { WordListCard } from "../components/WordListCard";
 import { db, ensureProfile } from "../db/database";
 import { go } from "../router";
-import { replacePlanItem } from "../study/plan";
+import { markPlanSense, replacePlanItem } from "../study/plan";
 import {
   buildToday,
   learnPlanSenses,
   markSenseKnown,
   saveSense,
-  setWordFeedback,
   startDueSession,
   type TodaySummary,
 } from "../study/session";
@@ -19,8 +19,7 @@ function statusLabel(status: DailyPlanItem["status"]): string {
   if (status === "started") return "Started";
   if (status === "not-started") return "Not started";
   if (status === "already-know") return "Already know";
-  if (status === "not-useful") return "Not useful";
-  return "Replaced";
+  return "Skipped";
 }
 
 export function TodayView() {
@@ -117,55 +116,53 @@ export function TodayView() {
       ) : (
         visibleItems.map((item) => {
           const sense = senses.get(item.senseId);
+          if (!sense) return null;
           return (
-            <article className="card tight" key={item.senseId}>
-              <div className="row">
-                <div className="word-row-title">
-                  <strong>{sense?.frequency.form || item.senseId}</strong>
-                  {sense ? <span className="pos-inline">{sense.pos}</span> : null}
-                </div>
-                <span className="tiny">{statusLabel(item.status)}</span>
-              </div>
-              <p className="tiny">{item.reason}</p>
-              {item.status === "not-started" && sense ? (
-                <div className="mini-actions">
-                  <button
-                    type="button"
-                    className="ghost"
-                    onClick={async () => {
-                      await saveSense(sense, "Already know");
-                      await markSenseKnown(sense.id);
-                      await replacePlanItem(sense.id, "already-know");
-                      await refresh();
-                    }}
-                  >
-                    Already know
-                  </button>
-                  <button
-                    type="button"
-                    className="ghost"
-                    onClick={async () => {
-                      await saveSense(sense, "Not useful");
-                      await setWordFeedback(sense.id, "not-useful", "paused");
-                      await replacePlanItem(sense.id, "not-useful");
-                      await refresh();
-                    }}
-                  >
-                    Not useful
-                  </button>
-                  <button
-                    type="button"
-                    className="ghost"
-                    onClick={async () => {
-                      await replacePlanItem(sense.id, "replaced");
-                      await refresh();
-                    }}
-                  >
-                    Replace
-                  </button>
-                </div>
-              ) : null}
-            </article>
+            <WordListCard
+              key={item.senseId}
+              sense={sense}
+              status={statusLabel(item.status)}
+              onOpen={() => go({ name: "entry", entryId: sense.entryId, senseId: sense.id })}
+              actions={
+                item.status === "not-started" ? (
+                  <div className="card-actions">
+                    <button
+                      type="button"
+                      className="primary"
+                      onClick={async () => {
+                        await saveSense(sense, item.reason);
+                        await markPlanSense(sense.id, "started");
+                        go({ name: "entry", entryId: sense.entryId, senseId: sense.id });
+                      }}
+                    >
+                      Learn
+                    </button>
+                    <button
+                      type="button"
+                      className="ghost"
+                      onClick={async () => {
+                        await saveSense(sense, "Already know");
+                        await markSenseKnown(sense.id);
+                        await replacePlanItem(sense.id, "already-know");
+                        await refresh();
+                      }}
+                    >
+                      Already know
+                    </button>
+                    <button
+                      type="button"
+                      className="ghost"
+                      onClick={async () => {
+                        await replacePlanItem(sense.id, "replaced");
+                        await refresh();
+                      }}
+                    >
+                      Skip
+                    </button>
+                  </div>
+                ) : null
+              }
+            />
           );
         })
       )}

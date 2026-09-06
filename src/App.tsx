@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useRegisterSW } from "virtual:pwa-register/react";
-import { db } from "./db/database";
+import { db, ensureProfile } from "./db/database";
 import { parseHash, type Route, go } from "./router";
+import { applyAccent, DEFAULT_ACCENT } from "./theme/accents";
 import { DiagnosticView } from "./views/DiagnosticView";
 import { DictionaryView } from "./views/DictionaryView";
 import { EntryView } from "./views/EntryView";
@@ -32,6 +33,10 @@ export function App() {
     const onHash = () => setRoute(parseHash(window.location.hash));
     window.addEventListener("hashchange", onHash);
     return () => window.removeEventListener("hashchange", onHash);
+  }, []);
+
+  useEffect(() => {
+    void ensureProfile().then((profile) => applyAccent(profile.accentId || DEFAULT_ACCENT));
   }, []);
 
   useEffect(() => {

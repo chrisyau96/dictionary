@@ -1,11 +1,10 @@
-import { commonnessLabel } from "../content/commonness";
-
 export function ScoreBadge({ score }: { score: number | null }) {
-  const label = score === null ? "Not measured" : `${score} / 100 · ${commonnessLabel(score)}`;
+  const label = score === null ? "Frequency not measured" : `Score ${score}. Frequency in general English.`;
   return (
-    <div className="score-badge" title="App commonness score from wordfreq Zipf, scale v1. Not a CEFR level or personal usefulness.">
+    <div className="score-badge" title="Commonness from wordfreq Zipf, scale v1. Not a CEFR level.">
+      <span className="score-caption">Score</span>
       <span className="score-value">{score === null ? "—" : score}</span>
-      <span className="score-denom">/100</span>
+      <span className="score-denom">Frequency</span>
       <span className="visually-hidden">{label}</span>
     </div>
   );

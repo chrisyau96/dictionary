@@ -1,15 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { ScreenHeader } from "../components/ScreenHeader";
+import { NoteField } from "../components/NoteField";
+import { SwipeRemove } from "../components/SwipeRemove";
+import { WordListCard } from "../components/WordListCard";
 import { db, ensureProfile } from "../db/database";
 import { libraryTab } from "../progress/metrics";
 import { go } from "../router";
-import {
-  nextDueForSense,
-  removeFromMyWords,
-  resumeLearning,
-  setWordNotes,
-  undoRemoveFromMyWords,
-} from "../study/session";
+import { nextDueForSense, removeFromMyWords, resumeLearning, undoRemoveFromMyWords } from "../study/session";
 import type { CardRecord, ReviewEventRecord, SenseRecord, UserWordRecord } from "../types";
 
 type Filter = "all" | "learning" | "known";
@@ -64,7 +61,7 @@ export function MyWordsView() {
   };
 
   return (
-    <section className="stack compact">
+    <section className="stack compact words-page">
       <ScreenHeader title="My Words" />
       <div className="segmented" role="tablist" aria-label="My Words filters">
         {(["all", "learning", "known"] as Filter[]).map((item) => (
@@ -77,48 +74,48 @@ export function MyWordsView() {
       {visible.length === 0 ? (
         <div className="panel">
           <p>No words in this list.</p>
-          <p className="muted">All is everything you saved. Learning is still in progress. Known is marked known or verified by delayed production reviews.</p>
+          <p className="muted">Swipe a card left to remove it. Notes save when you finish typing.</p>
         </div>
       ) : null}
-      {visible.map(({ word, sense, due, tab }) => (
-        <article className="card tight" key={word.id}>
-          <div className="row">
-            <div className="word-row-title">
-              <strong>{sense?.frequency.form || word.senseId}</strong>
-              {sense ? <span className="pos-inline">{sense.pos}</span> : null}
-            </div>
-            <span className="tiny">{tab === "known" ? (word.knownEvidence === "self-declared" ? "Marked known" : "Verified") : due === "Due now" ? "Due" : word.status === "learning" && due === null ? "Not started" : "Learning"}</span>
-          </div>
-          <p className="muted">{sense?.glossTc}</p>
-          {sense ? (
-            <button type="button" className="text-btn" onClick={() => go({ name: "entry", entryId: sense.entryId, senseId: sense.id })}>
-              Open
-            </button>
-          ) : null}
-          <label>
-            Note
-            <input defaultValue={word.notes} placeholder="When you would use this" onBlur={(event) => setWordNotes(word.senseId, event.target.value)} />
-          </label>
-          <div className="mini-actions">
-            {tab === "known" ? (
-              <button type="button" className="ghost" onClick={() => resumeLearning(word.senseId).then(refresh)}>
-                Learn again
-              </button>
-            ) : null}
-            <button
-              type="button"
-              className="ghost"
-              onClick={async () => {
-                const previous = await removeFromMyWords(word.senseId);
-                setUndo(previous);
-                await refresh();
-              }}
-            >
-              Remove from My Words
-            </button>
-          </div>
-        </article>
-      ))}
+      {visible.map(({ word, sense, due, tab }) => {
+        if (!sense) return null;
+        const status =
+          tab === "known"
+            ? word.knownEvidence === "self-declared"
+              ? "Marked known"
+              : "Verified"
+            : due === "Due now"
+              ? "Due"
+              : word.status === "learning" && due === null
+                ? "Not started"
+                : "Learning";
+        return (
+          <SwipeRemove
+            key={word.id}
+            onRemove={async () => {
+              const previous = await removeFromMyWords(word.senseId);
+              setUndo(previous);
+              await refresh();
+            }}
+          >
+            <WordListCard
+              sense={sense}
+              status={status}
+              onOpen={() => go({ name: "entry", entryId: sense.entryId, senseId: sense.id })}
+              actions={
+                <div className="word-card-extra">
+                  <NoteField senseId={word.senseId} initial={word.notes} />
+                  {tab === "known" ? (
+                    <button type="button" className="ghost" onClick={() => resumeLearning(word.senseId).then(refresh)}>
+                      Learn again
+                    </button>
+                  ) : null}
+                </div>
+              }
+            />
+          </SwipeRemove>
+        );
+      })}
       {undo ? (
         <div className="toast">
           Removed. Dictionary entry kept.

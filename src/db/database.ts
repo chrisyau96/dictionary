@@ -1,6 +1,7 @@
 import Dexie, { type Table } from "dexie";
 import { normalizeSenseSynonyms } from "../content/synonyms";
 import { detectTimezone, studyDayKey } from "../time/timezone";
+import { DEFAULT_ACCENT, isAccentId } from "../theme/accents";
 import type {
   AssessmentSessionRecord,
   AudioRecord,
@@ -81,6 +82,7 @@ export function normalizeProfile(raw: Partial<ProfileRecord> | undefined, now = 
     difficultyPreference: raw.difficultyPreference ?? "none",
     seenReviewHelp: raw.seenReviewHelp ?? false,
     showPhonetics: raw.showPhonetics ?? false,
+    accentId: isAccentId(raw.accentId) ? raw.accentId : DEFAULT_ACCENT,
     diagnosticResponses: raw.diagnosticResponses ?? [],
   };
 }
@@ -194,6 +196,7 @@ export function defaultProfile(now = new Date()): ProfileRecord {
     difficultyPreference: "none",
     seenReviewHelp: false,
     showPhonetics: false,
+    accentId: DEFAULT_ACCENT,
   };
 }
 
@@ -208,6 +211,7 @@ export async function ensureProfile(): Promise<ProfileRecord> {
     existing.difficultyPreference == null ||
     existing.seenReviewHelp == null ||
     existing.showPhonetics == null ||
+    existing.accentId == null ||
     existing.estimatedBand === ("emerging" as ProfileRecord["estimatedBand"]) ||
     existing.estimatedBand === ("developing" as ProfileRecord["estimatedBand"]) ||
     existing.estimatedBand === ("independent" as ProfileRecord["estimatedBand"]);

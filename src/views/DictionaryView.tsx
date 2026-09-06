@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { db } from "../db/database";
 import { ScreenHeader } from "../components/ScreenHeader";
+import { WordListCard } from "../components/WordListCard";
 import { go } from "../router";
-import { searchDictionary, type SearchHit } from "../search/lookup";
+import type { SearchHit } from "../search/lookup";
+import { searchDictionary } from "../search/lookup";
 import { normalizeQuery } from "../search/normalize";
 import type { DomainId, SenseRecord } from "../types";
 
@@ -82,42 +84,23 @@ export function DictionaryView({ initialQuery }: { initialQuery: string }) {
             <button type="button" className="text-btn" onClick={() => setBrowse(null)}>Back</button>
           </div>
           {topicSenses.map((sense) => (
-            <button
+            <WordListCard
               key={sense.id}
-              type="button"
-              className="card"
-              style={{ textAlign: "left" }}
-              onClick={() => go({ name: "entry", entryId: sense.entryId, senseId: sense.id })}
-            >
-              <div className="word-row-title">
-                <strong>{sense.frequency.form || sense.id}</strong>
-                <span className="pos-inline">{sense.pos}</span>
-              </div>
-              <p className="muted">{sense.glossTc}</p>
-            </button>
+              sense={sense}
+              onOpen={() => go({ name: "entry", entryId: sense.entryId, senseId: sense.id })}
+            />
           ))}
         </div>
       ) : null}
-      {hits.map((hit) => (
-        <article className="card" key={hit.entry.id}>
-          <button type="button" className="text-btn" onClick={() => go({ name: "entry", entryId: hit.entry.id, senseId: hit.senses[0]?.id })}>
-            <span className="word-row-title">
-              <strong>{hit.entry.display}</strong>
-              <span className="pos-inline">{hit.senses[0]?.pos}</span>
-            </span>
-          </button>
-          {hit.senses.map((sense) => (
-            <button
-              key={sense.id}
-              type="button"
-              className="ghost block"
-              onClick={() => go({ name: "entry", entryId: hit.entry.id, senseId: sense.id })}
-            >
-              {sense.pos}: {sense.glossEn}
-            </button>
-          ))}
-        </article>
-      ))}
+      {hits.flatMap((hit) =>
+        hit.senses.map((sense) => (
+          <WordListCard
+            key={sense.id}
+            sense={sense}
+            onOpen={() => go({ name: "entry", entryId: hit.entry.id, senseId: sense.id })}
+          />
+        )),
+      )}
       {missing ? (
         <div className="panel">
           <p><strong>Not in this offline pack</strong></p>

@@ -94,12 +94,15 @@ export function EntryView({ entryId, senseId }: { entryId: string; senseId?: str
               {entry.display}
               <span className="pos-inline">{sense.pos}</span>
             </h1>
-            <AudioButton
-              pronunciationId={sense.pronunciationId}
-              fallbackText={entry.display}
-              allowed
-              label={`Play pronunciation of ${entry.display}`}
-            />
+            <div className="word-card-meta">
+              <ScoreBadge score={sense.frequency.commonness} />
+              <AudioButton
+                pronunciationId={sense.pronunciationId}
+                fallbackText={entry.display}
+                allowed
+                label={`Play pronunciation of ${entry.display}`}
+              />
+            </div>
           </div>
           <div className="meaning">
             <div className="en">{sense.glossEn}</div>
@@ -146,13 +149,10 @@ export function EntryView({ entryId, senseId }: { entryId: string; senseId?: str
             {synonymCopy(sense)}
           </div>
           <button type="button" className="text-btn" onClick={() => setShowDetails((value) => !value)}>
-            {showDetails ? "Hide extra detail" : "Commonness and extra detail"}
+            {showDetails ? "Hide extra detail" : "Usage note"}
           </button>
-          {showDetails ? (
-            <div className="panel row">
-              <span className="tiny">How common this form is in general English</span>
-              <ScoreBadge score={sense.frequency.commonness} />
-            </div>
+          {showDetails && sense.usageNote ? (
+            <p className="tiny">{sense.usageNote}</p>
           ) : null}
           <div className="center-actions">
             {membershipActive ? (

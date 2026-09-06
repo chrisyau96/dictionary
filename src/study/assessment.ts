@@ -1,8 +1,15 @@
 import { db, ensureProfile } from "../db/database";
-import { ASSESSMENT_BANK_VERSION, type AssessmentOutcome, type AssessmentResponse, type AssessmentResult, type AssessmentSessionRecord, type EditorialBand } from "../types";
+import { ASSESSMENT_BANK_VERSION, ASSESSMENT_LENGTH, type AssessmentOutcome, type AssessmentResponse, type AssessmentResult, type AssessmentSessionRecord, type EditorialBand } from "../types";
 import { ASSESSMENT_ITEMS, itemsById, type AssessmentItem } from "./assessmentItems";
 
 export const BANDS: EditorialBand[] = ["everyday", "workplace", "professional", "specialist"];
+
+export function bandTitle(band: EditorialBand): string {
+  if (band === "everyday") return "Everyday";
+  if (band === "workplace") return "Workplace";
+  if (band === "professional") return "Professional";
+  return "Specialist";
+}
 
 export function bandLabel(band: EditorialBand): string {
   if (band === "everyday") return "everyday workplace English";
@@ -92,14 +99,26 @@ export function routeAfterBlock(current: EditorialBand, outcomes: AssessmentOutc
   return current;
 }
 
+export function ensureMcq(item: AssessmentItem): AssessmentItem {
+  if (item.options && item.options.length >= 4) return item;
+  const distractors: string[] = [];
+  for (const candidate of ASSESSMENT_ITEMS) {
+    if (candidate.id === item.id) continue;
+    const option = candidate.correct;
+    if (!option || option === item.correct) continue;
+    if (distractors.includes(option)) continue;
+    distractors.push(option);
+    if (distractors.length === 3) break;
+  }
+  if (distractors.length < 3) return item;
+  return { ...item, options: [item.correct, ...distractors] };
+}
+
 export function buildAssessmentQueue(startBand: EditorialBand = "workplace"): AssessmentItem[] {
   const used = new Set<string>();
   const idx = bandIndex(startBand);
   const routingBands: EditorialBand[] = [
     clampBand(idx),
-    clampBand(idx),
-    clampBand(idx - 1),
-    clampBand(idx + 1),
     clampBand(idx),
     clampBand(idx - 1),
     clampBand(idx + 1),
@@ -110,31 +129,26 @@ export function buildAssessmentQueue(startBand: EditorialBand = "workplace"): As
     const next = pickFromBand(band, "recognition", "routing", used, 1)[0]
       ?? pickFromBand(band, "recognition", "understanding", used, 1)[0];
     if (next) {
-      routing.push(next);
+      routing.push(ensureMcq(next));
       used.add(next.id);
     }
   }
-  const understanding = pickAroundBand(startBand, "understanding", "recognition", used, 16);
-  const production = pickAroundBand(startBand, "use", "production", used, 8);
-  return [...routing, ...understanding, ...production].slice(0, 32);
+  const understanding = pickAroundBand(startBand, "understanding", "recognition", used, 10).map(ensureMcq);
+  const useItems = pickAroundBand(startBand, "use", null, used, 5).map(ensureMcq);
+  const queue = [...routing, ...understanding, ...useItems].filter((item) => (item.options?.length ?? 0) >= 4);
+  if (queue.length < ASSESSMENT_LENGTH) {
+    for (const item of shuffle(ASSESSMENT_ITEMS.map(ensureMcq))) {
+      if (queue.length >= ASSESSMENT_LENGTH) break;
+      if (used.has(item.id) || (item.options?.length ?? 0) < 4) continue;
+      queue.push(item);
+      used.add(item.id);
+    }
+  }
+  return queue.slice(0, ASSESSMENT_LENGTH);
 }
 
-export function maybeExtendQueue(
-  items: AssessmentItem[],
-  responses: AssessmentResponse[],
-): AssessmentItem[] {
-  if (items.length >= 40) return items;
-  const rec = bandFromSkill(responses, "recognition");
-  const prod = bandFromSkill(responses, "production");
-  const conflict = Math.abs(bandIndex(rec) - bandIndex(prod)) >= 2;
-  const boundary = majorityBand(responses);
-  const atBoundary = responses.filter((item) => item.band === boundary).length;
-  if (!conflict && atBoundary >= 6) return items;
-  const used = new Set(items.map((item) => item.id));
-  const extraPhase: AssessmentItem["phase"] = conflict ? "use" : "understanding";
-  const extraSkill = conflict ? "production" : null;
-  const extra = pickAroundBand(boundary, extraPhase, extraSkill, used, Math.min(8, 40 - items.length));
-  return [...items, ...extra];
+export function maybeExtendQueue(items: AssessmentItem[]): AssessmentItem[] {
+  return items.slice(0, ASSESSMENT_LENGTH);
 }
 
 function majorityBand(responses: AssessmentResponse[]): EditorialBand {
@@ -197,7 +211,9 @@ export function evaluateAssessment(responses: AssessmentResponse[]): AssessmentR
   const recommendedBand =
     bandIndex(productionBand) < bandIndex(recognitionBand) ? productionBand : recognitionBand;
   const coverage: AssessmentResult["coverage"] =
-    responses.length >= 24 && recognition.length >= 12 && production.length >= 6 ? "adequate" : "provisional";
+    responses.length >= 16 ? "adequate" : "provisional";
+  const overallCorrect = responses.filter((item) => item.outcome === "correct").length;
+  const overallTotal = responses.length;
   const recRate = recognition.length ? recognition.filter((item) => item.outcome === "correct").length / recognition.length : 0;
   const prodRate = production.length ? production.filter((item) => item.outcome === "correct").length / production.length : 0;
   let note = "Start with useful words near this band, then let reviews adjust the mix.";
@@ -223,6 +239,8 @@ export function evaluateAssessment(responses: AssessmentResponse[]): AssessmentR
     productionTotal: production.length,
     sampledByBand,
     note,
+    overallCorrect,
+    overallTotal,
   };
 }
 
@@ -235,7 +253,10 @@ export async function loadActiveAssessment(): Promise<AssessmentSessionRecord | 
 
 export async function startAssessment(now = new Date()): Promise<AssessmentSessionRecord> {
   const existing = await loadActiveAssessment();
-  if (existing) return existing;
+  if (existing?.version === ASSESSMENT_BANK_VERSION && existing.itemIds.length <= ASSESSMENT_LENGTH) {
+    return existing;
+  }
+  if (existing && !existing.completedAt) await db.assessmentSessions.delete(existing.id);
   const profile = await ensureProfile();
   const queue = buildAssessmentQueue(profile.estimatedBand ?? "workplace");
   const session: AssessmentSessionRecord = {
@@ -256,7 +277,8 @@ export async function startAssessment(now = new Date()): Promise<AssessmentSessi
 export function itemForSession(session: AssessmentSessionRecord, index = session.currentIndex): AssessmentItem | null {
   const id = session.itemIds[index];
   if (!id) return null;
-  return itemsById().get(id) ?? null;
+  const found = itemsById().get(id);
+  return found ? ensureMcq(found) : null;
 }
 
 export async function recordAssessmentAnswer(
@@ -268,20 +290,15 @@ export async function recordAssessmentAnswer(
     const session = await db.assessmentSessions.get(sessionId);
     if (!session || session.completedAt) throw new Error("Assessment session is not active.");
     const responses = [...session.responses, response];
-    let itemIds = session.itemIds;
     let routingBand = session.routingBand;
+    const itemIds = session.itemIds;
     if (responses.length === 5) {
       routingBand = routeAfterBlock(
         session.routingBand,
         responses.slice(0, 5).map((item) => item.outcome),
       );
     }
-    if (responses.length === 32) {
-      const lookup = itemsById();
-      const currentItems = itemIds.map((id) => lookup.get(id)).filter((item): item is AssessmentItem => Boolean(item));
-      itemIds = maybeExtendQueue(currentItems, responses).map((item) => item.id);
-    }
-    const done = responses.length >= itemIds.length;
+    const done = responses.length >= Math.min(itemIds.length, ASSESSMENT_LENGTH);
     const result = done ? evaluateAssessment(responses) : null;
     const next: AssessmentSessionRecord = {
       ...session,

@@ -4,6 +4,7 @@ import { ScreenHeader } from "../components/ScreenHeader";
 import { db, ensureProfile } from "../db/database";
 import { storageSnapshot } from "../content/install";
 import { go } from "../router";
+import { ACCENT_OPTIONS, applyAccent, type AccentId } from "../theme/accents";
 import type { DomainId, ProfileRecord } from "../types";
 
 const DOMAIN_LABELS: Record<DomainId, string> = {
@@ -21,7 +22,10 @@ export function SettingsView() {
   const [restoreNote, setRestoreNote] = useState("");
 
   useEffect(() => {
-    void ensureProfile().then(setProfile);
+    void ensureProfile().then((next) => {
+      setProfile(next);
+      applyAccent(next.accentId);
+    });
     void storageSnapshot().then((info) => {
       const used = info.usage !== null ? `${Math.round(info.usage / 1024)} KB used` : "usage unknown";
       const persist = info.persisted === true ? "persistent storage granted" : info.persisted === false ? "persistence not granted" : "persistence unknown";
@@ -39,6 +43,26 @@ export function SettingsView() {
   return (
     <section className="stack">
       <ScreenHeader title="Settings" back={{ name: "today" }} />
+      <div className="panel stack">
+        <p>Accent colour</p>
+        <div className="accent-row">
+          {ACCENT_OPTIONS.map((option) => (
+            <button
+              key={option.id}
+              type="button"
+              className={`accent-swatch${profile.accentId === option.id ? " active" : ""}`}
+              style={{ background: option.swatch }}
+              aria-label={option.name}
+              title={option.name}
+              onClick={() => {
+                applyAccent(option.id);
+                void save({ ...profile, accentId: option.id as AccentId });
+              }}
+            />
+          ))}
+        </div>
+        <p className="tiny">{ACCENT_OPTIONS.find((item) => item.id === profile.accentId)?.name} is selected.</p>
+      </div>
       <div className="panel stack">
         <label>
           New senses each day

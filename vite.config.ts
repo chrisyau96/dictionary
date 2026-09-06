@@ -13,8 +13,8 @@ export default defineConfig({
         short_name: "Vocab Coach",
         description:
           "Offline English vocabulary study with Traditional Chinese explanations.",
-        theme_color: "#0f766e",
-        background_color: "#eef3f7",
+        theme_color: "#7c3aed",
+        background_color: "#f4f0fb",
         display: "standalone",
         start_url: "/",
         lang: "en",
