@@ -78,7 +78,7 @@ export function ReviewView() {
       <ScreenHeader
         eyebrow={`Contextual recall · ${index + 1}/${queue.length}`}
         title={item.card.task === "recognition" ? "Retrieve the meaning." : "Retrieve the word."}
-        subtitle="Think or say it before revealing."
+        subtitle={revealed ? "Rate your recall from before you revealed." : "Think or say it before revealing."}
         back={{ name: "today" }}
         backLabel="Exit practice"
       />
