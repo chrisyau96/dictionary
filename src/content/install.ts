@@ -45,7 +45,7 @@ export interface InstallProgress {
   message: string;
 }
 
-const PACK_BASE = "/packs/chris-1000";
+const PACK_BASE = `${import.meta.env.BASE_URL}packs/chris-1000`;
 
 export async function fetchManifest(): Promise<PackManifest> {
   const response = await fetch(`${PACK_BASE}/manifest.json`);

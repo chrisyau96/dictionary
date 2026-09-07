@@ -94,9 +94,21 @@ This is the app’s display convention (scale `v1`), not a language standard. `I
 
 See `public/packs/foundation-50/NOTICES.md`.
 
-## Hosting
+## Test on the web
 
-The built `dist/` folder is a static site. Cloudflare Pages is a suitable free HTTPS host. There is no server process and no database to provision.
+GitHub Pages URL:
+
+https://chrisyau96.github.io/dictionary/
+
+There is no server and no cloud database. Learning records stay in the browser on your phone.
+
+This repository is private. GitHub Free can only publish Pages from a **public** repo. One-time setup:
+
+1. GitHub → this repo → **Settings** → **General** → Change repository visibility → **Public** (skip this if you already have GitHub Pro).
+2. **Settings** → **Pages** → Build and deployment → Source → **GitHub Actions**.
+3. Wait for the **Deploy GitHub Pages** workflow, then open the URL and tap **Download and verify pack**.
+
+Local `npm run dev` is unchanged (`http://localhost:5173`). The Pages build uses the `/dictionary/` base path.
 
 ## Status
 
