@@ -7,7 +7,7 @@ export interface AccentOption {
 }
 
 export const ACCENT_OPTIONS: AccentOption[] = [
-  { id: "purple", name: "Purple", swatch: "#7c3aed" },
+  { id: "purple", name: "Periwinkle", swatch: "#6d5cff" },
   { id: "indigo", name: "Indigo", swatch: "#4f46e5" },
   { id: "blue", name: "Blue", swatch: "#2563eb" },
   { id: "teal", name: "Teal", swatch: "#0f766e" },

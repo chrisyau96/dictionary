@@ -77,8 +77,8 @@ export function ReviewView() {
     <section className="stack compact">
       <ScreenHeader
         eyebrow={`Contextual recall · ${index + 1}/${queue.length}`}
-        title={item.card.task === "recognition" ? "Retrieve the meaning." : "Retrieve the word."}
-        subtitle={revealed ? "Rate your recall from before you revealed." : "Think or say it before revealing."}
+        title={item.card.task === "recognition" ? "What does it mean?" : "What is the word?"}
+        subtitle={revealed ? "How well did you remember it?" : "Think of the answer, then reveal."}
         back={{ name: "today" }}
         backLabel="Exit practice"
       />
@@ -105,7 +105,7 @@ export function ReviewView() {
             <span className="mini">Several expressions may be valid. The answer shows the intended teaching target.</span>
           </div>
           <button type="button" className="primary block" onClick={() => setRevealed(true)}>
-            Reveal the intended answer
+            Reveal
           </button>
         </>
       ) : (
@@ -117,12 +117,12 @@ export function ReviewView() {
             </h2>
             <p>{item.sense.glossEn}</p>
             <p>{item.sense.glossTc}</p>
-            {item.sense.collocations.slice(0, 3).map((col) => (
-              <span className="phrase" key={col}>
+            {item.sense.collocations.slice(0, 3).map((col, index) => (
+              <span className={`phrase tone-${index % 4}`} key={col}>
                 {col}
               </span>
             ))}
-            {item.sense.examples.slice(0, 1).map((example) => (
+            {item.sense.examples.map((example) => (
               <p className="example-line" key={example.id}>
                 {example.en}
                 <br />

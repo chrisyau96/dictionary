@@ -3,7 +3,7 @@ import { recommendationReason } from "../recommend/select";
 import { applyRating, isDue, newCardRecord } from "../scheduler/schedule";
 import { studyDayKey } from "../time/timezone";
 import type { CardRecord, CardTask, DailyPlanRecord, ReviewSessionType, SenseRecord, UserWordRecord } from "../types";
-import { getOrCreateDailyPlan, markPlanSense } from "./plan";
+import { getOrCreateDailyPlan, markPlanSense, replacePlanItem } from "./plan";
 
 export interface QueueItem {
   card: CardRecord;
@@ -384,6 +384,40 @@ export async function resumeLearning(senseId: string): Promise<void> {
   });
   const cards = await db.cards.where("senseId").equals(senseId).toArray();
   await db.cards.bulkPut(cards.map((card) => ({ ...card, paused: false })));
+}
+
+export async function skipSense(sense: SenseRecord, now = new Date()): Promise<void> {
+  const existing = await db.userWords.get(`word:${sense.id}`);
+  await db.userWords.put(
+    normalizeUserWord({
+      id: `word:${sense.id}`,
+      senseId: sense.id,
+      entryId: sense.entryId,
+      savedAt: existing?.savedAt ?? now.toISOString(),
+      status: "paused",
+      notes: existing?.notes ?? "",
+      usefulness: "not-useful",
+      reason: existing?.reason || "Skipped",
+      membership: "active",
+      removedAt: null,
+      knownEvidence: existing?.knownEvidence ?? null,
+      recommend: "exclude",
+    }),
+  );
+  const cards = await db.cards.where("senseId").equals(sense.id).toArray();
+  if (cards.length) await db.cards.bulkPut(cards.map((card) => ({ ...card, paused: true })));
+  const plan = await getOrCreateDailyPlan(now);
+  const onPlan = plan.items.some(
+    (item) => item.senseId === sense.id && (item.status === "not-started" || item.status === "started"),
+  );
+  if (onPlan) await replacePlanItem(sense.id, "replaced", now);
+}
+
+export async function learnSense(sense: SenseRecord, reason = "I want to learn this", now = new Date()): Promise<CardRecord> {
+  const existing = await db.userWords.get(`word:${sense.id}`);
+  if (existing) await resumeLearning(sense.id);
+  else await saveSense(sense, reason);
+  return introduceSense(sense, reason, now);
 }
 
 export async function studySavedWords(now = new Date()): Promise<number> {

@@ -12,6 +12,7 @@
     "test:watch": "vitest",
     "pack:foundation": "python3 scripts/build_foundation_pack.py",
     "pack:chris": "python3 scripts/build_chris_pack.py",
+    "pack:audio": "python3 scripts/rebuild_chris_audio.py",
     "icons": "python3 scripts/make_icons.py"
   },
   "dependencies": {

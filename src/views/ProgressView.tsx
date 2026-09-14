@@ -109,7 +109,7 @@ export function ProgressView() {
 
   return (
     <section className="stack compact">
-      <ScreenHeader eyebrow="This device · recorded activity" title="Progress" subtitle="Count what actually happened." />
+      <ScreenHeader eyebrow="This device" title="Progress" subtitle="What you actually practised." />
       <div className="kpi-grid">
         <div className="stat">
           <b>{stats.newVocabulary7d}</b>
@@ -184,9 +184,7 @@ export function ProgressView() {
           <p>{stats.takeaway}</p>
         </div>
       ) : (
-        <p className="tiny helper-copy">
-          Saving is not learning. Streaks stay secondary. Rule {stats.ruleVersion}.
-        </p>
+        <p className="tiny helper-copy">Rule {stats.ruleVersion}.</p>
       )}
       <button type="button" className="ghost block" onClick={() => go({ name: "words" })}>
         Open My Words

@@ -141,7 +141,7 @@ export function SettingsView() {
         {restoreNote ? <p className="tiny">{restoreNote}</p> : null}
       </div>
       <div className="panel tiny">
-        <p>Chris Workplace 1000 is original teaching text for shop, project, business, and everyday English, with wordfreq 3.1.1 scores and eSpeak NG British English audio.</p>
+        <p>Chris Workplace 1000 is original teaching text for shop, project, business, and everyday English, with wordfreq 3.1.1 scores and Piper British English audio (Jenny).</p>
       </div>
     </section>
   );

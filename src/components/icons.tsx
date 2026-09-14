@@ -48,3 +48,11 @@ export function SettingsIcon() {
     </Icon>
   );
 }
+
+export function BackIcon() {
+  return (
+    <Icon>
+      <path d="M15 5 8 12l7 7" />
+    </Icon>
+  );
+}

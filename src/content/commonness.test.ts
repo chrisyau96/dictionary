@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { zipfToCommonness } from "./commonness";
+import { zipfToCommonness, frequencyBarCount } from "./commonness";
 
 describe("commonness scale v1", () => {
   it("matches the documented wordfreq examples", () => {
@@ -12,5 +12,14 @@ describe("commonness scale v1", () => {
     expect(zipfToCommonness(6.5)).toBe(100);
     expect(zipfToCommonness(2)).toBe(0);
     expect(zipfToCommonness(1.2)).toBe(0);
+  });
+
+  it("maps commonness to wifi-style bars, more bars for more common words", () => {
+    expect(frequencyBarCount(null)).toBe(0);
+    expect(frequencyBarCount(10)).toBe(1);
+    expect(frequencyBarCount(25)).toBe(2);
+    expect(frequencyBarCount(50)).toBe(3);
+    expect(frequencyBarCount(75)).toBe(4);
+    expect(frequencyBarCount(96)).toBe(4);
   });
 });

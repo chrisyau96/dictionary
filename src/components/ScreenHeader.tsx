@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { BackIcon } from "./icons";
 import { go, type Route } from "../router";
 
 export function ScreenHeader({
@@ -23,13 +24,14 @@ export function ScreenHeader({
           {back ? (
             <button
               type="button"
-              className="back-link"
+              className="icon-btn"
+              aria-label={backLabel}
               onClick={() => {
                 if (back === "history") window.history.back();
                 else go(back);
               }}
             >
-              ← {backLabel}
+              <BackIcon />
             </button>
           ) : (
             <span />

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { computeProgress } from "./metrics";
+import { computeProgress, wordListTab } from "./metrics";
 import { newCardRecord } from "../scheduler/schedule";
 import type { ReviewEventRecord, UserWordRecord } from "../types";
 
@@ -68,5 +68,11 @@ describe("progress KPIs", () => {
     const snapshot = computeProgress(new Date("2026-09-05T04:00:00.000Z"), "UTC", [], [], [], []);
     expect(snapshot.delayedRecall.total).toBe(0);
     expect(snapshot.newVocabulary7d).toBe(0);
+  });
+
+  it("splits My Words into learning, learnt, and skipped", () => {
+    expect(wordListTab(word("s-learn"), [], [], "UTC")).toBe("learning");
+    expect(wordListTab(word("s-known", { status: "known", knownEvidence: "self-declared" }), [], [], "UTC")).toBe("learnt");
+    expect(wordListTab(word("s-skip", { usefulness: "not-useful", recommend: "exclude", status: "paused" }), [], [], "UTC")).toBe("skipped");
   });
 });

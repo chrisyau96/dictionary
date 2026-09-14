@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useRegisterSW } from "virtual:pwa-register/react";
 import { db, ensureProfile } from "./db/database";
+import { fetchManifest } from "./content/install";
 import { parseHash, type Route, go } from "./router";
 import { applyAccent, DEFAULT_ACCENT } from "./theme/accents";
 import { TabBar } from "./components/TabBar";
@@ -25,6 +26,7 @@ export function App() {
   const [route, setRoute] = useState<Route>(() => parseHash(window.location.hash));
   const [ready, setReady] = useState(false);
   const [installed, setInstalled] = useState(false);
+  const [packStale, setPackStale] = useState(false);
   const {
     needRefresh: [needRefresh],
     updateServiceWorker,
@@ -49,6 +51,18 @@ export function App() {
     });
   }, [route.name]);
 
+  useEffect(() => {
+    if (!installed) return;
+    void (async () => {
+      try {
+        const [pack, manifest] = await Promise.all([db.packs.get("chris-1000"), fetchManifest()]);
+        setPackStale(Boolean(pack?.status === "installed" && pack.version !== manifest.version));
+      } catch {
+        setPackStale(false);
+      }
+    })();
+  }, [installed, route.name]);
+
   if (!ready) return <p className="muted">Opening local records…</p>;
 
   const tab = currentTab(route);
@@ -59,7 +73,17 @@ export function App() {
       {needRefresh ? (
         <div className="update-banner">
           <span>A new app version is ready. Your learning records stay on this device.</span>
-          <button type="button" className="ghost" onClick={() => updateServiceWorker(true)}>Update</button>
+          <button type="button" className="ghost" onClick={() => updateServiceWorker(true)}>
+            Update
+          </button>
+        </div>
+      ) : null}
+      {packStale && route.name !== "install" ? (
+        <div className="update-banner pack-banner">
+          <span>A clearer British voice is ready. Refresh the offline pack to hear it.</span>
+          <button type="button" className="ghost" onClick={() => go({ name: "install" })}>
+            Refresh
+          </button>
         </div>
       ) : null}
       {route.name === "today" && <TodayView />}

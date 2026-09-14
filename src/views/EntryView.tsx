@@ -1,12 +1,12 @@
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { AudioButton } from "../components/AudioButton";
-import { ScoreBadge } from "../components/ScoreBadge";
+import { FrequencyBars } from "../components/FrequencyBars";
 import { ScreenHeader } from "../components/ScreenHeader";
 import { db } from "../db/database";
-import { go } from "../router";
-import { introduceSense, markSenseKnown, removeFromMyWords, saveSense } from "../study/session";
-import type { EntryRecord, SenseRecord, UserWordRecord } from "../types";
+import { wordListTab, type WordListTab } from "../progress/metrics";
+import { learnSense } from "../study/session";
+import type { CardRecord, EntryRecord, ReviewEventRecord, SenseRecord, UserWordRecord } from "../types";
 
 function emphasize(text: string, collocations: string[]): ReactNode {
   const match = [...collocations].sort((a, b) => b.length - a.length).find((item) => text.toLowerCase().includes(item.toLowerCase()));
@@ -21,236 +21,155 @@ function emphasize(text: string, collocations: string[]): ReactNode {
   );
 }
 
-function synonymCopy(sense: SenseRecord): ReactNode {
-  if (sense.synonyms.length > 0 && sense.synonymStatus !== "not_prepared") {
-    return (
-      <div className="stack tight">
-        {sense.synonyms.map((item) => (
-          <p key={item.term}>
-            <strong>{item.term}</strong>
-            {item.relation ? <span className="tiny"> · {item.relation}</span> : null}
-            <br />
-            <span className="muted">{item.difference}</span>
-          </p>
-        ))}
-      </div>
-    );
-  }
-  if (sense.synonymStatus === "none_appropriate") {
-    return <p className="muted">No close substitute in this meaning.</p>;
-  }
-  return <p className="muted">Similar words for this sense are not prepared yet.</p>;
-}
-
-function savedStatus(word: UserWordRecord | null, started: boolean): string {
-  if (!word || word.membership !== "active") return "";
-  if (word.status === "known" && word.knownEvidence === "self-declared") return "Saved · marked known";
-  if (word.status === "known") return "Saved · known";
-  if (started) return "Saved · learning";
-  return "Saved · not started";
+function senseTab(
+  word: UserWordRecord | undefined,
+  events: ReviewEventRecord[],
+  cards: CardRecord[],
+  timezone: string,
+): WordListTab | "none" {
+  if (!word || word.membership !== "active") return "none";
+  return wordListTab(word, events, cards, timezone);
 }
 
 export function EntryView({ entryId, senseId }: { entryId: string; senseId?: string }) {
   const [entry, setEntry] = useState<EntryRecord | null>(null);
   const [senses, setSenses] = useState<SenseRecord[]>([]);
-  const [selected, setSelected] = useState<string | null>(senseId ?? null);
-  const [saved, setSaved] = useState<UserWordRecord | null>(null);
-  const [started, setStarted] = useState(false);
-  const [message, setMessage] = useState("");
-  const [showMoreExamples, setShowMoreExamples] = useState(false);
-  const [showDetails, setShowDetails] = useState(false);
+  const [tabs, setTabs] = useState<Record<string, WordListTab | "none">>({});
+  const [busyId, setBusyId] = useState<string | null>(null);
 
-  async function load(nextId?: string) {
-    const [found, list] = await Promise.all([db.entries.get(entryId), db.senses.where("entryId").equals(entryId).toArray()]);
+  async function load() {
+    const [found, list, events, cards, profile] = await Promise.all([
+      db.entries.get(entryId),
+      db.senses.where("entryId").equals(entryId).toArray(),
+      db.reviewEvents.toArray(),
+      db.cards.toArray(),
+      db.profile.get("profile"),
+    ]);
     setEntry(found ?? null);
     setSenses(list);
-    const currentId = nextId ?? selected ?? senseId ?? list[0]?.id ?? null;
-    setSelected(currentId);
-    if (currentId) {
-      const [word, card] = await Promise.all([db.userWords.get(`word:${currentId}`), db.cards.get(`card:recognition:${currentId}`)]);
-      setSaved(word ?? null);
-      setStarted(Boolean(card));
-    }
+    const words = await db.userWords.bulkGet(list.map((sense) => `word:${sense.id}`));
+    const timezone = profile?.timezone ?? "Asia/Hong_Kong";
+    const next: Record<string, WordListTab | "none"> = {};
+    list.forEach((sense, index) => {
+      next[sense.id] = senseTab(words[index], events, cards, timezone);
+    });
+    setTabs(next);
   }
 
   useEffect(() => {
-    void load(senseId);
+    void load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [entryId, senseId]);
-
-  useEffect(() => {
-    if (!selected) return;
-    void Promise.all([db.userWords.get(`word:${selected}`), db.cards.get(`card:recognition:${selected}`)]).then(([word, card]) => {
-      setSaved(word ?? null);
-      setStarted(Boolean(card));
-    });
-  }, [selected]);
-
-  const sense = senses.find((item) => item.id === selected) ?? null;
-  const membershipActive = saved?.membership === "active";
-  const featured = sense?.examples[0] ?? null;
-  const extraExamples = sense?.examples.slice(1) ?? [];
+  }, [entryId]);
 
   if (!entry) {
     return (
       <section className="stack compact">
-        <ScreenHeader back="history" backLabel="Back to Dictionary" />
+        <ScreenHeader back="history" backLabel="Back" />
         <p className="muted">Entry not found in the installed pack.</p>
       </section>
     );
   }
 
+  const focused = senses.find((item) => item.id === senseId) ?? senses[0] ?? null;
+  const ordered = focused ? [focused, ...senses.filter((item) => item.id !== focused.id)] : senses;
+
   return (
-    <section className="stack compact">
-      <ScreenHeader back="history" backLabel="Back to Dictionary" />
-      {sense ? (
-        <div className="panel entry-hero">
-          <div className="entry-top">
-            <div>
-              <h1 className="headword">
-                {entry.display}
-                <span className="pos-inline">{sense.pos}</span>
-              </h1>
-              <p className="sense-kicker">{(sense.domains[0] ?? "workplace").replaceAll("-", " ")}</p>
+    <section className="stack compact entry-page">
+      <ScreenHeader back="history" backLabel="Back" />
+      {focused ? (
+        <div className="hero-card">
+          <p className="hero-kicker">{(focused.domains[0] ?? "workplace").replaceAll("-", " ")}</p>
+          <h1 className="headword">{entry.display}</h1>
+          <p className="hero-sub">in English</p>
+          <div className="pron-row">
+            <div className="pron-copy">
+              <span className="pron-label">Pronunciation</span>
+              {focused.ipa ? <span className="ipa-inline">{focused.ipa}</span> : null}
             </div>
-            <div className="word-card-meta">
-              <ScoreBadge score={sense.frequency.commonness} />
+            <div className="pron-tools">
+              <FrequencyBars score={focused.frequency.commonness} />
               <AudioButton
-                pronunciationId={sense.pronunciationId}
+                pronunciationId={focused.pronunciationId}
                 fallbackText={entry.display}
                 allowed
                 label={`Play pronunciation of ${entry.display}`}
               />
             </div>
           </div>
-          <div className="meaning">
-            <div className="en">{sense.glossEn}</div>
-            <div className="tc">{sense.glossTc}</div>
-          </div>
         </div>
       ) : null}
-      {senses.length > 1 ? (
-        <div className="sense-switch" role="list">
-          {senses.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              className={item.id === selected ? "sense-choice active" : "sense-choice"}
-              onClick={() => setSelected(item.id)}
-            >
-              <span className="pos-inline">{item.pos}</span>
-              <span>{item.glossEn}</span>
-            </button>
-          ))}
-        </div>
-      ) : null}
-      {sense ? (
-        <>
-          {sense.collocations.length ? (
-            <div>
-              {sense.collocations.slice(0, 3).map((item) => (
-                <span className="phrase" key={item}>
-                  {item}
-                </span>
-              ))}
-            </div>
-          ) : (
-            <p className="muted">No strong combination is listed for this sense.</p>
-          )}
-          {featured ? (
-            <blockquote className="featured-example">
-              {emphasize(featured.en, sense.collocations)}
-              <br />
-              <span className="muted">{featured.tc}</span>
-            </blockquote>
-          ) : null}
-          {extraExamples.length ? (
-            <button type="button" className="text-btn" onClick={() => setShowMoreExamples((value) => !value)}>
-              {showMoreExamples ? "Hide extra examples" : "More examples"}
-            </button>
-          ) : null}
-          {showMoreExamples
-            ? extraExamples.map((example) => (
-                <div className="example" key={example.id}>
-                  <p>{emphasize(example.en, sense.collocations)}</p>
-                  <p className="muted">{example.tc}</p>
-                </div>
-              ))
-            : null}
-          <div className="insight-card">
-            <p className="example-index">Similar words · different use</p>
-            {synonymCopy(sense)}
-          </div>
-          {sense.usageNote ? (
-            <>
-              <button type="button" className="text-btn" onClick={() => setShowDetails((value) => !value)}>
-                {showDetails ? "Hide usage note" : "Usage note"}
-              </button>
-              {showDetails ? <p className="tiny">{sense.usageNote}</p> : null}
-            </>
-          ) : null}
-          <div className="center-actions">
-            {membershipActive ? (
-              <>
-                <div className="saved-banner">{savedStatus(saved, started)}. Saving is not learning.</div>
-                <button
-                  type="button"
-                  className="primary block"
-                  onClick={async () => {
-                    await saveSense(sense, "Saved by you");
-                    await introduceSense(sense, "Saved by you");
-                    setMessage("Queued to practise. It counts as introduced after you recall it.");
-                    go({ name: "review" });
-                  }}
-                >
-                  Practise this meaning
-                </button>
-                <div className="subtle-row">
-                  <button
-                    type="button"
-                    className="text-btn"
-                    onClick={async () => {
-                      await saveSense(sense, "Already know");
-                      await markSenseKnown(sense.id);
-                      setMessage("Marked known. This does not invent a successful review history.");
-                      await load(sense.id);
-                    }}
-                  >
-                    Mark known
-                  </button>
-                  <button
-                    type="button"
-                    className="text-btn"
-                    onClick={async () => {
-                      await removeFromMyWords(sense.id);
-                      setMessage("Removed from My Words. Dictionary entry kept.");
-                      await load(sense.id);
-                    }}
-                  >
-                    Remove
-                  </button>
-                </div>
-              </>
+      {ordered.map((sense, index) => {
+        const tab = tabs[sense.id] ?? "none";
+        const showLearn = tab !== "learning";
+        return (
+          <article key={sense.id} className={`sense-block${sense.id === senseId ? " is-focus" : ""}`}>
+            {senses.length > 1 ? (
+              <p className="sense-kicker">
+                Meaning {index + 1} of {senses.length}
+                <span className="pos-inline">{sense.pos}</span>
+              </p>
             ) : (
-              <>
-                <button
-                  type="button"
-                  className="primary block"
-                  onClick={async () => {
-                    await saveSense(sense, "Saved by you");
-                    setMessage("Saved this meaning only. It remains Not started until a learning attempt.");
-                    await load(sense.id);
-                  }}
-                >
-                  Save this meaning
-                </button>
-                <p className="tiny helper-copy">Saving alone does not count as learning.</p>
-              </>
+              <p className="sense-kicker">
+                {sense.pos}
+              </p>
             )}
-            {message ? <p className="tiny">{message}</p> : null}
-          </div>
-        </>
-      ) : null}
+            {sense.id !== focused?.id ? (
+              <div className="pron-mini">
+                {sense.ipa ? <span className="ipa-inline">{sense.ipa}</span> : <span className="tiny">Pronunciation</span>}
+                <FrequencyBars score={sense.frequency.commonness} />
+                <AudioButton
+                  pronunciationId={sense.pronunciationId}
+                  fallbackText={entry.display}
+                  allowed
+                  label={`Play pronunciation of ${entry.display}, ${sense.pos}`}
+                />
+              </div>
+            ) : null}
+            <div className="meaning">
+              <div className="en">{sense.glossEn}</div>
+              <div className="tc">{sense.glossTc}</div>
+            </div>
+            {sense.collocations.length ? (
+              <div className="collocation-block">
+                <p className="example-index">Often used together</p>
+                {sense.collocations.map((item, index) => (
+                  <span className={`phrase tone-${index % 4}`} key={item}>
+                    {item}
+                  </span>
+                ))}
+              </div>
+            ) : null}
+            {sense.examples.length ? (
+              <div className="example-stack">
+                <p className="example-index">{sense.examples.length > 1 ? "Examples" : "Example"}</p>
+                {sense.examples.map((example) => (
+                  <div className="example-card" key={example.id}>
+                    <p>{emphasize(example.en, sense.collocations)}</p>
+                    <p className="muted">{example.tc}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+            {sense.usageNote ? <p className="tiny usage-note">{sense.usageNote}</p> : null}
+            {tab === "learning" ? <div className="saved-banner">In Learning</div> : null}
+            {showLearn ? (
+              <button
+                type="button"
+                className="primary block"
+                disabled={busyId === sense.id}
+                onClick={async () => {
+                  setBusyId(sense.id);
+                  await learnSense(sense);
+                  await load();
+                  setBusyId(null);
+                }}
+              >
+                I want to learn this
+              </button>
+            ) : null}
+          </article>
+        );
+      })}
     </section>
   );
 }

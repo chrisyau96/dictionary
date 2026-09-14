@@ -21,8 +21,6 @@ export function DictionaryView({ initialQuery }: { initialQuery: string }) {
   const [query, setQuery] = useState(initialQuery);
   const [hits, setHits] = useState<SearchHit[]>([]);
   const [missing, setMissing] = useState(false);
-  const [requestNote, setRequestNote] = useState("");
-  const [savedRequest, setSavedRequest] = useState("");
   const [browse, setBrowse] = useState<DomainId | null>(null);
   const [topicSenses, setTopicSenses] = useState<SenseRecord[]>([]);
   const [packLabel, setPackLabel] = useState("Installed offline pack");
@@ -61,7 +59,7 @@ export function DictionaryView({ initialQuery }: { initialQuery: string }) {
 
   return (
     <section className="stack">
-      <ScreenHeader eyebrow={packLabel} title="Dictionary" subtitle="Find the meaning you need." />
+      <ScreenHeader eyebrow={packLabel} title="Dictionary" subtitle="Find a meaning you want to learn." />
       <input
         className="search-box"
         value={query}
@@ -74,7 +72,6 @@ export function DictionaryView({ initialQuery }: { initialQuery: string }) {
         autoCorrect="off"
         aria-label="Search installed words"
       />
-      <p className="tiny helper-copy">Searches this device only. Separate noun and verb senses stay separate.</p>
       {!normalized && !browse ? (
         <div className="browse-grid">
           {TOPICS.map((topic) => (
@@ -111,43 +108,7 @@ export function DictionaryView({ initialQuery }: { initialQuery: string }) {
           />
         )),
       )}
-      {missing ? (
-        <div className="empty-state">
-          <strong>Not in this offline pack.</strong>
-          <br />
-          No online lookup has been made.
-        </div>
-      ) : null}
-      {missing ? (
-        <div className="panel">
-          <label>
-            Save a local request
-            <input value={requestNote} onChange={(event) => setRequestNote(event.target.value)} placeholder="Optional note" />
-          </label>
-          <div className="center-actions">
-            <button
-              type="button"
-              className="primary block"
-              onClick={async () => {
-                await db.localRequests.add({
-                  id: crypto.randomUUID(),
-                  term: query.trim(),
-                  note: requestNote,
-                  createdAt: new Date().toISOString(),
-                });
-                setSavedRequest(query.trim());
-                setRequestNote("");
-              }}
-            >
-              Save request
-            </button>
-            <button type="button" className="ghost block" onClick={() => go({ name: "today" })}>
-              Back to Today
-            </button>
-          </div>
-          {savedRequest ? <p className="tiny">Saved local request for “{savedRequest}”.</p> : null}
-        </div>
-      ) : null}
+      {missing ? <div className="empty-state">No wordings found.</div> : null}
     </section>
   );
 }

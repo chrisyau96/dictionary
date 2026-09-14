@@ -16,8 +16,8 @@ export default defineConfig({
         short_name: "Vocab Coach",
         description:
           "Offline English vocabulary study with Traditional Chinese explanations.",
-        theme_color: "#7c3aed",
-        background_color: "#f4f0fb",
+        theme_color: "#6d5cff",
+        background_color: "#f6f3ff",
         display: "standalone",
         start_url: "./",
         scope: "./",
@@ -39,7 +39,7 @@ export default defineConfig({
       },
       workbox: {
         cleanupOutdatedCaches: true,
-        globPatterns: ["**/*.{js,css,html,svg,png,webmanifest}"],
+        globPatterns: ["**/*.{js,css,html,svg,png,webmanifest,woff2}"],
         globIgnores: ["**/packs/**"],
         navigateFallback: "index.html",
         runtimeCaching: [

@@ -4,24 +4,8 @@ import { ScreenHeader } from "../components/ScreenHeader";
 import { WordListCard } from "../components/WordListCard";
 import { db, ensureProfile } from "../db/database";
 import { go } from "../router";
-import { markPlanSense, replacePlanItem } from "../study/plan";
-import {
-  buildToday,
-  learnPlanSenses,
-  markSenseKnown,
-  saveSense,
-  startDueSession,
-  type TodaySummary,
-} from "../study/session";
-import type { DailyPlanItem, SenseRecord } from "../types";
-
-function statusLabel(status: DailyPlanItem["status"]): string {
-  if (status === "practised") return "Practised";
-  if (status === "started") return "Started";
-  if (status === "not-started") return "Not started";
-  if (status === "already-know") return "Already know";
-  return "Skipped";
-}
+import { buildToday, learnPlanSenses, learnSense, skipSense, startDueSession, type TodaySummary } from "../study/session";
+import type { SenseRecord } from "../types";
 
 export function TodayView() {
   const [summary, setSummary] = useState<TodaySummary | null>(null);
@@ -40,7 +24,7 @@ export function TodayView() {
     void refresh();
   }, []);
 
-  if (!summary) return <p className="muted">Computing today’s list…</p>;
+  if (!summary) return <p className="muted">Preparing today’s words…</p>;
 
   const visibleItems = summary.plan.items.filter(
     (item) => item.status === "not-started" || item.status === "started" || item.status === "practised",
@@ -70,9 +54,9 @@ export function TodayView() {
   return (
     <section className="stack compact">
       <ScreenHeader
-        eyebrow={`${summary.dayLabel} · daily workspace`}
+        eyebrow={summary.dayLabel}
         title="Today"
-        subtitle="A little learning. Deliberate practice."
+        subtitle="A few useful words. Then practise them."
         right={
           <button type="button" className="icon-btn" aria-label="Settings" onClick={() => go({ name: "settings" })}>
             <SettingsIcon />
@@ -85,7 +69,7 @@ export function TodayView() {
             {introducedCount}
             <span className="stat-over">/{summary.newLimit}</span>
           </b>
-          <span className="stat-label">New senses introduced today</span>
+          <span className="stat-label">New today</span>
         </div>
         <div className="stat">
           <b>{summary.dueCount}</b>
@@ -94,10 +78,10 @@ export function TodayView() {
       </div>
       {needsCheck ? (
         <button type="button" className="text-btn" onClick={() => go({ name: "diagnostic" })}>
-          Find your starting vocabulary level
+          Find your starting level
         </button>
       ) : null}
-      {summary.pauseNew ? <p className="tiny">New words are paused until due reviews are closer to your daily capacity.</p> : null}
+      {summary.pauseNew ? <p className="tiny">New words wait until due reviews are closer to your daily capacity.</p> : null}
       {primary ? (
         <button
           type="button"
@@ -112,20 +96,19 @@ export function TodayView() {
           {primary.label}
         </button>
       ) : (
-        <div className="empty-state">Today’s planned work is done. More study is optional.</div>
+        <div className="empty-state">Today’s planned work is done.</div>
       )}
       {waitingCount ? (
         <p className="tiny helper-copy">
-          {waitingCount} new {waitingCount === 1 ? "sense is" : "senses are"} still waiting on this list. This is not a
-          due-review count.
+          {waitingCount} {waitingCount === 1 ? "word is" : "words are"} still waiting on this list.
         </p>
-      ) : summary.dueCount > 0 ? (
-        <p className="tiny helper-copy">Due reviews are counted separately from words you have only saved.</p>
       ) : null}
-      <h2 className="section-label">Your learning queue</h2>
+      <h2 className="section-label">Your words</h2>
       {visibleItems.length === 0 ? (
         <div className="empty-state">
-          {summary.pauseNew ? "Review first today." : "No new words were selected for today. Save a meaning from Dictionary if you need something specific."}
+          {summary.pauseNew
+            ? "Review first today."
+            : "No new words were selected for today. Search Dictionary if you need something specific."}
         </div>
       ) : (
         visibleItems.map((item) => {
@@ -135,66 +118,41 @@ export function TodayView() {
             <WordListCard
               key={item.senseId}
               sense={sense}
-              status={statusLabel(item.status)}
               onOpen={() => go({ name: "entry", entryId: sense.entryId, senseId: sense.id })}
               actions={
                 item.status === "not-started" ? (
-                  <>
-                    <div className="card-actions">
-                      <button
-                        type="button"
-                        className="primary"
-                        onClick={async () => {
-                          await saveSense(sense, item.reason);
-                          await markPlanSense(sense.id, "started");
-                          go({ name: "entry", entryId: sense.entryId, senseId: sense.id });
-                        }}
-                      >
-                        Learn
-                      </button>
-                    </div>
-                    <div className="subtle-row">
-                      <button
-                        type="button"
-                        className="text-btn"
-                        onClick={async () => {
-                          await saveSense(sense, "Already know");
-                          await markSenseKnown(sense.id);
-                          await replacePlanItem(sense.id, "already-know");
-                          await refresh();
-                        }}
-                      >
-                        Already know
-                      </button>
-                      <button
-                        type="button"
-                        className="text-btn"
-                        onClick={async () => {
-                          await replacePlanItem(sense.id, "replaced");
-                          await refresh();
-                        }}
-                      >
-                        Skip
-                      </button>
-                    </div>
-                  </>
+                  <div className="split-actions">
+                    <button
+                      type="button"
+                      className="primary"
+                      onClick={async () => {
+                        await learnSense(sense, item.reason);
+                        go({ name: "entry", entryId: sense.entryId, senseId: sense.id });
+                      }}
+                    >
+                      Learn
+                    </button>
+                    <button
+                      type="button"
+                      className="ghost skip-btn"
+                      onClick={async () => {
+                        await skipSense(sense);
+                        await refresh();
+                      }}
+                    >
+                      Skip
+                    </button>
+                  </div>
                 ) : null
               }
             />
           );
         })
       )}
-      <div className="insight-card">
-        <p className="example-index">Useful words, not random words</p>
-        <p>Start with meanings you save. Today only adds a small batch when the workload still fits.</p>
-      </div>
       <p className="tiny reviewed-note">
         {summary.reviewedSensesToday
-          ? `Reviewed today: ${summary.reviewedSensesToday} word senses / ${summary.reviewedCardsToday} cards`
-          : "No scheduled reviews completed yet today."}
-        {summary.reviewAttemptsToday > summary.reviewedCardsToday
-          ? ` · ${summary.reviewAttemptsToday} attempts including retries`
-          : ""}
+          ? `Reviewed today: ${summary.reviewedSensesToday} ${summary.reviewedSensesToday === 1 ? "word" : "words"}`
+          : "No reviews completed yet today."}
       </p>
     </section>
   );

@@ -106,6 +106,19 @@ export function libraryTab(
   return "learning";
 }
 
+export type WordListTab = "learning" | "learnt" | "skipped";
+
+export function wordListTab(
+  word: UserWordRecord,
+  events: ReviewEventRecord[],
+  cards: CardRecord[],
+  timezone: string,
+): WordListTab {
+  if (word.usefulness === "not-useful") return "skipped";
+  if (libraryTab(word, events, cards, timezone) === "known") return "learnt";
+  return "learning";
+}
+
 function dayWindow(endDay: string, days: number): string[] {
   const [year, month, day] = endDay.split("-").map(Number);
   const keys: string[] = [];

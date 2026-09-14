@@ -1,7 +1,9 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { db } from "../db/database";
+import { db, defaultProfile } from "../db/database";
 import { newCardRecord } from "../scheduler/schedule";
-import { markSenseKnown, rateCard, reAddToMyWords, removeFromMyWords, undoLastReview } from "./session";
+import { learnSense, markSenseKnown, rateCard, reAddToMyWords, removeFromMyWords, skipSense, undoLastReview } from "./session";
+import { pickNewSenses } from "../recommend/select";
+import type { SenseRecord } from "../types";
 
 describe("review recording", () => {
   beforeEach(async () => {
@@ -95,5 +97,59 @@ describe("review recording", () => {
     expect((await db.userWords.get("word:s-1"))?.notes).toBe("keep me");
     expect(await db.reviewEvents.count()).toBe(1);
     expect((await db.userWords.get("word:s-1"))?.membership).toBe("active");
+  });
+});
+
+function teachingSense(id: string): SenseRecord {
+  return {
+    id,
+    entryId: `e-${id}`,
+    packId: "p",
+    pos: "verb",
+    ipa: "",
+    pronunciationId: id,
+    glossEn: id,
+    glossTc: id,
+    usageNote: null,
+    domains: ["business"],
+    examples: [{ id: "ex", en: `Please ${id} this.`, tc: "請處理。", context: "work" }],
+    synonyms: [],
+    synonymStatus: "not_prepared",
+    collocations: [id],
+    frequency: { form: id, zipf: 3.5, commonness: 26, source: "wordfreq", sourceVersion: "3.1.1", scaleVersion: "v1", status: "measured" },
+    selection: "learn",
+  };
+}
+
+describe("skip and learn", () => {
+  beforeEach(async () => {
+    await db.delete();
+    await db.open();
+  });
+
+  it("keeps a skipped meaning out of later Today picks", async () => {
+    const now = new Date("2026-09-05T04:00:00.000Z");
+    const skipped = teachingSense("streamline");
+    const other = teachingSense("mitigate");
+    await db.senses.bulkPut([skipped, other]);
+    await skipSense(skipped, now);
+    const stored = await db.userWords.get("word:streamline");
+    expect(stored?.usefulness).toBe("not-useful");
+    expect(stored?.recommend).toBe("exclude");
+    const picked = pickNewSenses([skipped, other], defaultProfile(), stored ? [stored] : [], new Set(), 2);
+    expect(picked.map((item) => item.id)).toEqual(["mitigate"]);
+  });
+
+  it("learnSense returns a skipped meaning to learning", async () => {
+    const now = new Date("2026-09-05T04:00:00.000Z");
+    const skipped = teachingSense("streamline");
+    await db.senses.put(skipped);
+    await skipSense(skipped, now);
+    await learnSense(skipped, "I want to learn this", now);
+    const stored = await db.userWords.get("word:streamline");
+    expect(stored?.usefulness).toBe(null);
+    expect(stored?.recommend).toBe("include");
+    expect(stored?.status).toBe("learning");
+    expect(await db.cards.get("card:recognition:streamline")).toBeTruthy();
   });
 });
