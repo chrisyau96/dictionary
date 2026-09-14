@@ -143,7 +143,9 @@ export function TodayView() {
                       Skip
                     </button>
                   </div>
-                ) : null
+                ) : (
+                  <p className="tiny helper-copy">{item.status === "practised" ? "Practised today" : "In Learning"}</p>
+                )
               }
             />
           );

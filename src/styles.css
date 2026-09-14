@@ -319,8 +319,7 @@ input, textarea, select {
   margin: 0.28rem 0 0;
   color: color-mix(in srgb, var(--accent-2) 55%, var(--muted));
   font-size: 0.78rem;
-  letter-spacing: 0.04em;
-  text-transform: lowercase;
+  letter-spacing: 0.03em;
 }
 .pos-inline {
   display: inline-block;
@@ -637,12 +636,13 @@ input, textarea, select {
 }
 .toast .text-btn { color: #fff; }
 .empty-state {
-  background: color-mix(in srgb, var(--accent-soft) 55%, white);
-  padding: 1.15rem 1rem;
+  background: color-mix(in srgb, var(--accent-soft) 70%, white);
+  padding: 1.25rem 1rem;
   border-radius: 1.35rem;
   text-align: center;
-  color: var(--muted);
-  font-size: 0.95rem;
+  color: var(--ink);
+  font-size: 0.98rem;
+  font-weight: 650;
 }
 .compact-empty { margin: 0.4rem 0; padding: 0.9rem; }
 .insight-card {
@@ -730,7 +730,6 @@ input, textarea, select {
   margin: 0;
   font-size: 0.72rem;
   letter-spacing: 0.05em;
-  text-transform: capitalize;
   color: var(--accent);
   font-weight: 700;
 }
