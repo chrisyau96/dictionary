@@ -1,16 +1,19 @@
 import type { ReactNode } from "react";
 import { AudioButton } from "./AudioButton";
 import { FrequencyBars } from "./FrequencyBars";
+import { NoteDisplay } from "./NoteField";
 import type { SenseRecord } from "../types";
 
 export function WordListCard({
   sense,
   status,
+  note,
   onOpen,
   actions,
 }: {
   sense: SenseRecord;
   status?: ReactNode;
+  note?: string;
   onOpen?: () => void;
   actions?: ReactNode;
 }) {
@@ -40,6 +43,7 @@ export function WordListCard({
           <AudioButton pronunciationId={sense.pronunciationId} fallbackText={word} allowed label={`Play pronunciation of ${word}`} />
         </div>
       </div>
+      <NoteDisplay note={note ?? ""} />
       {actions}
     </article>
   );

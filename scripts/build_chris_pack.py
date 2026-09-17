@@ -176,7 +176,7 @@ def main() -> None:
 
         examples = [
             {"id": f"ex-{sense_id}-{index + 1}", "en": example["en"], "tc": example["tc"], "context": row["domains"][0]}
-            for index, example in enumerate(row["examples"][:3])
+            for index, example in enumerate(row["examples"][:5])
         ]
         while len(examples) < 2:
             examples.append(

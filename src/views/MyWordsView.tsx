@@ -1,12 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { ScreenHeader } from "../components/ScreenHeader";
-import { NoteField } from "../components/NoteField";
 import { SwipeRemove } from "../components/SwipeRemove";
 import { WordListCard } from "../components/WordListCard";
 import { db, ensureProfile } from "../db/database";
 import { wordListTab, type WordListTab } from "../progress/metrics";
 import { go } from "../router";
-import { learnSense, removeFromMyWords, undoRemoveFromMyWords } from "../study/session";
+import { learnSense, removeFromMyWords, skipSense, undoRemoveFromMyWords } from "../study/session";
 import type { CardRecord, ReviewEventRecord, SenseRecord, UserWordRecord } from "../types";
 
 const TABS: Array<{ id: WordListTab; label: string }> = [
@@ -94,20 +93,23 @@ export function MyWordsView() {
           >
             <WordListCard
               sense={sense}
+              note={word.notes}
               onOpen={() => go({ name: "entry", entryId: sense.entryId, senseId: sense.id })}
               actions={
-                <div className="word-card-extra">
-                  <NoteField senseId={word.senseId} initial={word.notes} />
-                  {tab !== "learning" ? (
-                    <button
-                      type="button"
-                      className="primary block"
-                      onClick={() => learnSense(sense).then(refresh)}
-                    >
+                tab === "learnt" ? (
+                  <div className="split-actions">
+                    <button type="button" className="primary" onClick={() => learnSense(sense).then(refresh)}>
                       Learn
                     </button>
-                  ) : null}
-                </div>
+                    <button type="button" className="ghost skip-btn" onClick={() => skipSense(sense).then(refresh)}>
+                      Skip
+                    </button>
+                  </div>
+                ) : tab === "skipped" ? (
+                  <button type="button" className="primary block" onClick={() => learnSense(sense).then(refresh)}>
+                    Learn
+                  </button>
+                ) : null
               }
             />
           </SwipeRemove>

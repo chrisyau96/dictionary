@@ -1,22 +1,30 @@
 import { useEffect, useState } from "react";
+import { InstallHomeCard } from "../components/InstallHomeCard";
 import { SettingsIcon } from "../components/icons";
 import { ScreenHeader } from "../components/ScreenHeader";
 import { WordListCard } from "../components/WordListCard";
 import { db, ensureProfile } from "../db/database";
 import { go } from "../router";
-import { buildToday, learnPlanSenses, learnSense, skipSense, startDueSession, type TodaySummary } from "../study/session";
+import { buildToday, learnPlanSenses, learnSense, loadSenseNotes, skipSense, startDueSession, type TodaySummary } from "../study/session";
 import type { SenseRecord } from "../types";
 
 export function TodayView() {
   const [summary, setSummary] = useState<TodaySummary | null>(null);
   const [senses, setSenses] = useState<Map<string, SenseRecord>>(new Map());
+  const [notes, setNotes] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
   const [needsCheck, setNeedsCheck] = useState(false);
 
   async function refresh() {
-    const [today, allSenses, profile] = await Promise.all([buildToday(), db.senses.toArray(), ensureProfile()]);
+    const [today, allSenses, profile, senseNotes] = await Promise.all([
+      buildToday(),
+      db.senses.toArray(),
+      ensureProfile(),
+      loadSenseNotes(),
+    ]);
     setSummary(today);
     setSenses(new Map(allSenses.map((sense) => [sense.id, sense])));
+    setNotes(senseNotes);
     setNeedsCheck(!profile.diagnosticCompletedAt);
   }
 
@@ -118,6 +126,7 @@ export function TodayView() {
             <WordListCard
               key={item.senseId}
               sense={sense}
+              note={notes[item.senseId]}
               onOpen={() => go({ name: "entry", entryId: sense.entryId, senseId: sense.id })}
               actions={
                 item.status === "not-started" ? (
@@ -156,6 +165,7 @@ export function TodayView() {
           ? `Reviewed today: ${summary.reviewedSensesToday} ${summary.reviewedSensesToday === 1 ? "word" : "words"}`
           : "No reviews completed yet today."}
       </p>
+      <InstallHomeCard compact />
     </section>
   );
 }

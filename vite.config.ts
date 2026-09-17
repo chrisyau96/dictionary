@@ -19,9 +19,12 @@ export default defineConfig({
         theme_color: "#6d5cff",
         background_color: "#f6f3ff",
         display: "standalone",
+        display_override: ["standalone", "minimal-ui", "browser"],
         start_url: "./",
         scope: "./",
+        id: "./",
         lang: "en",
+        categories: ["education"],
         icons: [
           {
             src: "icons/icon-192.png",

@@ -1,11 +1,13 @@
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
+import { AiDialog } from "../components/AiDialog";
 import { AudioButton } from "../components/AudioButton";
 import { FrequencyBars } from "../components/FrequencyBars";
+import { NoteField } from "../components/NoteField";
 import { ScreenHeader } from "../components/ScreenHeader";
 import { db } from "../db/database";
 import { wordListTab, type WordListTab } from "../progress/metrics";
-import { learnSense } from "../study/session";
+import { learnSense, loadSenseNotes } from "../study/session";
 import type { CardRecord, EntryRecord, ReviewEventRecord, SenseRecord, UserWordRecord } from "../types";
 
 function emphasize(text: string, collocations: string[]): ReactNode {
@@ -35,7 +37,9 @@ export function EntryView({ entryId, senseId }: { entryId: string; senseId?: str
   const [entry, setEntry] = useState<EntryRecord | null>(null);
   const [senses, setSenses] = useState<SenseRecord[]>([]);
   const [tabs, setTabs] = useState<Record<string, WordListTab | "none">>({});
+  const [notes, setNotes] = useState<Record<string, string>>({});
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [aiOpen, setAiOpen] = useState(false);
 
   async function load() {
     const [found, list, events, cards, profile] = await Promise.all([
@@ -54,6 +58,7 @@ export function EntryView({ entryId, senseId }: { entryId: string; senseId?: str
       next[sense.id] = senseTab(words[index], events, cards, timezone);
     });
     setTabs(next);
+    setNotes(await loadSenseNotes(list.map((sense) => sense.id)));
   }
 
   useEffect(() => {
@@ -75,7 +80,17 @@ export function EntryView({ entryId, senseId }: { entryId: string; senseId?: str
 
   return (
     <section className="stack compact entry-page">
-      <ScreenHeader back="history" backLabel="Back" />
+      <ScreenHeader
+        back="history"
+        backLabel="Back"
+        right={
+          focused ? (
+            <button type="button" className="ai-btn" onClick={() => setAiOpen(true)}>
+              AI
+            </button>
+          ) : null
+        }
+      />
       {focused ? (
         <div className="hero-card">
           <p className="hero-kicker">{(focused.domains[0] ?? "workplace").replaceAll("-", " ")}</p>
@@ -109,9 +124,7 @@ export function EntryView({ entryId, senseId }: { entryId: string; senseId?: str
                 <span className="pos-inline">{sense.pos}</span>
               </p>
             ) : (
-              <p className="sense-kicker">
-                {sense.pos}
-              </p>
+              <p className="sense-kicker">{sense.pos}</p>
             )}
             {sense.id !== focused?.id ? (
               <div className="pron-mini">
@@ -132,8 +145,8 @@ export function EntryView({ entryId, senseId }: { entryId: string; senseId?: str
             {sense.collocations.length ? (
               <div className="collocation-block">
                 <p className="example-index">Often used together</p>
-                {sense.collocations.map((item, index) => (
-                  <span className={`phrase tone-${index % 4}`} key={item}>
+                {sense.collocations.map((item, collocationIndex) => (
+                  <span className={`phrase tone-${collocationIndex % 4}`} key={item}>
                     {item}
                   </span>
                 ))}
@@ -151,6 +164,7 @@ export function EntryView({ entryId, senseId }: { entryId: string; senseId?: str
               </div>
             ) : null}
             {sense.usageNote ? <p className="tiny usage-note">{sense.usageNote}</p> : null}
+            <NoteField senseId={sense.id} entryId={entry.id} initial={notes[sense.id] ?? ""} />
             {tab === "learning" ? <div className="saved-banner">In Learning</div> : null}
             {showLearn ? (
               <button
@@ -170,6 +184,15 @@ export function EntryView({ entryId, senseId }: { entryId: string; senseId?: str
           </article>
         );
       })}
+      {aiOpen && focused ? (
+        <AiDialog
+          word={entry.display}
+          senseId={focused.id}
+          entryId={entry.id}
+          onClose={() => setAiOpen(false)}
+          onNoted={() => void load()}
+        />
+      ) : null}
     </section>
   );
 }

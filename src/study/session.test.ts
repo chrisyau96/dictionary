@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { db, defaultProfile } from "../db/database";
 import { newCardRecord } from "../scheduler/schedule";
-import { learnSense, markSenseKnown, rateCard, reAddToMyWords, removeFromMyWords, skipSense, undoLastReview } from "./session";
+import { appendWordNote, learnSense, markSenseKnown, rateCard, reAddToMyWords, removeFromMyWords, skipSense, undoLastReview } from "./session";
 import { pickNewSenses } from "../recommend/select";
 import type { SenseRecord } from "../types";
 
@@ -138,6 +138,15 @@ describe("skip and learn", () => {
     expect(stored?.recommend).toBe("exclude");
     const picked = pickNewSenses([skipped, other], defaultProfile(), stored ? [stored] : [], new Set(), 2);
     expect(picked.map((item) => item.id)).toEqual(["mitigate"]);
+  });
+
+  it("appendWordNote stores a clean AI line on a new or existing word", async () => {
+    const sense = teachingSense("streamline");
+    await db.senses.put(sense);
+    await appendWordNote(sense.id, sense.entryId, "Connotation: positive");
+    expect((await db.userWords.get("word:streamline"))?.notes).toBe("Connotation: positive");
+    await appendWordNote(sense.id, sense.entryId, "Word history: from Latin.");
+    expect((await db.userWords.get("word:streamline"))?.notes).toBe("Connotation: positive\nWord history: from Latin.");
   });
 
   it("learnSense returns a skipped meaning to learning", async () => {

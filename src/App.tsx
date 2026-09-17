@@ -80,7 +80,7 @@ export function App() {
       ) : null}
       {packStale && route.name !== "install" ? (
         <div className="update-banner pack-banner">
-          <span>A clearer British voice is ready. Refresh the offline pack to hear it.</span>
+          <span>An updated word pack is ready. Refresh to get the latest examples on this device.</span>
           <button type="button" className="ghost" onClick={() => go({ name: "install" })}>
             Refresh
           </button>

@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { downloadJson, exportBackup, previewBackup, restoreBackup } from "../backup/io";
+import { AiSetupForm } from "../components/AiSetupForm";
+import { InstallHomeCard } from "../components/InstallHomeCard";
 import { ScreenHeader } from "../components/ScreenHeader";
 import { db, ensureProfile } from "../db/database";
 import { storageSnapshot } from "../content/install";
@@ -18,7 +20,7 @@ const DOMAIN_LABELS: Record<DomainId, string> = {
 
 export function SettingsView() {
   const [profile, setProfile] = useState<ProfileRecord | null>(null);
-  const [storage, setStorage] = useState<string>("");
+  const [storage, setStorage] = useState("");
   const [restoreNote, setRestoreNote] = useState("");
 
   useEffect(() => {
@@ -41,10 +43,12 @@ export function SettingsView() {
   if (!profile) return <p className="muted">Loading settings…</p>;
 
   return (
-    <section className="stack">
+    <section className="stack settings-page">
       <ScreenHeader title="Settings" back={{ name: "today" }} backLabel="Back to Today" />
-      <div className="panel stack">
-        <p>Accent colour</p>
+
+      <section className="settings-section">
+        <h2>Appearance</h2>
+        <p className="settings-copy">Accent colour</p>
         <div className="accent-row">
           {ACCENT_OPTIONS.map((option) => (
             <button
@@ -61,28 +65,47 @@ export function SettingsView() {
             />
           ))}
         </div>
-        <p className="tiny">{ACCENT_OPTIONS.find((item) => item.id === profile.accentId)?.name} is selected.</p>
-      </div>
-      <div className="panel stack">
+        <p className="tiny helper-copy">{ACCENT_OPTIONS.find((item) => item.id === profile.accentId)?.name} is selected.</p>
+      </section>
+
+      <section className="settings-section">
+        <h2>Daily plan</h2>
         <label>
-          New senses each day
-          <input type="number" min={0} max={20} value={profile.dailyNewLimit} onChange={(event) => save({ ...profile, dailyNewLimit: Number(event.target.value) })} />
+          New words each day
+          <input
+            type="number"
+            min={0}
+            max={20}
+            value={profile.dailyNewLimit}
+            onChange={(event) => save({ ...profile, dailyNewLimit: Number(event.target.value) })}
+          />
         </label>
         <label>
           Review capacity before pausing new words
-          <input type="number" min={5} max={80} value={profile.dailyReviewCapacity} onChange={(event) => save({ ...profile, dailyReviewCapacity: Number(event.target.value) })} />
+          <input
+            type="number"
+            min={5}
+            max={80}
+            value={profile.dailyReviewCapacity}
+            onChange={(event) => save({ ...profile, dailyReviewCapacity: Number(event.target.value) })}
+          />
         </label>
-        <label>
-          Study timezone
-          <input value={profile.timezone} onChange={(event) => save({ ...profile, timezone: event.target.value })} />
-        </label>
-        <p className="tiny">Desired retention target is 0.90. This is a scheduler target, not a guaranteed recall rate.</p>
-      </div>
-      <div className="panel">
-        <p>Domains used when choosing new material</p>
-        <div className="stack">
+        <aside className="settings-tip">
+          <p className="example-index">Tip</p>
+          <p>
+            These two numbers are the daily load the scheduler will try to keep. It aims for about 90% of reviewed words to stay
+            rememberable, so new words pause when due reviews are already near this capacity. That is a planning target, not a
+            guaranteed recall rate. Your study day follows this device’s current timezone.
+          </p>
+        </aside>
+      </section>
+
+      <section className="settings-section">
+        <h2>Topics</h2>
+        <p className="settings-copy">Used when choosing new material</p>
+        <div className="stack tight">
           {(Object.keys(DOMAIN_LABELS) as DomainId[]).map((domain) => (
-            <label key={domain}>
+            <label key={domain} className="check-row">
               <input
                 type="checkbox"
                 checked={profile.domains.includes(domain)}
@@ -92,25 +115,46 @@ export function SettingsView() {
                     : profile.domains.filter((item) => item !== domain);
                   void save({ ...profile, domains });
                 }}
-              />{" "}
+              />
               {DOMAIN_LABELS[domain]}
             </label>
           ))}
         </div>
-      </div>
-      <div className="center-actions">
-        <button type="button" className="primary block" onClick={() => go({ name: "install" })}>Install or refresh pack</button>
-        <button type="button" className="ghost block" onClick={() => go({ name: "diagnostic" })}>
-          Retake vocabulary check
-        </button>
-        <button type="button" className="ghost block" onClick={() => go({ name: "today" })}>Back to Today</button>
-      </div>
-      <p className="tiny">{storage}</p>
-      <div className="panel stack">
-        <p>Keep a copy outside this phone. An internal database copy is not an independent backup.</p>
+      </section>
+
+      <section className="settings-section">
+        <h2>AI helper</h2>
+        <p className="settings-copy">
+          Pick a default fast model and paste your own API key. Keys stay on this device and are never included in learning backups.
+        </p>
+        <AiSetupForm />
+      </section>
+
+      <section className="settings-section">
+        <h2>Home screen</h2>
+        <p className="settings-copy">Install this as an app on your phone’s Home Screen.</p>
+        <InstallHomeCard />
+      </section>
+
+      <section className="settings-section">
+        <h2>Offline pack</h2>
+        <p className="settings-copy">Download or refresh the word pack, or retake the starting check.</p>
+        <div className="center-actions">
+          <button type="button" className="primary block" onClick={() => go({ name: "install" })}>
+            Install or refresh pack
+          </button>
+          <button type="button" className="ghost block" onClick={() => go({ name: "diagnostic" })}>
+            Retake vocabulary check
+          </button>
+        </div>
+      </section>
+
+      <section className="settings-section">
+        <h2>Backup</h2>
+        <p className="settings-copy">Keep a copy outside this phone. An internal database copy is not an independent backup. API keys are not exported.</p>
         <button
           type="button"
-          className="primary"
+          className="primary block"
           onClick={async () => {
             const backup = await exportBackup();
             downloadJson(`vocab-backup-${backup.exportedAt.slice(0, 10)}.json`, backup);
@@ -139,10 +183,16 @@ export function SettingsView() {
           />
         </label>
         {restoreNote ? <p className="tiny">{restoreNote}</p> : null}
-      </div>
-      <div className="panel tiny">
-        <p>Chris Workplace 1000 is original teaching text for shop, project, business, and everyday English, with wordfreq 3.1.1 scores and Piper British English audio (Jenny).</p>
-      </div>
+      </section>
+
+      <section className="settings-section">
+        <h2>About</h2>
+        <p className="settings-copy">
+          Chris Workplace 1000 is original teaching text for shop, project, business, and everyday English, with wordfreq 3.1.1
+          scores and Piper British English audio (Jenny).
+        </p>
+        <p className="tiny helper-copy">{storage}</p>
+      </section>
     </section>
   );
 }

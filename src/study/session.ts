@@ -364,10 +364,40 @@ export async function reAddToMyWords(senseId: string): Promise<void> {
   }
 }
 
-export async function setWordNotes(senseId: string, notes: string): Promise<void> {
-  const word = await db.userWords.get(`word:${senseId}`);
-  if (!word) return;
+export async function setWordNotes(senseId: string, notes: string, entryId?: string): Promise<void> {
+  let word = await db.userWords.get(`word:${senseId}`);
+  if (!word) {
+    if (!entryId) return;
+    await saveSense(
+      {
+        id: senseId,
+        entryId,
+      } as SenseRecord,
+      "Saved with a note",
+    );
+    word = await db.userWords.get(`word:${senseId}`);
+    if (!word) return;
+  }
   await db.userWords.put({ ...word, notes });
+}
+
+export async function appendWordNote(senseId: string, entryId: string, chunk: string): Promise<void> {
+  const word = await db.userWords.get(`word:${senseId}`);
+  const current = word?.notes?.trim() ?? "";
+  const next = current ? `${current}\n${chunk.trim()}` : chunk.trim();
+  await setWordNotes(senseId, next, entryId);
+}
+
+export async function loadSenseNotes(senseIds?: string[]): Promise<Record<string, string>> {
+  const words = senseIds?.length
+    ? await db.userWords.bulkGet(senseIds.map((id) => `word:${id}`))
+    : await db.userWords.toArray();
+  const map: Record<string, string> = {};
+  for (const word of words) {
+    if (!word?.notes?.trim()) continue;
+    map[word.senseId] = word.notes;
+  }
+  return map;
 }
 
 export async function resumeLearning(senseId: string): Promise<void> {

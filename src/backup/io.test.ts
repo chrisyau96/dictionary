@@ -57,6 +57,13 @@ describe("backup", () => {
     expect(previewBackup({ hello: true }).ok).toBe(false);
   });
 
+  it("does not export locally saved AI keys", async () => {
+    await db.meta.put({ key: "ai-key:google", value: { apiKey: "secret-test-key" } });
+    const backup = await exportBackup();
+    expect(JSON.stringify(backup)).not.toContain("secret-test-key");
+    expect(JSON.stringify(backup)).not.toContain("ai-key:google");
+  });
+
   it("still restores a version 1 backup", async () => {
     const card = newCardRecord("s-1", "e-1", "recognition");
     const parsed = previewBackup({

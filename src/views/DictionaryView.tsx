@@ -6,6 +6,7 @@ import { go } from "../router";
 import type { SearchHit } from "../search/lookup";
 import { searchDictionary } from "../search/lookup";
 import { normalizeQuery } from "../search/normalize";
+import { loadSenseNotes } from "../study/session";
 import type { DomainId, SenseRecord } from "../types";
 
 const TOPICS: Array<{ id: DomainId; label: string; hint: string }> = [
@@ -23,6 +24,7 @@ export function DictionaryView({ initialQuery }: { initialQuery: string }) {
   const [missing, setMissing] = useState(false);
   const [browse, setBrowse] = useState<DomainId | null>(null);
   const [topicSenses, setTopicSenses] = useState<SenseRecord[]>([]);
+  const [notes, setNotes] = useState<Record<string, string>>({});
   const [packLabel, setPackLabel] = useState("Installed offline pack");
 
   const normalized = useMemo(() => normalizeQuery(query), [query]);
@@ -31,6 +33,7 @@ export function DictionaryView({ initialQuery }: { initialQuery: string }) {
     void db.packs.where("status").equals("installed").first().then((pack) => {
       if (pack) setPackLabel(`${pack.name} · installed`);
     });
+    void loadSenseNotes().then(setNotes);
   }, []);
 
   useEffect(() => {
@@ -94,6 +97,7 @@ export function DictionaryView({ initialQuery }: { initialQuery: string }) {
             <WordListCard
               key={sense.id}
               sense={sense}
+              note={notes[sense.id]}
               onOpen={() => go({ name: "entry", entryId: sense.entryId, senseId: sense.id })}
             />
           ))}
@@ -104,6 +108,7 @@ export function DictionaryView({ initialQuery }: { initialQuery: string }) {
           <WordListCard
             key={sense.id}
             sense={sense}
+            note={notes[sense.id]}
             onOpen={() => go({ name: "entry", entryId: hit.entry.id, senseId: sense.id })}
           />
         )),

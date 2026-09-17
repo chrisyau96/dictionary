@@ -216,6 +216,8 @@ export async function ensureProfile(): Promise<ProfileRecord> {
     existing.estimatedBand === ("developing" as ProfileRecord["estimatedBand"]) ||
     existing.estimatedBand === ("independent" as ProfileRecord["estimatedBand"]);
   const normalized = normalizeProfile(existing);
-  if (needsWrite) await db.profile.put(normalized);
-  return normalized;
+  const timezone = detectTimezone();
+  const withZone = normalized.timezone === timezone ? normalized : { ...normalized, timezone };
+  if (needsWrite || withZone.timezone !== existing.timezone) await db.profile.put(withZone);
+  return withZone;
 }
