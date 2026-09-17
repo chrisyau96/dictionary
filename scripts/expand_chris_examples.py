@@ -98,8 +98,8 @@ def extra_pairs(lemma: str, gloss_tc: str, collocations: list[str], pos: str) ->
             )
             pairs.append(
                 (
-                    f"Today is especially {lemma} — {gloss_tc}.",
-                    f"今天特別「{lemma}」：{gloss_tc}",
+                    f"Today is especially {lemma} on the shop floor.",
+                    f"店舖今天特別「{lemma}」。",
                 )
             )
         else:
