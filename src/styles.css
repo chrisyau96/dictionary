@@ -780,37 +780,42 @@ input, textarea, select {
   position: fixed;
   z-index: 12;
   right: max(1.05rem, calc((100vw - min(100vw, 28.5rem)) / 2 + 1.05rem));
-  bottom: calc(1.2rem + env(safe-area-inset-bottom, 0px));
-  width: 3.85rem;
-  height: 3.85rem;
-  min-width: 3.85rem;
-  min-height: 3.85rem;
+  bottom: calc(1.35rem + env(safe-area-inset-bottom, 0px));
+  width: 3.9rem;
+  height: 3.9rem;
+  min-width: 3.9rem;
+  min-height: 3.9rem;
   padding: 0;
-  border-radius: 1.35rem;
+  border-radius: 1.4rem;
   display: grid;
   place-items: center;
   overflow: visible;
   background:
-    radial-gradient(circle at 28% 22%, color-mix(in srgb, white 48%, var(--accent)), transparent 46%),
-    linear-gradient(165deg, color-mix(in srgb, var(--accent) 72%, white), var(--accent) 58%, var(--accent-2));
+    radial-gradient(circle at 28% 22%, color-mix(in srgb, white 52%, var(--accent)), transparent 48%),
+    linear-gradient(165deg, color-mix(in srgb, var(--accent) 70%, white), var(--accent) 55%, var(--accent-2));
   color: #fff;
   box-shadow:
     0 16px 32px color-mix(in srgb, var(--accent) 38%, transparent),
     0 0 0 6px color-mix(in srgb, var(--accent-soft) 82%, transparent);
 }
 .ai-fab:active { transform: translateY(1px) scale(0.98); }
-.ai-fab-art {
-  width: 2.55rem;
-  height: 2.55rem;
-  overflow: visible;
-  color: #fff;
-}
-.ai-fab-label {
+.ai-fab-sparkles {
   position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
+  inset: 50% auto auto 50%;
+  width: 4.85rem;
+  height: 4.85rem;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  color: #fff;
+  filter: drop-shadow(0 2px 4px color-mix(in srgb, var(--accent) 35%, transparent));
+}
+.ai-fab-text {
+  position: relative;
+  z-index: 1;
+  font-weight: 800;
+  font-size: 1.05rem;
+  letter-spacing: 0.08em;
+  line-height: 1;
 }
 .ai-overlay {
   position: fixed;
