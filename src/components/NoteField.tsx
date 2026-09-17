@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { noteIsEmpty } from "../ai/html";
 import { setWordNotes } from "../study/session";
 import { RichHtml, RichTextEditor } from "./RichText";
@@ -12,12 +11,6 @@ export function NoteField({
   entryId: string;
   initial: string;
 }) {
-  const [value, setValue] = useState(initial);
-
-  useEffect(() => {
-    setValue(initial);
-  }, [senseId, initial]);
-
   function persist(next: string) {
     void setWordNotes(senseId, noteIsEmpty(next) ? "" : next, entryId);
   }
@@ -27,9 +20,8 @@ export function NoteField({
       Note
       <RichTextEditor
         resetKey={`${senseId}:${initial}`}
-        value={value}
+        value={initial}
         placeholder="Write something that helps you remember this"
-        onChange={setValue}
         onBlur={persist}
       />
     </label>
