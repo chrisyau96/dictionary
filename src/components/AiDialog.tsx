@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { completeChat } from "../ai/client";
+import { toSafeHtml } from "../ai/html";
 import { hasAiReady, loadAiConfig, loadApiKey, saveAiConfig } from "../ai/storage";
-import { buildAiPrompt, DEFAULT_AI_PROMPTS, formatAiNote, rememberCommand, suggestedCommands } from "../ai/types";
+import { DEFAULT_AI_PROMPTS, formatAiNote, rememberCommand, suggestedCommands } from "../ai/types";
 import { appendWordNote } from "../study/session";
 import { AiSetupForm } from "./AiSetupForm";
+import { RichTextEditor } from "./RichText";
 
 export function AiDialog({
   word,
@@ -21,7 +23,8 @@ export function AiDialog({
   const [ready, setReady] = useState<boolean | null>(null);
   const [ask, setAsk] = useState("");
   const [command, setCommand] = useState("Ask");
-  const [answer, setAnswer] = useState("");
+  const [answerHtml, setAnswerHtml] = useState("");
+  const [answerTick, setAnswerTick] = useState(0);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [recent, setRecent] = useState<string[]>([]);
@@ -64,9 +67,11 @@ export function AiDialog({
         provider: config.provider,
         model: config.model,
         apiKey,
-        prompt: buildAiPrompt(word, question),
+        word,
+        ask: question,
       });
-      setAnswer(text);
+      setAnswerHtml(toSafeHtml(text));
+      setAnswerTick((tick) => tick + 1);
       const nextRecent = rememberCommand(config.recentPrompts, nextCommand);
       await saveAiConfig({ ...config, recentPrompts: nextRecent });
       setRecent(nextRecent);
@@ -103,7 +108,6 @@ export function AiDialog({
         ) : null}
         {ready ? (
           <>
-            <p className="tiny helper-copy">Please base on the word “{word}”. Answer only, as concise as possible.</p>
             <div className="ai-chips">
               {chips.map((label) => (
                 <button
@@ -125,6 +129,12 @@ export function AiDialog({
                 value={ask}
                 placeholder={`Ask anything about “${word}”`}
                 onChange={(event) => setAsk(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) {
+                    event.preventDefault();
+                    void send(ask, ask.trim() || "Ask");
+                  }
+                }}
               />
             </label>
             <button
@@ -136,15 +146,15 @@ export function AiDialog({
               {busy ? "Thinking…" : "Ask"}
             </button>
             {error ? <p className="tiny danger">{error}</p> : null}
-            {answer ? (
+            {answerHtml ? (
               <div className="ai-answer">
-                <p>{answer}</p>
+                <RichTextEditor resetKey={`ans-${answerTick}`} value={answerHtml} onChange={setAnswerHtml} />
                 <div className="split-actions">
                   <button
                     type="button"
                     className="primary"
                     onClick={async () => {
-                      await appendWordNote(senseId, entryId, formatAiNote(command, answer));
+                      await appendWordNote(senseId, entryId, formatAiNote(command, answerHtml));
                       setSavedNote(true);
                       onNoted?.();
                     }}

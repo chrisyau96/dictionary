@@ -143,10 +143,12 @@ describe("skip and learn", () => {
   it("appendWordNote stores a clean AI line on a new or existing word", async () => {
     const sense = teachingSense("streamline");
     await db.senses.put(sense);
-    await appendWordNote(sense.id, sense.entryId, "Connotation: positive");
-    expect((await db.userWords.get("word:streamline"))?.notes).toBe("Connotation: positive");
-    await appendWordNote(sense.id, sense.entryId, "Word history: from Latin.");
-    expect((await db.userWords.get("word:streamline"))?.notes).toBe("Connotation: positive\nWord history: from Latin.");
+    await appendWordNote(sense.id, sense.entryId, "<p><strong>Connotation</strong></p><p>positive</p>");
+    expect((await db.userWords.get("word:streamline"))?.notes).toBe("<p><strong>Connotation</strong></p><p>positive</p>");
+    await appendWordNote(sense.id, sense.entryId, "<p><strong>Word history</strong></p><p>from Latin.</p>");
+    expect((await db.userWords.get("word:streamline"))?.notes).toBe(
+      "<p><strong>Connotation</strong></p><p>positive</p><p><br></p><p><strong>Word history</strong></p><p>from Latin.</p>",
+    );
   });
 
   it("learnSense returns a skipped meaning to learning", async () => {

@@ -384,7 +384,8 @@ export async function setWordNotes(senseId: string, notes: string, entryId?: str
 export async function appendWordNote(senseId: string, entryId: string, chunk: string): Promise<void> {
   const word = await db.userWords.get(`word:${senseId}`);
   const current = word?.notes?.trim() ?? "";
-  const next = current ? `${current}\n${chunk.trim()}` : chunk.trim();
+  const piece = chunk.trim();
+  const next = current ? `${current}<p><br></p>${piece}` : piece;
   await setWordNotes(senseId, next, entryId);
 }
 

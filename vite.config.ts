@@ -12,8 +12,8 @@ export default defineConfig({
       registerType: "prompt",
       includeAssets: ["icons/icon-192.png", "icons/icon-512.png", "favicon.svg"],
       manifest: {
-        name: "Chris Offline Vocabulary Coach",
-        short_name: "Vocab Coach",
+        name: "Vocab AI",
+        short_name: "Vocab AI",
         description:
           "Offline English vocabulary study with Traditional Chinese explanations.",
         theme_color: "#6d5cff",

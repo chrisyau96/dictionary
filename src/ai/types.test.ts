@@ -3,9 +3,9 @@ import { DEFAULT_AI_PROMPTS, formatAiNote, rememberCommand, suggestedCommands } 
 
 describe("AI prompt helpers", () => {
   it("formats a clean command and answer for notes", () => {
-    expect(formatAiNote("Connotation", "positive")).toBe("Connotation: positive");
+    expect(formatAiNote("Connotation", "positive")).toBe("<p><strong>Connotation</strong></p><p>positive</p>");
     expect(formatAiNote("What is the connotation? Positive, negative, or neutral — one short line.", "positive")).toBe(
-      "Connotation: positive",
+      "<p><strong>Connotation</strong></p><p>positive</p>",
     );
   });
 

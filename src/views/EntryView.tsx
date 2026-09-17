@@ -176,7 +176,7 @@ export function EntryView({ entryId, senseId }: { entryId: string; senseId?: str
         );
       })}
       {focused && !aiOpen ? (
-        <button type="button" className="ai-fab" onClick={() => setAiOpen(true)}>
+        <button type="button" className="ai-fab" aria-label="Ask AI" onClick={() => setAiOpen(true)}>
           <AiSparkles />
           <span className="ai-fab-text">AI</span>
         </button>

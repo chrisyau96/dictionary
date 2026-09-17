@@ -1,3 +1,5 @@
+import { escapeHtml, toSafeHtml } from "./html";
+
 export type AiProviderId = "openai" | "google" | "deepseek" | "mistral";
 
 export interface AiProvider {
@@ -97,8 +99,8 @@ export const DEFAULT_AI_PROMPTS: Array<{ label: string; ask: string }> = [
   },
 ];
 
-export function buildAiPrompt(word: string, ask: string): string {
-  return `Please base on the word "${word}". Answer only, as concise as possible.\n${ask.trim()}`;
+export function buildAiPrompt(_word: string, ask: string): string {
+  return ask.trim();
 }
 
 export function cleanCommand(command: string): string {
@@ -109,8 +111,9 @@ export function cleanCommand(command: string): string {
 }
 
 export function formatAiNote(command: string, answer: string): string {
-  const body = answer.replace(/\s+/g, " ").trim();
-  return `${cleanCommand(command)}: ${body}`;
+  const title = escapeHtml(cleanCommand(command));
+  const body = toSafeHtml(answer);
+  return `<p><strong>${title}</strong></p>${body}`;
 }
 
 export function rememberCommand(recent: string[], command: string): string[] {
