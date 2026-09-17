@@ -795,9 +795,11 @@ input, textarea, select {
   background: color-mix(in srgb, #12081f 48%, transparent);
   display: grid;
   align-items: end;
+  justify-items: center;
   padding: 0.8rem;
 }
 .ai-sheet {
+  width: min(26.5rem, 100%);
   background: var(--card);
   border-radius: 1.5rem 1.5rem 1.15rem 1.15rem;
   padding: 1.1rem;
@@ -952,7 +954,14 @@ input, textarea, select {
 .browse-tile span { display: block; margin-top: 0.2rem; font-weight: 500; color: var(--muted); font-size: 0.78rem; }
 
 .words-page { padding-bottom: 0.4rem; }
-.entry-page { padding-bottom: 0.4rem; }
+.entry-page .page-header {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: color-mix(in srgb, var(--bg) 92%, white);
+  margin: 0 -0.2rem;
+  padding: 0.55rem 0.2rem 0.35rem;
+}
 
 @media (max-width: 360px) {
   :root { font-size: 16px; }

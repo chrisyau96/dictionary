@@ -87,7 +87,7 @@ export function AiSetupForm({
           {models.map((item) => (
             <option key={item.id} value={item.id}>
               {item.name}
-              {item.reasoning ? " · slower" : " · fast"}
+              {/mini|nano|flash|lite|small|ministral|nemo/i.test(`${item.id} ${item.name}`) || !item.reasoning ? " · fast" : " · slower"}
             </option>
           ))}
         </select>
