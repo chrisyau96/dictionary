@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { AiDialog } from "../components/AiDialog";
 import { AudioButton } from "../components/AudioButton";
 import { FrequencyBars } from "../components/FrequencyBars";
+import { AiMark } from "../components/icons";
 import { NoteField } from "../components/NoteField";
 import { ScreenHeader } from "../components/ScreenHeader";
 import { db } from "../db/database";
@@ -80,17 +81,7 @@ export function EntryView({ entryId, senseId }: { entryId: string; senseId?: str
 
   return (
     <section className="stack compact entry-page">
-      <ScreenHeader
-        back="history"
-        backLabel="Back"
-        right={
-          focused ? (
-            <button type="button" className="ai-btn" onClick={() => setAiOpen(true)}>
-              AI
-            </button>
-          ) : null
-        }
-      />
+      <ScreenHeader back="history" backLabel="Back" />
       {focused ? (
         <div className="hero-card">
           <p className="hero-kicker">{(focused.domains[0] ?? "workplace").replaceAll("-", " ")}</p>
@@ -184,6 +175,12 @@ export function EntryView({ entryId, senseId }: { entryId: string; senseId?: str
           </article>
         );
       })}
+      {focused && !aiOpen ? (
+        <button type="button" className="ai-fab" aria-label="Ask AI about this word" onClick={() => setAiOpen(true)}>
+          <AiMark />
+          <span className="ai-fab-label">AI</span>
+        </button>
+      ) : null}
       {aiOpen && focused ? (
         <AiDialog
           word={entry.display}

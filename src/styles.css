@@ -210,7 +210,7 @@ a { color: var(--accent); }
   font-size: 0.92rem;
 }
 
-.back-btn, .icon-btn, .text-btn, .primary, .ghost, .rating, .chip, .audio-btn, .choice, .swipe-remove, .ai-btn {
+.back-btn, .icon-btn, .text-btn, .primary, .ghost, .rating, .chip, .audio-btn, .choice, .swipe-remove, .ai-fab {
   border: 0;
   border-radius: 1.25rem;
   min-height: 2.9rem;
@@ -776,18 +776,42 @@ input, textarea, select {
 .note-display p { margin: 0; white-space: pre-wrap; }
 .note-display .example-index { margin-bottom: 0.3rem; }
 
-.ai-btn {
-  min-width: 3.2rem;
-  min-height: 2.7rem;
-  padding: 0 0.95rem;
-  border-radius: 999px;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 82%, white), var(--accent));
+.ai-fab {
+  position: fixed;
+  z-index: 12;
+  right: max(1.05rem, calc((100vw - min(100vw, 28.5rem)) / 2 + 1.05rem));
+  bottom: calc(1.2rem + env(safe-area-inset-bottom, 0px));
+  width: 3.85rem;
+  height: 3.85rem;
+  min-width: 3.85rem;
+  min-height: 3.85rem;
+  padding: 0;
+  border-radius: 1.35rem;
+  display: grid;
+  place-items: center;
+  overflow: visible;
+  background:
+    radial-gradient(circle at 28% 22%, color-mix(in srgb, white 48%, var(--accent)), transparent 46%),
+    linear-gradient(165deg, color-mix(in srgb, var(--accent) 72%, white), var(--accent) 58%, var(--accent-2));
   color: #fff;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  box-shadow: var(--btn-shadow);
+  box-shadow:
+    0 16px 32px color-mix(in srgb, var(--accent) 38%, transparent),
+    0 0 0 6px color-mix(in srgb, var(--accent-soft) 82%, transparent);
 }
-.ai-btn:active { transform: translateY(1px); }
+.ai-fab:active { transform: translateY(1px) scale(0.98); }
+.ai-fab-art {
+  width: 2.55rem;
+  height: 2.55rem;
+  overflow: visible;
+  color: #fff;
+}
+.ai-fab-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+}
 .ai-overlay {
   position: fixed;
   inset: 0;
