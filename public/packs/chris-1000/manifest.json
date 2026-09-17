@@ -1,6 +1,6 @@
 {
   "packId": "chris-1000",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "schemaVersion": 1,
   "name": "Chris Workplace 1000",
   "accent": "en-GB",
@@ -1974,10 +1974,10 @@
     "audio/p-usb.mp3": "7d31aa481505efe30b9f7c398bc82f358ebb54586182ee24f5fd604dbf4b8cf8",
     "audio/p-battery.mp3": "34f7422c6814bba2060cd89d9c2efd69de4d28a9e148bfa594315b56c3cbb3da",
     "audio/p-signal.mp3": "8d6a7459fc00f1d7a66e444b7d5d5b1d3a250aa335032bd13e04289cb072f319",
-    "pack.json": "667f7db1d7214a30e57f9f663499e6f114d6347eee027bd15fd3c496adaed583",
+    "pack.json": "126897537930c11841b0302c29428889367f358d322b9fd2cb9df4b59d18a686",
     "NOTICES.md": "1b63057962a88c47186b89b282eba43ae4b32702364b3ab6452b303771ca25c6"
   },
-  "byteSize": 6631615,
+  "byteSize": 6637262,
   "audioBytes": 4700381,
   "completeness": {
     "meanings": "complete",

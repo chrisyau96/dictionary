@@ -9,11 +9,14 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "public" / "packs" / "chris-1000"
-PACK_VERSION = "1.2.0"
+PACK_VERSION = "1.2.1"
 
 VERBISH = {
     "add",
+    "address",
+    "approve",
     "ask",
+    "book",
     "bring",
     "call",
     "change",
@@ -21,22 +24,31 @@ VERBISH = {
     "close",
     "confirm",
     "cut",
+    "deliver",
     "follow",
     "get",
     "give",
     "go",
+    "handle",
     "keep",
     "leave",
     "make",
+    "manage",
+    "meet",
+    "miss",
     "open",
     "pay",
+    "process",
     "put",
     "read",
+    "review",
+    "schedule",
     "send",
     "set",
     "share",
     "sign",
     "start",
+    "streamline",
     "take",
     "talk",
     "tell",
@@ -59,21 +71,35 @@ def is_verb_phrase(col: str) -> bool:
     return first in VERBISH
 
 
-def extra_pairs(lemma: str, gloss_tc: str, collocations: list[str]) -> list[tuple[str, str]]:
+def extra_pairs(lemma: str, gloss_tc: str, collocations: list[str], pos: str) -> list[tuple[str, str]]:
     cols = [item for item in collocations if item.strip()] or [lemma]
     pairs: list[tuple[str, str]] = []
     for col in cols:
-        if is_verb_phrase(col):
+        verbish = pos == "verb" or is_verb_phrase(col)
+        if verbish:
             pairs.append(
                 (
                     f"Please {col} before the shop gets busy.",
-                    f"店舖忙起來之前，請先做到「{col}」。",
+                    f"店舖忙起來之前，請先「{col}」。",
                 )
             )
             pairs.append(
                 (
                     f"Can you {col} after the lunch rush?",
                     f"午市過後，你可以「{col}」嗎？",
+                )
+            )
+        elif pos == "adjective":
+            pairs.append(
+                (
+                    f"Keep this {lemma} in the handover notes.",
+                    f"交接備註要寫明這是「{lemma}」。",
+                )
+            )
+            pairs.append(
+                (
+                    f"Today is especially {lemma} — {gloss_tc}.",
+                    f"今天特別「{lemma}」：{gloss_tc}",
                 )
             )
         else:
@@ -105,12 +131,13 @@ def extra_pairs(lemma: str, gloss_tc: str, collocations: list[str]) -> list[tupl
 
 
 def pad_examples(sense: dict) -> list[dict]:
-    examples = list(sense.get("examples") or [])
+    examples = list(sense.get("examples") or [])[:3]
     seen = {str(item.get("en", "")).strip().lower() for item in examples}
     lemma = sense.get("frequency", {}).get("form") or sense["id"]
     gloss_tc = sense.get("glossTc") or ""
     collocations = sense.get("collocations") or []
-    for en, tc in extra_pairs(lemma, gloss_tc, collocations):
+    pos = str(sense.get("pos") or "")
+    for en, tc in extra_pairs(lemma, gloss_tc, collocations, pos):
         if len(examples) >= 5:
             break
         key = en.strip().lower()
