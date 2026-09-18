@@ -119,7 +119,7 @@ export function AiSetupForm({
       <button type="button" className="primary block" disabled={busy} onClick={() => void save()}>
         Save AI setup
       </button>
-      {!compact && hasKey ? (
+      {hasKey ? (
         <button
           type="button"
           className="ghost block"

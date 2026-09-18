@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { downloadJson, exportBackup, previewBackup, restoreBackup } from "../backup/io";
 import { AiSetupForm } from "../components/AiSetupForm";
 import { InstallHomeCard } from "../components/InstallHomeCard";
@@ -22,6 +22,8 @@ export function SettingsView() {
   const [profile, setProfile] = useState<ProfileRecord | null>(null);
   const [storage, setStorage] = useState("");
   const [restoreNote, setRestoreNote] = useState("");
+  const [restoreName, setRestoreName] = useState("");
+  const restoreInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     void ensureProfile().then((next) => {
@@ -162,14 +164,27 @@ export function SettingsView() {
         >
           Export learning records
         </button>
-        <label>
-          Restore from file
-          <input
-            type="file"
-            accept="application/json"
-            onChange={async (event) => {
-              const file = event.target.files?.[0];
-              if (!file) return;
+        <button
+          type="button"
+          className="ghost block file-pick"
+          onClick={() => restoreInput.current?.click()}
+        >
+          <span className="file-pick-title">Restore from file</span>
+          <span className="file-pick-copy">
+            {restoreName || "Tap to choose a JSON backup. This replaces learning records on this device."}
+          </span>
+        </button>
+        <input
+          ref={restoreInput}
+          className="sr-only"
+          type="file"
+          accept="application/json"
+          onChange={async (event) => {
+            const file = event.target.files?.[0];
+            event.target.value = "";
+            if (!file) return;
+            setRestoreName(file.name);
+            try {
               const parsed = previewBackup(JSON.parse(await file.text()));
               if (!parsed.ok) {
                 setRestoreNote(parsed.error);
@@ -179,9 +194,11 @@ export function SettingsView() {
               if (!window.confirm(preview)) return;
               await restoreBackup(parsed.backup);
               setRestoreNote("Restore complete. Check Today and My Words.");
-            }}
-          />
-        </label>
+            } catch {
+              setRestoreNote("This file could not be read as a backup.");
+            }
+          }}
+        />
         {restoreNote ? <p className="tiny">{restoreNote}</p> : null}
       </section>
 

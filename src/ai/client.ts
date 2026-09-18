@@ -4,7 +4,10 @@ export function hiddenWordPrompt(word: string): string {
   return [
     `Base your answer on the English word "${word}" only.`,
     "Answer only, as concise as possible.",
-    "Use simple HTML: p, strong, em, ul, li, br. No markdown. No preamble.",
+    "Do not repeat the word as a heading.",
+    "Use simple HTML: p, strong, em, ul, ol, li, br.",
+    "Use ul/ol lists for nearby words, synonyms, or numbered points. Nest lists instead of using markdown.",
+    "No markdown markers, no empty list items, no preamble.",
   ].join(" ");
 }
 

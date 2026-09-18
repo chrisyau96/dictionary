@@ -57,6 +57,53 @@ export function BackIcon() {
   );
 }
 
+export function PencilIcon() {
+  return (
+    <Icon strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+    </Icon>
+  );
+}
+
+export function ListBulletIcon() {
+  return (
+    <Icon strokeLinecap="round">
+      <circle cx="5" cy="7" r="1.15" fill="currentColor" />
+      <circle cx="5" cy="12" r="1.15" fill="currentColor" />
+      <circle cx="5" cy="17" r="1.15" fill="currentColor" />
+      <path d="M9 7h11M9 12h11M9 17h11" />
+    </Icon>
+  );
+}
+
+export function ListNumberIcon() {
+  return (
+    <Icon strokeLinecap="round" strokeLinejoin="round">
+      <path d="M10 7h10M10 12h10M10 17h10" />
+      <path d="M5.2 6.2V10M4 10h2.4M4.4 14.2c.4-.6 1.2-.8 1.8-.4.5.3.6.9.3 1.3L4 18.2h2.6" />
+    </Icon>
+  );
+}
+
+export function IndentIncreaseIcon() {
+  return (
+    <Icon strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 6h18M13 12h8M3 18h18" />
+      <path d="M3 9v6l4.5-3Z" fill="currentColor" stroke="none" />
+    </Icon>
+  );
+}
+
+export function IndentDecreaseIcon() {
+  return (
+    <Icon strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 6h18M13 12h8M3 18h18" />
+      <path d="M8 9v6L3.5 12Z" fill="currentColor" stroke="none" />
+    </Icon>
+  );
+}
+
 export function AiSparkles() {
   return (
     <svg className="ai-fab-sparkles" viewBox="0 0 64 64" aria-hidden="true" focusable="false">

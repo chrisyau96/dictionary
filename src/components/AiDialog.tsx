@@ -5,6 +5,7 @@ import { hasAiReady, loadAiConfig, loadApiKey, saveAiConfig } from "../ai/storag
 import { DEFAULT_AI_PROMPTS, formatAiNote, rememberCommand, suggestedCommands } from "../ai/types";
 import { appendWordNote } from "../study/session";
 import { AiSetupForm } from "./AiSetupForm";
+import { PencilIcon, SettingsIcon } from "./icons";
 import { RichTextEditor } from "./RichText";
 
 export function AiDialog({
@@ -29,6 +30,7 @@ export function AiDialog({
   const [error, setError] = useState("");
   const [recent, setRecent] = useState<string[]>([]);
   const [savedNote, setSavedNote] = useState(false);
+  const [setupOpen, setSetupOpen] = useState(false);
 
   useEffect(() => {
     void (async () => {
@@ -60,6 +62,7 @@ export function AiDialog({
     setBusy(true);
     setError("");
     setSavedNote(false);
+    setSetupOpen(false);
     setCommand(nextCommand);
     setAsk(question);
     try {
@@ -87,6 +90,8 @@ export function AiDialog({
     void send(preset?.ask ?? label, preset?.label ?? label);
   }
 
+  const showAnswer = busy || Boolean(answerHtml);
+
   return (
     <div className="ai-overlay" role="dialog" aria-modal="true" aria-label={`AI for ${word}`} onClick={onClose}>
       <div className="ai-sheet" onClick={(event) => event.stopPropagation()}>
@@ -95,9 +100,22 @@ export function AiDialog({
             <p className="example-index">AI</p>
             <h2 className="ai-word">{word}</h2>
           </div>
-          <button type="button" className="text-btn" onClick={onClose}>
-            Close
-          </button>
+          <div className="ai-sheet-actions">
+            {ready && !showAnswer ? (
+              <button
+                type="button"
+                className="icon-btn ai-answer-gear"
+                aria-label="Change AI model or API key"
+                aria-expanded={setupOpen}
+                onClick={() => setSetupOpen((open) => !open)}
+              >
+                <SettingsIcon />
+              </button>
+            ) : null}
+            <button type="button" className="text-btn" onClick={onClose}>
+              Close
+            </button>
+          </div>
         </div>
         {ready === null ? <p className="muted">Opening AI…</p> : null}
         {ready === false ? (
@@ -146,25 +164,79 @@ export function AiDialog({
               {busy ? "Thinking…" : "Ask"}
             </button>
             {error ? <p className="tiny danger">{error}</p> : null}
-            {answerHtml ? (
+            {setupOpen && !showAnswer ? (
+              <div className="ai-inline-setup">
+                <AiSetupForm
+                  compact
+                  onReady={() => {
+                    setReady(true);
+                    setSetupOpen(false);
+                  }}
+                />
+              </div>
+            ) : null}
+            {showAnswer ? (
               <div className="ai-answer">
-                <RichTextEditor resetKey={`ans-${answerTick}`} value={answerHtml} onChange={setAnswerHtml} />
-                <div className="split-actions">
+                <div className="ai-answer-head">
+                  <p className="ai-edit-hint">
+                    {busy ? (
+                      "Working on an answer"
+                    ) : (
+                      <>
+                        <PencilIcon />
+                        You can edit this
+                      </>
+                    )}
+                  </p>
                   <button
                     type="button"
-                    className="primary"
-                    onClick={async () => {
-                      await appendWordNote(senseId, entryId, formatAiNote(command, answerHtml));
-                      setSavedNote(true);
-                      onNoted?.();
-                    }}
+                    className="icon-btn ai-answer-gear"
+                    aria-label="Change AI model or API key"
+                    aria-expanded={setupOpen}
+                    onClick={() => setSetupOpen((open) => !open)}
                   >
-                    Add to note
-                  </button>
-                  <button type="button" className="ghost" disabled={busy} onClick={() => void send(ask, command)}>
-                    Ask again
+                    <SettingsIcon />
                   </button>
                 </div>
+                {setupOpen ? (
+                  <div className="ai-inline-setup">
+                    <AiSetupForm
+                      compact
+                      onReady={() => {
+                        setReady(true);
+                        setSetupOpen(false);
+                      }}
+                    />
+                  </div>
+                ) : null}
+                {busy ? (
+                  <div className="ai-loading" aria-busy="true" aria-live="polite">
+                    <span className="ai-skel" />
+                    <span className="ai-skel" />
+                    <span className="ai-skel is-short" />
+                    <p className="tiny">Thinking…</p>
+                  </div>
+                ) : (
+                  <RichTextEditor resetKey={`ans-${answerTick}`} value={answerHtml} onChange={setAnswerHtml} />
+                )}
+                {!busy && answerHtml ? (
+                  <div className="split-actions">
+                    <button
+                      type="button"
+                      className="primary"
+                      onClick={async () => {
+                        await appendWordNote(senseId, entryId, formatAiNote(command, answerHtml));
+                        setSavedNote(true);
+                        onNoted?.();
+                      }}
+                    >
+                      Add to note
+                    </button>
+                    <button type="button" className="ghost" onClick={() => void send(ask, command)}>
+                      Ask again
+                    </button>
+                  </div>
+                ) : null}
                 {savedNote ? <p className="tiny">Added to your note.</p> : null}
               </div>
             ) : null}
