@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { AiDialog } from "../components/AiDialog";
-import { AudioButton } from "../components/AudioButton";
+import { PronunciationButtons } from "../components/AudioButton";
 import { FrequencyBars } from "../components/FrequencyBars";
 import { AiSparkles } from "../components/icons";
 import { NoteField } from "../components/NoteField";
@@ -94,11 +94,10 @@ export function EntryView({ entryId, senseId }: { entryId: string; senseId?: str
             </div>
             <div className="pron-tools">
               <FrequencyBars score={focused.frequency.commonness} />
-              <AudioButton
+              <PronunciationButtons
                 pronunciationId={focused.pronunciationId}
                 fallbackText={entry.display}
                 allowed
-                label={`Play pronunciation of ${entry.display}`}
               />
             </div>
           </div>
@@ -121,11 +120,10 @@ export function EntryView({ entryId, senseId }: { entryId: string; senseId?: str
               <div className="pron-mini">
                 {sense.ipa ? <span className="ipa-inline">{sense.ipa}</span> : <span className="tiny">Pronunciation</span>}
                 <FrequencyBars score={sense.frequency.commonness} />
-                <AudioButton
+                <PronunciationButtons
                   pronunciationId={sense.pronunciationId}
                   fallbackText={entry.display}
                   allowed
-                  label={`Play pronunciation of ${entry.display}, ${sense.pos}`}
                 />
               </div>
             ) : null}

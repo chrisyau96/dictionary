@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { AudioButton } from "../components/AudioButton";
+import { PronunciationButtons } from "../components/AudioButton";
 import { ScreenHeader } from "../components/ScreenHeader";
 import { db, ensureProfile } from "../db/database";
 import { go } from "../router";
@@ -7,10 +7,10 @@ import { previewRatingIntervals } from "../scheduler/schedule";
 import { buildToday, persistSessionIndex, productionBlank, questionFor, rateCard, undoLastReview, type QueueItem } from "../study/session";
 
 const GRADE_HELP = [
-  { rating: 1 as const, key: "again", label: "Again", hint: "Could not recall" },
-  { rating: 2 as const, key: "hard", label: "Hard", hint: "Correct, with effort" },
-  { rating: 3 as const, key: "good", label: "Good", hint: "Correct" },
-  { rating: 4 as const, key: "easy", label: "Easy", hint: "Correct, effortless" },
+  { rating: 1 as const, key: "again", label: "Again", hint: "Forgot" },
+  { rating: 2 as const, key: "hard", label: "Hard", hint: "Hesitated" },
+  { rating: 3 as const, key: "good", label: "Good", hint: "Recalled" },
+  { rating: 4 as const, key: "easy", label: "Easy", hint: "Instant" },
 ];
 
 export function ReviewView() {
@@ -18,16 +18,14 @@ export function ReviewView() {
   const [index, setIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [showHelp, setShowHelp] = useState(false);
   const [sessionType, setSessionType] = useState<"scheduled" | "learn-new">("scheduled");
 
   useEffect(() => {
     void (async () => {
-      const [today, profile] = await Promise.all([buildToday(), ensureProfile()]);
+      const today = await buildToday();
       setQueue(today.queue);
       setIndex(today.plan.session && !today.plan.session.completedAt ? today.plan.session.index : 0);
       setSessionType(today.plan.session?.sessionType ?? "scheduled");
-      setShowHelp(!profile.seenReviewHelp);
       setRevealed(false);
     })();
   }, []);
@@ -44,12 +42,24 @@ export function ReviewView() {
     setRevealed(false);
     setIndex(nextIndex);
     setBusy(false);
-    if (showHelp) {
-      const profile = await ensureProfile();
-      await db.profile.put({ ...profile, seenReviewHelp: true });
-      setShowHelp(false);
-    }
+    const profile = await ensureProfile();
+    if (!profile.seenReviewHelp) await db.profile.put({ ...profile, seenReviewHelp: true });
   }
+
+  useEffect(() => {
+    function onKey(event: KeyboardEvent) {
+      if (event.target instanceof HTMLElement && ["INPUT", "TEXTAREA"].includes(event.target.tagName)) return;
+      if (!revealed && (event.key === " " || event.key === "Enter")) {
+        event.preventDefault();
+        setRevealed(true);
+        return;
+      }
+      const grade = { "1": 1, "2": 2, "3": 3, "4": 4 }[event.key] as 1 | 2 | 3 | 4 | undefined;
+      if (grade) void rate(grade);
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [revealed, busy, index, item, sessionType]);
 
   if (!item) {
     return (
@@ -72,66 +82,79 @@ export function ReviewView() {
   const previews = revealed ? previewRatingIntervals(item.card) : null;
   const word = item.sense.frequency.form || item.sense.id;
   const blank = productionBlank(item.sense);
+  const example = item.sense.examples[0];
 
   return (
     <section className="stack compact">
       <ScreenHeader
-        eyebrow={`Contextual recall · ${index + 1}/${queue.length}`}
+        eyebrow={`Flashcards · ${index + 1}/${queue.length}`}
         title={item.card.task === "recognition" ? "What does it mean?" : "What is the word?"}
-        subtitle={revealed ? "How well did you remember it?" : "Think of the answer, then reveal."}
+        subtitle={revealed ? "How well did you remember the front?" : "Think of the answer, then tap the card."}
         back={{ name: "today" }}
         backLabel="Exit practice"
       />
       <div className="progress-bar" aria-label="Session progress">
         <span style={{ width: `${Math.round((index / queue.length) * 100)}%` }} />
       </div>
-      {!revealed ? (
-        <>
-          <div className="review-cue">
-            {showWord ? (
-              <>
-                <p className="prompt-word">
-                  {word}
-                  <span className="pos-inline">{item.sense.pos}</span>
-                </p>
-                <p>{question.prompt}</p>
-              </>
-            ) : (
-              <>
-                <p className="cue-sentence">{blank}</p>
-                <p>{item.sense.glossTc}</p>
-              </>
-            )}
-            <span className="mini">Several expressions may be valid. The answer shows the intended teaching target.</span>
-          </div>
-          <button type="button" className="primary block" onClick={() => setRevealed(true)}>
-            Reveal
-          </button>
-        </>
-      ) : (
-        <>
-          <div className="review-answer">
-            <h2 className="prompt-word">
-              {word}
-              <span className="pos-inline">{item.sense.pos}</span>
-            </h2>
-            <p>{item.sense.glossEn}</p>
-            <p>{item.sense.glossTc}</p>
-            {item.sense.collocations.slice(0, 3).map((col, index) => (
-              <span className={`phrase tone-${index % 4}`} key={col}>
-                {col}
-              </span>
-            ))}
-            {item.sense.examples.map((example) => (
-              <p className="example-line" key={example.id}>
-                {example.en}
-                <br />
-                <span className="muted">{example.tc}</span>
+      <div
+        className={`flashcard${revealed ? " is-flipped" : ""}`}
+        role="button"
+        tabIndex={0}
+        onClick={() => setRevealed((open) => !open)}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            setRevealed((open) => !open);
+          }
+        }}
+        aria-label={revealed ? "Hide answer" : "Show answer"}
+      >
+        <div className="flash-face flash-front">
+          {showWord ? (
+            <>
+              <p className="prompt-word">
+                {word}
+                <span className="pos-inline">{item.sense.pos}</span>
               </p>
-            ))}
-            <AudioButton pronunciationId={item.sense.pronunciationId} fallbackText={word} allowed={revealed} />
+              <p>{question.prompt}</p>
+            </>
+          ) : (
+            <>
+              <p className="cue-sentence">{blank}</p>
+              <p>{item.sense.glossTc}</p>
+            </>
+          )}
+          <span className="flash-hint">Tap to flip</span>
+        </div>
+        <div className="flash-face flash-back">
+          <h2 className="prompt-word">
+            {word}
+            <span className="pos-inline">{item.sense.pos}</span>
+          </h2>
+          <p>{item.sense.glossEn}</p>
+          <p>{item.sense.glossTc}</p>
+          {item.sense.collocations.slice(0, 3).map((col, collocationIndex) => (
+            <span className={`phrase tone-${collocationIndex % 4}`} key={col}>
+              {col}
+            </span>
+          ))}
+          {example ? (
+            <p className="example-line">
+              {example.en}
+              <br />
+              <span className="muted">{example.tc}</span>
+            </p>
+          ) : null}
+          <div className="flash-audio" onClick={(event) => event.stopPropagation()}>
+            <PronunciationButtons pronunciationId={item.sense.pronunciationId} fallbackText={word} allowed />
           </div>
-          <p className="tiny helper-copy">Rate your recall from before you revealed—not how familiar it looks now.</p>
+        </div>
+      </div>
+      {revealed ? (
+        <>
+          <p className="tiny helper-copy">
+            Rate the moment before you flipped — FSRS, the same spaced-repetition method used by Anki.
+          </p>
           <div className="rating-row">
             {GRADE_HELP.map((grade) => (
               <button
@@ -163,6 +186,8 @@ export function ReviewView() {
             Undo last rating
           </button>
         </>
+      ) : (
+        <p className="tiny helper-copy">Space flips the card. 1–4 rate Again, Hard, Good, Easy.</p>
       )}
     </section>
   );

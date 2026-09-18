@@ -37,4 +37,10 @@ describe("Gemini answers", () => {
     expect(hiddenWordPrompt("amendment")).toContain('English word "amendment"');
     expect(hiddenWordPrompt("amendment")).toContain("as concise as possible");
   });
+
+  it("uses one user-facing message when the model returns nothing", () => {
+    expect(() => extractGeminiText({ candidates: [{ finishReason: "STOP", content: { parts: [] } }] })).toThrow(
+      "An error occurred. Please try again.",
+    );
+  });
 });

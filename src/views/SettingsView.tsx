@@ -1,10 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { downloadJson, exportBackup, previewBackup, restoreBackup } from "../backup/io";
 import { AiSetupForm } from "../components/AiSetupForm";
-import { InstallHomeCard } from "../components/InstallHomeCard";
 import { ScreenHeader } from "../components/ScreenHeader";
 import { db, ensureProfile } from "../db/database";
-import { storageSnapshot } from "../content/install";
 import { go } from "../router";
 import { ACCENT_OPTIONS, applyAccent, type AccentId } from "../theme/accents";
 import type { DomainId, ProfileRecord } from "../types";
@@ -18,24 +16,26 @@ const DOMAIN_LABELS: Record<DomainId, string> = {
   technology: "Technology",
 };
 
-export function SettingsView() {
+export function SettingsView({ focus }: { focus?: string }) {
   const [profile, setProfile] = useState<ProfileRecord | null>(null);
-  const [storage, setStorage] = useState("");
   const [restoreNote, setRestoreNote] = useState("");
   const [restoreName, setRestoreName] = useState("");
   const restoreInput = useRef<HTMLInputElement>(null);
+  const aiSection = useRef<HTMLElement>(null);
 
   useEffect(() => {
     void ensureProfile().then((next) => {
       setProfile(next);
       applyAccent(next.accentId);
     });
-    void storageSnapshot().then((info) => {
-      const used = info.usage !== null ? `${Math.round(info.usage / 1024)} KB used` : "usage unknown";
-      const persist = info.persisted === true ? "persistent storage granted" : info.persisted === false ? "persistence not granted" : "persistence unknown";
-      setStorage(`${used}; ${persist}. Browser storage can still be cleared or evicted.`);
-    });
   }, []);
+
+  useEffect(() => {
+    if (focus !== "ai") return;
+    const node = aiSection.current;
+    if (!node) return;
+    node.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [focus, profile]);
 
   async function save(next: ProfileRecord) {
     setProfile(next);
@@ -92,14 +92,6 @@ export function SettingsView() {
             onChange={(event) => save({ ...profile, dailyReviewCapacity: Number(event.target.value) })}
           />
         </label>
-        <aside className="settings-tip">
-          <p className="example-index">Tip</p>
-          <p>
-            These two numbers are the daily load the scheduler will try to keep. It aims for about 90% of reviewed words to stay
-            rememberable, so new words pause when due reviews are already near this capacity. That is a planning target, not a
-            guaranteed recall rate. Your study day follows this device’s current timezone.
-          </p>
-        </aside>
       </section>
 
       <section className="settings-section">
@@ -124,8 +116,12 @@ export function SettingsView() {
         </div>
       </section>
 
-      <section className="settings-section">
-        <h2>AI helper</h2>
+      <section
+        className={`settings-section${focus === "ai" ? " is-anchored" : ""}`}
+        id="settings-ai"
+        ref={aiSection}
+      >
+        <h2>API setting</h2>
         <p className="settings-copy">
           Pick a default fast model and paste your own API key. Keys stay on this device and are never included in learning backups.
         </p>
@@ -133,20 +129,11 @@ export function SettingsView() {
       </section>
 
       <section className="settings-section">
-        <h2>Home screen</h2>
-        <p className="settings-copy">Install this as an app on your phone’s Home Screen.</p>
-        <InstallHomeCard />
-      </section>
-
-      <section className="settings-section">
         <h2>Offline pack</h2>
-        <p className="settings-copy">Download or refresh the word pack, or retake the starting check.</p>
+        <p className="settings-copy">Download or refresh the word pack.</p>
         <div className="center-actions">
           <button type="button" className="primary block" onClick={() => go({ name: "install" })}>
             Install or refresh pack
-          </button>
-          <button type="button" className="ghost block" onClick={() => go({ name: "diagnostic" })}>
-            Retake vocabulary check
           </button>
         </div>
       </section>
@@ -200,15 +187,6 @@ export function SettingsView() {
           }}
         />
         {restoreNote ? <p className="tiny">{restoreNote}</p> : null}
-      </section>
-
-      <section className="settings-section">
-        <h2>About</h2>
-        <p className="settings-copy">
-          Chris Workplace 1000 is original teaching text for shop, project, business, and everyday English, with wordfreq 3.1.1
-          scores and Piper British English audio (Jenny).
-        </p>
-        <p className="tiny helper-copy">{storage}</p>
       </section>
     </section>
   );

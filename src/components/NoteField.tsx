@@ -16,15 +16,15 @@ export function NoteField({
   }
 
   return (
-    <label className="note-field">
-      Note
+    <div className="note-field">
+      <span className="note-field-label">Note</span>
       <RichTextEditor
         resetKey={`${senseId}:${initial}`}
         value={initial}
         placeholder="Write something that helps you remember this"
         onBlur={persist}
       />
-    </label>
+    </div>
   );
 }
 

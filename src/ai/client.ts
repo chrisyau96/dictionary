@@ -1,5 +1,7 @@
 import { providerById, type AiProviderId } from "./types";
 
+export const AI_USER_ERROR = "An error occurred. Please try again.";
+
 export function hiddenWordPrompt(word: string): string {
   return [
     `Base your answer on the English word "${word}" only.`,
@@ -8,7 +10,14 @@ export function hiddenWordPrompt(word: string): string {
     "Use simple HTML: p, strong, em, ul, ol, li, br.",
     "Use ul/ol lists for nearby words, synonyms, or numbered points. Nest lists instead of using markdown.",
     "No markdown markers, no empty list items, no preamble.",
+    "Always return at least one HTML paragraph with visible text.",
   ].join(" ");
+}
+
+function nonempty(text: string | undefined): string {
+  const value = text?.trim() ?? "";
+  if (!value) throw new Error(AI_USER_ERROR);
+  return value;
 }
 
 function extractOpenAiText(payload: unknown): string {
@@ -18,8 +27,7 @@ function extractOpenAiText(payload: unknown): string {
   const content = Array.isArray(raw)
     ? raw.map((part) => part.text ?? "").join("").trim()
     : raw?.trim() ?? "";
-  if (!content) throw new Error("The model returned an empty answer.");
-  return content;
+  return nonempty(content);
 }
 
 export function extractGeminiText(payload: unknown): string {
@@ -31,9 +39,7 @@ export function extractGeminiText(payload: unknown): string {
       content?: { parts?: Array<{ text?: string; thought?: boolean }> };
     }>;
   };
-  if (data.promptFeedback?.blockReason) {
-    throw new Error(`Gemini blocked this (${data.promptFeedback.blockReason}).`);
-  }
+  if (data.promptFeedback?.blockReason) throw new Error(AI_USER_ERROR);
   const candidate = data.candidates?.[0];
   const parts = candidate?.content?.parts ?? [];
   const visible = parts
@@ -42,23 +48,13 @@ export function extractGeminiText(payload: unknown): string {
     .join("")
     .trim();
   if (visible) return visible;
-  // Flash-Lite often spends the whole budget on thought parts. Prefer that
-  // text over a blank sheet if the model never emitted a visible part.
   const anyText = parts.map((part) => part.text ?? "").join("").trim();
   if (anyText) return anyText;
-  const finish = candidate?.finishReason;
-  if (finish === "MAX_TOKENS") {
-    throw new Error("The model used its token budget before answering. Try Ask again, or pick Gemini 2.5 Flash in Settings.");
-  }
-  if (finish === "SAFETY" || finish === "RECITATION") {
-    throw new Error("Gemini blocked this answer.");
-  }
-  throw new Error("The model returned an empty answer. Try Ask again.");
+  throw new Error(AI_USER_ERROR);
 }
 
-function corsHint(provider: AiProviderId): string {
-  if (provider === "google") return "Check the Gemini API key and try again.";
-  return "This provider may block browser calls. Gemini usually works on this phone. You can also paste a key in Settings.";
+function corsHint(_provider: AiProviderId): string {
+  return AI_USER_ERROR;
 }
 
 async function geminiComplete(model: string, apiKey: string, word: string, ask: string): Promise<string> {
@@ -79,13 +75,21 @@ async function geminiComplete(model: string, apiKey: string, word: string, ask: 
     {
       ...base,
       generationConfig: {
-        temperature: 0.3,
+        temperature: 0.2,
         maxOutputTokens: 8192,
+        thinkingConfig: { thinkingBudget: 0, includeThoughts: false },
+      },
+    },
+    {
+      systemInstruction: { parts: [{ text: hiddenWordPrompt(word) }] },
+      contents: [{ role: "user", parts: [{ text: `${ask}\n\nReply with at least one short HTML paragraph. Do not leave the answer empty.` }] }],
+      generationConfig: {
+        temperature: 0.1,
+        maxOutputTokens: 4096,
       },
     },
   ];
 
-  let lastError = "Gemini request failed.";
   for (const body of attempts) {
     const response = await fetch(url, {
       method: "POST",
@@ -94,17 +98,16 @@ async function geminiComplete(model: string, apiKey: string, word: string, ask: 
     });
     const payload: unknown = await response.json().catch(() => null);
     if (!response.ok) {
-      lastError = (payload as { error?: { message?: string } } | null)?.error?.message || `Gemini request failed (${response.status}).`;
       if (response.status === 400) continue;
-      throw new Error(lastError);
+      throw new Error(AI_USER_ERROR);
     }
     try {
       return extractGeminiText(payload);
-    } catch (error) {
-      lastError = error instanceof Error ? error.message : lastError;
+    } catch {
+      continue;
     }
   }
-  throw new Error(lastError);
+  throw new Error(AI_USER_ERROR);
 }
 
 export async function completeChat(input: {
@@ -116,9 +119,9 @@ export async function completeChat(input: {
 }): Promise<string> {
   const provider = providerById(input.provider);
   const key = input.apiKey.trim();
-  if (!key) throw new Error("Add an API key in Settings first.");
+  if (!key) throw new Error(AI_USER_ERROR);
   const ask = input.ask.trim();
-  if (!ask) throw new Error("Type a question first.");
+  if (!ask) throw new Error(AI_USER_ERROR);
 
   try {
     if (provider.kind === "gemini") {
@@ -143,13 +146,10 @@ export async function completeChat(input: {
       }),
     });
     const payload: unknown = await response.json().catch(() => null);
-    if (!response.ok) {
-      const message = (payload as { error?: { message?: string } } | null)?.error?.message;
-      throw new Error(message || `${provider.name} request failed (${response.status}).`);
-    }
+    if (!response.ok) throw new Error(AI_USER_ERROR);
     return extractOpenAiText(payload);
   } catch (error) {
     if (error instanceof TypeError) throw new Error(corsHint(input.provider));
-    throw error;
+    throw error instanceof Error ? error : new Error(AI_USER_ERROR);
   }
 }

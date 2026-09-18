@@ -4,10 +4,9 @@ export type Route =
   | { name: "entry"; entryId: string; senseId?: string }
   | { name: "words" }
   | { name: "progress" }
-  | { name: "settings" }
+  | { name: "settings"; focus?: string }
   | { name: "review" }
-  | { name: "install" }
-  | { name: "diagnostic" };
+  | { name: "install" };
 
 export function parseHash(hash: string): Route {
   const raw = hash.replace(/^#/, "") || "/today";
@@ -17,7 +16,8 @@ export function parseHash(hash: string): Route {
   const head = parts[0] ?? "today";
   if (head === "dictionary" && parts[1]) return { name: "entry", entryId: parts[1], senseId: parts[2] };
   if (head === "dictionary") return { name: "dictionary", q: query.get("q") ?? "" };
-  if (head === "words" || head === "progress" || head === "settings" || head === "review" || head === "install" || head === "diagnostic") {
+  if (head === "settings") return { name: "settings", focus: query.get("focus") ?? undefined };
+  if (head === "words" || head === "progress" || head === "review" || head === "install") {
     return { name: head };
   }
   return { name: "today" };
@@ -29,6 +29,8 @@ export function toHash(route: Route): string {
       return route.q ? `#/dictionary?q=${encodeURIComponent(route.q)}` : "#/dictionary";
     case "entry":
       return route.senseId ? `#/dictionary/${route.entryId}/${route.senseId}` : `#/dictionary/${route.entryId}`;
+    case "settings":
+      return route.focus ? `#/settings?focus=${encodeURIComponent(route.focus)}` : "#/settings";
     case "today":
       return "#/today";
     default:

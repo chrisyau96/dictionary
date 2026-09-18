@@ -105,10 +105,6 @@ export function MyWordsView() {
                       Skip
                     </button>
                   </div>
-                ) : tab === "skipped" ? (
-                  <button type="button" className="primary block" onClick={() => learnSense(sense).then(refresh)}>
-                    Learn
-                  </button>
                 ) : null
               }
             />

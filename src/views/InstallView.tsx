@@ -21,7 +21,7 @@ export function InstallView() {
     try {
       await installFoundationPack(setProgress);
       setPersisted(await requestPersistentStorage());
-      go({ name: "diagnostic" });
+      go({ name: "today" });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Install failed.");
       setProgress(null);

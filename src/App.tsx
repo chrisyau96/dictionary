@@ -5,7 +5,6 @@ import { fetchManifest } from "./content/install";
 import { parseHash, type Route, go } from "./router";
 import { applyAccent, DEFAULT_ACCENT } from "./theme/accents";
 import { TabBar } from "./components/TabBar";
-import { DiagnosticView } from "./views/DiagnosticView";
 import { DictionaryView } from "./views/DictionaryView";
 import { EntryView } from "./views/EntryView";
 import { InstallView } from "./views/InstallView";
@@ -66,7 +65,7 @@ export function App() {
   if (!ready) return <p className="muted">Opening local records…</p>;
 
   const tab = currentTab(route);
-  const hideTabs = route.name === "review" || route.name === "install" || route.name === "diagnostic" || route.name === "entry" || route.name === "settings";
+  const hideTabs = route.name === "review" || route.name === "install" || route.name === "entry" || route.name === "settings";
 
   return (
     <div className="app">
@@ -91,10 +90,9 @@ export function App() {
       {route.name === "entry" && <EntryView entryId={route.entryId} senseId={route.senseId} />}
       {route.name === "words" && <MyWordsView />}
       {route.name === "progress" && <ProgressView />}
-      {route.name === "settings" && <SettingsView />}
+      {route.name === "settings" && <SettingsView focus={route.focus} />}
       {route.name === "review" && <ReviewView />}
       {route.name === "install" && <InstallView />}
-      {route.name === "diagnostic" && <DiagnosticView />}
       {hideTabs || !installed ? null : <TabBar current={tab} />}
     </div>
   );
