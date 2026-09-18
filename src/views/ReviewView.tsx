@@ -100,11 +100,11 @@ export function ReviewView() {
         className={`flashcard${revealed ? " is-flipped" : ""}`}
         role="button"
         tabIndex={0}
-        onClick={() => setRevealed((open) => !open)}
+        onClick={() => setRevealed(true)}
         onKeyDown={(event) => {
           if (event.key === "Enter" || event.key === " ") {
             event.preventDefault();
-            setRevealed((open) => !open);
+            setRevealed(true);
           }
         }}
         aria-label={revealed ? "Hide answer" : "Show answer"}

@@ -690,47 +690,45 @@ input, textarea, select {
 .flashcard {
   position: relative;
   width: 100%;
-  min-height: 17.5rem;
+  min-height: 15rem;
   padding: 0;
   border: 0;
   background: transparent;
-  perspective: 1400px;
-  transform-style: preserve-3d;
   cursor: pointer;
   color: inherit;
   text-align: inherit;
+  font: inherit;
 }
 .flash-face {
-  position: absolute;
-  inset: 0;
   border-radius: 1.7rem;
   padding: 1.35rem 1.15rem 1.2rem;
   box-shadow: var(--shadow);
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
   display: grid;
   align-content: center;
   justify-items: center;
   gap: 0.4rem;
-  overflow: auto;
-  transition: transform 0.45s cubic-bezier(0.2, 0.7, 0.2, 1);
+  min-height: 15rem;
 }
 .flash-front {
   background: var(--hero);
   text-align: center;
-  transform: rotateY(0deg);
-  z-index: 1;
 }
 .flash-back {
+  display: none;
   background: var(--card);
   text-align: left;
   justify-items: start;
   align-content: start;
-  transform: rotateY(180deg);
-  pointer-events: none;
 }
-.flashcard.is-flipped .flash-front { transform: rotateY(-180deg); pointer-events: none; }
-.flashcard.is-flipped .flash-back { transform: rotateY(0deg); pointer-events: auto; z-index: 2; }
+.flashcard.is-flipped .flash-front { display: none; }
+.flashcard.is-flipped .flash-back {
+  display: grid;
+  animation: card-in 0.28s ease;
+}
+@keyframes card-in {
+  from { transform: translateY(8px) scale(0.98); opacity: 0.55; }
+  to { transform: none; opacity: 1; }
+}
 .flash-hint {
   margin-top: 0.7rem;
   font-size: 0.75rem;
