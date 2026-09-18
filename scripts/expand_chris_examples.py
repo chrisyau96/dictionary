@@ -29,6 +29,7 @@ VERBISH = {
     "check",
     "close",
     "confirm",
+    "count",
     "cut",
     "deliver",
     "follow",
@@ -36,6 +37,9 @@ VERBISH = {
     "give",
     "go",
     "handle",
+    "help",
+    "issue",
+    "join",
     "keep",
     "leave",
     "make",
@@ -44,10 +48,12 @@ VERBISH = {
     "miss",
     "open",
     "pay",
+    "print",
     "process",
     "put",
     "read",
     "review",
+    "save",
     "schedule",
     "send",
     "set",
@@ -62,7 +68,24 @@ VERBISH = {
     "update",
     "use",
     "wait",
+    "wake",
     "write",
+}
+
+PREPOSITIONS = {
+    "about",
+    "after",
+    "at",
+    "before",
+    "by",
+    "for",
+    "from",
+    "in",
+    "into",
+    "of",
+    "on",
+    "to",
+    "with",
 }
 
 TEMPLATE_MARKERS = (
@@ -201,13 +224,21 @@ def is_template(en: str) -> bool:
     return any(marker in text for marker in TEMPLATE_MARKERS)
 
 
+def usable_phrase(col: str) -> str:
+    text = col.strip()
+    last = text.split()[-1].lower() if text else ""
+    if last in PREPOSITIONS:
+        return f"{text} this"
+    return text
+
+
 def is_verb_phrase(col: str, pos: str, lemma: str) -> bool:
     first = col.strip().split(" ", 1)[0].lower()
-    if first in {"a", "an", "the", "on", "in", "at", "to", "for", "of", "with"}:
+    if first in {"a", "an", "the", "on", "in", "at", "to", "for", "of"}:
         return False
-    if pos == "verb" and (col.lower().startswith(lemma.lower()) or first in VERBISH):
+    if first in VERBISH:
         return True
-    return first in VERBISH and pos != "noun"
+    return pos == "verb" and col.lower().startswith(lemma.lower())
 
 
 def pick(items: list[tuple[str, str]], salt: str) -> tuple[str, str]:
@@ -216,22 +247,23 @@ def pick(items: list[tuple[str, str]], salt: str) -> tuple[str, str]:
 
 
 def collocation_pair(col: str, lemma: str, pos: str, salt: str) -> tuple[str, str]:
+    phrase = usable_phrase(col)
     if is_verb_phrase(col, pos, lemma):
         return pick(
             [
-                (f"Please {col} before closing.", f"關門前請先「{col}」。"),
-                (f"Can you {col} for the afternoon team?", f"你可以替下午的同事「{col}」嗎？"),
-                (f"We should {col} after the briefing.", f"簡報後我們應該「{col}」。"),
-                (f"I will {col} once the queue is shorter.", f"排隊短一點，我就會「{col}」。"),
+                (f"Please {phrase} before we close.", f"關門前請先「{col}」。"),
+                (f"Can you {phrase} for the afternoon team?", f"你可以替下午的同事「{col}」嗎？"),
+                (f"We should {phrase} after the briefing.", f"簡報後我們應該「{col}」。"),
+                (f"I will {phrase} once the queue is shorter.", f"排隊短一點，我就會「{col}」。"),
             ],
             salt,
         )
     return pick(
         [
-            (f"Today's notes mention {col}.", f"今天的備註提到「{col}」。"),
-            (f"A customer asked about {col}.", f"有顧客問及「{col}」。"),
-            (f"Keep {col} on the whiteboard.", f"把「{col}」寫在白板上。"),
-            (f"The briefing covered {col}.", f"簡報談到「{col}」。"),
+            (f"Today's notes mention {phrase}.", f"今天的備註提到「{col}」。"),
+            (f"A customer asked about {phrase}.", f"有顧客問及「{col}」。"),
+            (f"Write {phrase} on the whiteboard.", f"把「{col}」寫在白板上。"),
+            (f"The briefing covered {phrase}.", f"簡報談到「{col}」。"),
         ],
         salt,
     )
@@ -348,10 +380,9 @@ def pad_examples(sense: dict) -> list[dict]:
                 missing.remove(col)
         else:
             leftover.append(item)
-    chosen = (required + leftover)[:5]
-    # If slicing dropped a required collocation example, put required first (max 3).
-    if len(required) <= 5:
-        chosen = (required + leftover)[:5]
+    leftover_quotes = [item for item in leftover if " — " in str(item.get("en", ""))]
+    leftover_rest = [item for item in leftover if item not in leftover_quotes]
+    chosen = (required + leftover_quotes + leftover_rest)[:5]
     for index, item in enumerate(chosen, start=1):
         item["id"] = f"ex-{sense['id']}-{index}"
     return chosen
