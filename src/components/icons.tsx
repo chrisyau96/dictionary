@@ -104,13 +104,3 @@ export function IndentDecreaseIcon() {
   );
 }
 
-export function AiSparkles() {
-  return (
-    <svg className="ai-fab-sparkles" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
-      <path fill="#ffe27a" d="M54.2 6.4 56.4 12.6 62.6 14.8 56.4 17 54.2 23.2 52 17 45.8 14.8 52 12.6Z" />
-      <path fill="#7af0ff" d="M8.2 42.2 9.7 46.2 13.7 47.7 9.7 49.2 8.2 53.2 6.7 49.2 2.7 47.7 6.7 46.2Z" />
-      <path fill="#ff8ad8" d="M57.4 40.6 58.6 43.6 61.6 44.8 58.6 46 57.4 49 56.2 46 53.2 44.8 56.2 43.6Z" />
-      <path fill="#b9a6ff" d="M14.8 8.4 15.7 10.8 18.1 11.7 15.7 12.6 14.8 15 13.9 12.6 11.5 11.7 13.9 10.8Z" />
-    </svg>
-  );
-}

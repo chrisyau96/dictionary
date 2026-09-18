@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { AiDialog } from "../components/AiDialog";
 import { PronunciationButtons } from "../components/AudioButton";
 import { FrequencyBars } from "../components/FrequencyBars";
-import { AiSparkles } from "../components/icons";
+import aiFabIcon from "../assets/ai-fab.png";
 import { NoteField } from "../components/NoteField";
 import { ScreenHeader } from "../components/ScreenHeader";
 import { db } from "../db/database";
@@ -175,8 +175,7 @@ export function EntryView({ entryId, senseId }: { entryId: string; senseId?: str
       })}
       {focused && !aiOpen ? (
         <button type="button" className="ai-fab" aria-label="Ask AI" onClick={() => setAiOpen(true)}>
-          <AiSparkles />
-          <span className="ai-fab-text">AI</span>
+          <img src={aiFabIcon} alt="" width={64} height={64} />
         </button>
       ) : null}
       {aiOpen && focused ? (
