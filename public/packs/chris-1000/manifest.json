@@ -1975,9 +1975,9 @@
     "audio/p-battery.mp3": "34f7422c6814bba2060cd89d9c2efd69de4d28a9e148bfa594315b56c3cbb3da",
     "audio/p-signal.mp3": "8d6a7459fc00f1d7a66e444b7d5d5b1d3a250aa335032bd13e04289cb072f319",
     "pack.json": "ef96e4638d606920aab5bdefe6f731d8ae682d6a28fb1289299b1aa44de44d72",
-    "NOTICES.md": "de0cbfeec2f8361d91c7bc1d6e9fcceec3dbda813b88512013caa13db3fdbdf8"
+    "NOTICES.md": "7c54a2a836e9ee5d02823a7a58a5ff610b9192bdbfade43b1eb2d86e4f3b4f51"
   },
-  "byteSize": 6625334,
+  "byteSize": 6625307,
   "audioBytes": 4700381,
   "completeness": {
     "meanings": "complete",
