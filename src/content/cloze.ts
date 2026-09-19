@@ -50,10 +50,12 @@ function isTargetCore(core: string, targets: string[]): boolean {
   return targets.some((target) => {
     if (!target) return false;
     if (lower === target) return true;
-    if (target.length < 3) return false;
+    if (target.length < 4 || lower.length < 4) return false;
     const delta = Math.abs(lower.length - target.length);
     if (delta > 3) return false;
-    return lower.startsWith(target) || target.startsWith(lower);
+    const shorter = lower.length <= target.length ? lower : target;
+    const longer = lower.length <= target.length ? target : lower;
+    return longer.startsWith(shorter);
   });
 }
 

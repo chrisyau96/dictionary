@@ -75,6 +75,15 @@ describe("cloze blanks", () => {
     expect(cores).toEqual(["deadline"]);
   });
 
+  it("does not blank short words that only prefix the wording", () => {
+    const exercise = buildCloze("A customer asked about an angel investor.", ["angel"]);
+    const blanked: string[] = [];
+    for (const token of exercise.tokens) {
+      if (token.type === "word" && token.blank) blanked.push(token.core);
+    }
+    expect(blanked).toEqual(["angel"]);
+  });
+
   it("compares answers without case or extra punctuation", () => {
     expect(answersMatch("Deadline", "deadline")).toBe(true);
     expect(answersMatch("don't", "dont")).toBe(false);
