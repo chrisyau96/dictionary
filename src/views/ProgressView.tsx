@@ -23,11 +23,11 @@ function formatDay(day: string): string {
 function BarChart({ values, labels }: { values: number[]; labels: string[] }) {
   const max = Math.max(1, ...values);
   const width = 320;
-  const height = 148;
+  const height = 124;
   const padL = 24;
   const padR = 8;
   const padT = 10;
-  const padB = 28;
+  const padB = 24;
   const plotW = width - padL - padR;
   const plotH = height - padT - padB;
   const gap = 2.2;
@@ -90,12 +90,16 @@ function LineChart({ values }: { values: Array<number | null> }) {
 }
 
 function HorizonBars({ rows }: { rows: ProgressSnapshot["coverage"] }) {
-  const values = rows.map((row) => row.learning + row.reviewVerified + row.selfDeclared);
+  const visible = rows.filter((row) => row.learning + row.reviewVerified + row.selfDeclared > 0);
+  if (!visible.length) {
+    return <div className="empty-state compact-empty">No learning or learnt words in a topic yet.</div>;
+  }
+  const values = visible.map((row) => row.learning + row.reviewVerified + row.selfDeclared);
   const max = Math.max(1, ...values);
   const xTicks = Array.from(new Set([0, Math.round(max / 2), max]));
   return (
     <div className="horizon-chart">
-      {rows.map((row) => {
+      {visible.map((row) => {
         const learnt = row.reviewVerified + row.selfDeclared;
         const value = learnt + row.learning;
         const fill = (value / max) * 100;

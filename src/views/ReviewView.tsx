@@ -53,11 +53,11 @@ function ClozePrompt({
 }) {
   return (
     <p className="cloze-sentence">
-      {exercise.tokens.map((token, index) => {
-        if (token.type === "space") return <span key={`s${index}`}>{token.text}</span>;
+      {exercise.tokens.map((token) => {
+        if (token.type !== "word") return null;
         if (!token.blank) {
           return (
-            <span key={token.key}>
+            <span className="cloze-word" key={token.key}>
               {token.leading}
               {token.core}
               {token.trailing}
@@ -67,7 +67,7 @@ function ClozePrompt({
         const given = answers[token.key] ?? "";
         const ok = checked ? answersMatch(token.core, given) : null;
         return (
-          <span key={token.key} className="cloze-word">
+          <span key={token.key} className="cloze-word is-blank">
             {token.leading}
             <input
               className={`cloze-input${ok === true ? " is-correct" : ok === false ? " is-wrong" : ""}`}
@@ -75,8 +75,8 @@ function ClozePrompt({
               autoCapitalize="none"
               autoCorrect="off"
               spellCheck={false}
-              aria-label={`Blank ${token.core.length} letters`}
-              style={{ width: `${Math.max(3.2, token.core.length + 1.2)}ch` }}
+              aria-label="Missing word"
+              size={Math.max(4, token.core.length)}
               onChange={(event) => onChange(token.key, event.target.value)}
             />
             {token.trailing}
@@ -257,7 +257,7 @@ export function ReviewView() {
       <ReviewChrome index={index} total={queue.length}>
         <div className="cloze-card">
           <p className="hero-kicker">Fill in the blanks</p>
-          <p className="lede">Type the missing English words. Half of the sentence is blanked.</p>
+          <p className="lede">Type the missing English words from the example sentence.</p>
           <ClozePrompt
             exercise={exercise}
             answers={answers}
@@ -299,6 +299,7 @@ export function ReviewView() {
         senseId={item.sense.id}
         showBack={false}
         hideLearn
+        hideFab
       />
       <div className="review-actions">
         <button type="button" className="rating again" disabled={busy} onClick={() => void rate(false)}>

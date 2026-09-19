@@ -495,7 +495,9 @@ input, textarea, select {
   gap: 0.15rem;
   padding: 0.45rem 0.45rem calc(0.6rem + env(safe-area-inset-bottom));
   background: var(--bg);
+  background-color: var(--bg);
   border-top: 1px solid var(--line);
+  box-shadow: 0 -8px 18px color-mix(in srgb, var(--bg) 80%, transparent);
 }
 .tabs button {
   border: 0;
@@ -626,10 +628,10 @@ input, textarea, select {
   font-size: 9px;
   font-weight: 650;
 }
-.horizon-chart { display: grid; gap: 0.5rem; }
+.horizon-chart { display: grid; gap: 0.5rem; padding-bottom: 0.35rem; scroll-margin-bottom: 7.2rem; }
 .horizon-row, .horizon-axis {
   display: grid;
-  grid-template-columns: 5.4rem 1fr;
+  grid-template-columns: 6.4rem minmax(0, 1fr);
   gap: 0.55rem;
   align-items: center;
 }
@@ -1285,8 +1287,8 @@ input, textarea, select {
 .browse-tile span { display: block; margin-top: 0.2rem; font-weight: 500; color: var(--muted); font-size: 0.78rem; }
 
 .words-page { padding-bottom: 0.4rem; }
-.entry-page { padding-bottom: 0.4rem; }
-.review-page { padding-bottom: 4.4rem; }
+.entry-page { padding-bottom: 4.8rem; }
+.review-page { padding-bottom: 6.2rem; }
 .review-chrome {
   display: flex;
   align-items: center;
@@ -1307,24 +1309,31 @@ input, textarea, select {
 .cloze-card .lede { margin: 0; }
 .cloze-sentence {
   margin: 0;
-  font-size: 1.08rem;
-  line-height: 2.05;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 0.4rem;
+  row-gap: 0.55rem;
+  font-size: 1.05rem;
+  line-height: 1.35;
   font-weight: 650;
 }
-.cloze-word { white-space: nowrap; }
+.cloze-word { display: inline-flex; align-items: baseline; max-width: 100%; }
 .cloze-input {
   display: inline-block;
-  width: 5.2rem;
+  width: auto;
+  min-width: 2.8rem;
   min-height: 2.05rem;
-  margin: 0 0.08rem;
-  padding: 0.12rem 0.35rem;
+  height: 2.05rem;
+  margin: 0;
+  padding: 0 0.4rem;
   border: 0;
   border-bottom: 2px solid var(--accent);
-  border-radius: 0.45rem;
+  border-radius: 0.55rem;
   background: #fff;
   text-align: center;
   font-weight: 700;
-  font-size: 0.98rem;
+  font-size: 16px;
 }
 .cloze-input.is-correct {
   border-color: #16a34a;
