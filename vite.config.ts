@@ -10,7 +10,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: "prompt",
-      includeAssets: ["icons/icon-192.png", "icons/icon-512.png", "favicon.svg"],
+      includeAssets: ["icons/icon-192.png", "icons/icon-512.png", "icons/icon-mark.png", "favicon.svg", "favicon-32.png"],
       manifest: {
         name: "Vocab AI",
         short_name: "Vocab AI",
@@ -47,7 +47,17 @@ export default defineConfig({
         navigateFallback: "index.html",
         runtimeCaching: [
           {
-            urlPattern: /\/packs\/.*\.(?:json|mp3)$/,
+            urlPattern: /\/packs\/.*\.json$/,
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "content-pack-meta",
+              networkTimeoutSeconds: 4,
+              expiration: { maxEntries: 40, maxAgeSeconds: 60 * 60 * 24 * 30 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+          {
+            urlPattern: /\/packs\/.*\.mp3$/,
             handler: "CacheFirst",
             options: {
               cacheName: "content-packs",

@@ -66,6 +66,23 @@ export function PencilIcon() {
   );
 }
 
+export function RefreshIcon() {
+  return (
+    <Icon strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 12a9 9 0 1 1-2.3-6" />
+      <path d="M21 3v6h-6" />
+    </Icon>
+  );
+}
+
+export function CloseIcon() {
+  return (
+    <Icon strokeLinecap="round">
+      <path d="m7 7 10 10M17 7 7 17" />
+    </Icon>
+  );
+}
+
 export function ListBulletIcon() {
   return (
     <Icon strokeLinecap="round">

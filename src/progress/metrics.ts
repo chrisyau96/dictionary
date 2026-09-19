@@ -185,7 +185,8 @@ export function computeProgress(
     for (const word of members) {
       const verified = remembered.has(word.senseId);
       const hasCard = cards.some((card) => card.senseId === word.senseId);
-      if (verified) reviewVerified += 1;
+      if (word.usefulness === "not-useful") notStarted += 1;
+      else if (verified) reviewVerified += 1;
       else if (word.status === "known") selfDeclared += 1;
       else if (!hasCard) notStarted += 1;
       else learning += 1;

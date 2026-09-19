@@ -36,11 +36,12 @@ describe("Gemini answers", () => {
   it("hides the word instruction from the user-facing ask", () => {
     expect(hiddenWordPrompt("amendment")).toContain('English word "amendment"');
     expect(hiddenWordPrompt("amendment")).toContain("as concise as possible");
+    expect(hiddenWordPrompt("amendment")).toContain("No findings");
   });
 
-  it("uses one user-facing message when the model returns nothing", () => {
-    expect(() => extractGeminiText({ candidates: [{ finishReason: "STOP", content: { parts: [] } }] })).toThrow(
-      "An error occurred. Please try again.",
+  it("returns No findings when the model has no visible text", () => {
+    expect(extractGeminiText({ candidates: [{ finishReason: "STOP", content: { parts: [] } }] })).toBe(
+      "<p>No findings.</p>",
     );
   });
 });

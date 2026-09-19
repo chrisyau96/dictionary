@@ -15,7 +15,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "public" / "packs" / "chris-1000"
-PACK_VERSION = "1.3.0"
+PACK_VERSION = "1.4.0"
 
 VERBISH = {
     "add",
@@ -246,50 +246,75 @@ def pick(items: list[tuple[str, str]], salt: str) -> tuple[str, str]:
     return items[index]
 
 
-def collocation_pair(col: str, lemma: str, pos: str, salt: str) -> tuple[str, str]:
+def meaning_label(gloss_tc: str) -> str:
+    text = re.sub(r"[A-Za-z0-9]+", "", gloss_tc or "")
+    if "：" in text:
+        text = text.split("：", 1)[-1]
+    elif ":" in text:
+        text = text.split(":", 1)[-1]
+    text = re.split(r"例如", text, 1)[0]
+    text = re.sub(r"\s+", "", text).strip(" ，,。；;、")
+    return text or "這個意思"
+
+
+def tc_without_latin(tc: str, gloss_tc: str) -> str:
+    meaning = meaning_label(gloss_tc)
+    text = re.sub(r"「[^」]*[A-Za-z][^」]*」", meaning, tc or "")
+    text = re.sub(r"[A-Za-z][A-Za-z0-9+.#]*", "", text)
+    text = text.replace("「」", "")
+    text = re.sub(r"\s+", "", text)
+    text = re.sub(r"[，,]{2,}", "，", text)
+    if not re.search(r"[\u4e00-\u9fff]", text):
+        return f"這是指{meaning}。"
+    return text
+
+
+def collocation_pair(col: str, lemma: str, pos: str, salt: str, gloss_tc: str) -> tuple[str, str]:
     phrase = usable_phrase(col)
+    meaning = meaning_label(gloss_tc)
     if is_verb_phrase(col, pos, lemma):
         return pick(
             [
-                (f"Please {phrase} before we close.", f"關門前請先「{col}」。"),
-                (f"Can you {phrase} for the afternoon team?", f"你可以替下午的同事「{col}」嗎？"),
-                (f"We should {phrase} after the briefing.", f"簡報後我們應該「{col}」。"),
-                (f"I will {phrase} once the queue is shorter.", f"排隊短一點，我就會「{col}」。"),
+                (f"Please {phrase} before we close.", f"關門前請先{meaning}。"),
+                (f"Can you {phrase} for the afternoon team?", f"你可以替下午的同事{meaning}嗎？"),
+                (f"We should {phrase} after the briefing.", f"簡報後我們應該{meaning}。"),
+                (f"I will {phrase} once the queue is shorter.", f"排隊短一點，我就會{meaning}。"),
             ],
             salt,
         )
     return pick(
         [
-            (f"Today's notes mention {phrase}.", f"今天的備註提到「{col}」。"),
-            (f"A customer asked about {phrase}.", f"有顧客問及「{col}」。"),
-            (f"Write {phrase} on the whiteboard.", f"把「{col}」寫在白板上。"),
-            (f"The briefing covered {phrase}.", f"簡報談到「{col}」。"),
+            (f"Today's notes mention {phrase}.", f"今天的備註提到{meaning}。"),
+            (f"A customer asked about {phrase}.", f"有顧客問及{meaning}。"),
+            (f"Write {phrase} on the whiteboard.", f"把{meaning}寫在白板上。"),
+            (f"The briefing covered {phrase}.", f"簡報談到{meaning}。"),
         ],
         salt,
     )
 
 
 def filler_pair(lemma: str, gloss_tc: str, pos: str, salt: str) -> tuple[str, str]:
+    meaning = meaning_label(gloss_tc)
     if pos == "verb":
         return pick(
             [
-                (f"We can {lemma} this after the next customer.", f"服務下一位顧客後，我們可以「{lemma}」。"),
-                (f"Do not forget to {lemma} before you leave.", f"離開前不要忘記「{lemma}」。"),
+                (f"We can {lemma} this after the next customer.", f"服務下一位顧客後，我們可以{meaning}。"),
+                (f"Do not forget to {lemma} before you leave.", f"離開前不要忘記{meaning}。"),
             ],
             salt,
         )
     if pos == "adjective":
         return pick(
             [
-                (f"Keep the wording {lemma} in the shop notice.", f"店舖告示的用字要保持「{lemma}」。"),
-                (f"The {lemma} option is clearer for staff.", f"對同事來說，「{lemma}」的做法更清楚。"),
+                (f"Keep the wording {lemma} in the shop notice.", f"店舖告示的用字要保持「{meaning}」。"),
+                (f"The {lemma} option is clearer for staff.", f"對同事來說，{meaning}的做法更清楚。"),
             ],
             salt,
         )
     return pick(
         [
-            (f"Put {lemma} on the afternoon list.", f"把「{lemma}」寫進下午清單。"),
-            (f"The team asked how {lemma} works here: {gloss_tc}", f"同事問這裡的「{lemma}」怎麼用：{gloss_tc}"),
+            (f"Put {lemma} on the afternoon list.", f"把{meaning}寫進下午清單。"),
+            (f"The team asked how {lemma} works here: {gloss_tc}", f"同事問這裡的{meaning}怎麼用。"),
         ],
         salt,
     )
@@ -336,7 +361,7 @@ def pad_examples(sense: dict) -> list[dict]:
         if not key or key in seen:
             return
         seen.add(key)
-        pool.append(make_example(sense["id"], en, tc, domain, len(pool) + 1))
+        pool.append(make_example(sense["id"], en, tc_without_latin(tc, gloss_tc), domain, len(pool) + 1))
 
     for item in sense.get("examples") or []:
         en = str(item.get("en", "")).strip()
@@ -351,12 +376,13 @@ def pad_examples(sense: dict) -> list[dict]:
     for col in collocations:
         if contains_col(pool, col):
             continue
-        add(*collocation_pair(col, lemma, pos, f"{sense['id']}:{col}"))
+        add(*collocation_pair(col, lemma, pos, f"{sense['id']}:{col}", gloss_tc))
 
+    meaning = meaning_label(gloss_tc)
     extras = [
-        (f"Keep a note of {lemma} beside the till.", f"把「{lemma}」記在收銀機旁。"),
-        (f"Ask a colleague if {lemma} is needed today.", f"問同事今天是否需要「{lemma}」。"),
-        (f"Check {lemma} before the evening handover.", f"晚班交接前先核對「{lemma}」。"),
+        (f"Keep a note of {lemma} beside the till.", f"把{meaning}記在收銀機旁。"),
+        (f"Ask a colleague if {lemma} is needed today.", f"問同事今天是否需要{meaning}。"),
+        (f"Check {lemma} before the evening handover.", f"晚班交接前先核對{meaning}。"),
     ]
     extra_i = 0
     while len(pool) < 5:
@@ -416,6 +442,7 @@ def main() -> None:
     lengths = [len(sense["examples"]) for sense in pack["senses"]]
     covered = 0
     quotes = 0
+    latin_tc = 0
     for sense in pack["senses"]:
         text = " ".join(item["en"].lower() for item in sense["examples"])
         cols = sense.get("collocations") or []
@@ -423,6 +450,9 @@ def main() -> None:
             covered += 1
         if any(" — " in item["en"] for item in sense["examples"]):
             quotes += 1
+        latin_tc += sum(1 for item in sense["examples"] if re.search(r"[A-Za-z]", item.get("tc") or ""))
+    if latin_tc:
+        raise SystemExit(f"Latin remaining in {latin_tc} Traditional Chinese examples")
     print(
         json.dumps(
             {

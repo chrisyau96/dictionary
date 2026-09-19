@@ -1,4 +1,5 @@
 import { db, ensureProfile } from "../db/database";
+import { PACK_CATALOG, REQUIRED_PACK_ID, summarizePackOffers, type PackCatalogItem, type PackOffer } from "./packs";
 import { sha256OfPackFile } from "./hash";
 import { normalizeQuery } from "../search/normalize";
 import { normalizeSenseSynonyms } from "./synonyms";
@@ -45,10 +46,25 @@ export interface InstallProgress {
   message: string;
 }
 
-const PACK_BASE = `${import.meta.env.BASE_URL}packs/chris-1000`;
+function packUrl(folder: string, path = ""): string {
+  const base = `${import.meta.env.BASE_URL}packs/${folder}`;
+  return path ? `${base}/${path}` : base;
+}
 
-export async function fetchManifest(): Promise<PackManifest> {
-  const response = await fetch(`${PACK_BASE}/manifest.json`);
+export async function loadPackCatalog(): Promise<PackCatalogItem[]> {
+  try {
+    const response = await fetch(`${import.meta.env.BASE_URL}packs/index.json`);
+    if (!response.ok) return [...PACK_CATALOG];
+    const data = (await response.json()) as { packs?: PackCatalogItem[] };
+    const packs = (data.packs ?? []).filter((item) => item.packId && item.folder);
+    return packs.length ? packs : [...PACK_CATALOG];
+  } catch {
+    return [...PACK_CATALOG];
+  }
+}
+
+export async function fetchManifest(folder = "chris-1000"): Promise<PackManifest> {
+  const response = await fetch(packUrl(folder, "manifest.json"));
   if (!response.ok) throw new Error("Could not read the content pack list.");
   const manifest = (await response.json()) as PackManifest;
   if (manifest.schemaVersion !== 1) {
@@ -57,8 +73,8 @@ export async function fetchManifest(): Promise<PackManifest> {
   return manifest;
 }
 
-async function fetchChecked(path: string, expected: string): Promise<ArrayBuffer> {
-  const response = await fetch(`${PACK_BASE}/${path}`);
+async function fetchChecked(folder: string, path: string, expected: string): Promise<ArrayBuffer> {
+  const response = await fetch(packUrl(folder, path));
   if (!response.ok) throw new Error(`Missing pack file: ${path}`);
   const buffer = await response.arrayBuffer();
   const digest = await sha256OfPackFile(path, buffer);
@@ -87,11 +103,36 @@ function formsForEntry(entry: EntryRecord): FormRecord[] {
   });
 }
 
-export async function installFoundationPack(
+export async function loadPackOffers(): Promise<PackOffer[]> {
+  const [catalog, installed] = await Promise.all([loadPackCatalog(), db.packs.toArray()]);
+  const byId = new Map(installed.map((pack) => [pack.packId, pack]));
+  const offers: PackOffer[] = [];
+  for (const item of catalog) {
+    const manifest = await fetchManifest(item.folder);
+    const pack = byId.get(item.packId);
+    const installedVersion = pack?.status === "installed" ? pack.version : null;
+    const status: PackOffer["status"] = !installedVersion
+      ? "missing"
+      : installedVersion !== manifest.version
+        ? "stale"
+        : "current";
+    offers.push({
+      packId: item.packId,
+      name: manifest.name,
+      installedVersion,
+      availableVersion: manifest.version,
+      status,
+    });
+  }
+  return offers;
+}
+
+export async function installPack(
+  folder: string,
   onProgress: (progress: InstallProgress) => void,
 ): Promise<ContentPackRecord> {
   onProgress({ phase: "check", current: 0, total: 1, message: "Checking pack details…" });
-  const manifest = await fetchManifest();
+  const manifest = await fetchManifest(folder);
   const existing = await db.packs.get(manifest.packId);
   if (existing?.status === "installed" && existing.version === manifest.version) {
     return existing;
@@ -102,23 +143,23 @@ export async function installFoundationPack(
     phase: "download",
     current: 0,
     total: required.length,
-    message: "Downloading and verifying files…",
+    message: `Downloading ${manifest.name}…`,
   });
 
-  const packBuffer = await fetchChecked("pack.json", manifest.checksums["pack.json"]);
+  const packBuffer = await fetchChecked(folder, "pack.json", manifest.checksums["pack.json"]);
   onProgress({ phase: "download", current: 1, total: required.length, message: "Verified pack.json" });
   const pack = JSON.parse(new TextDecoder().decode(packBuffer)) as PackFile;
   if (pack.entries.length !== manifest.entryCount || pack.senses.length !== manifest.senseCount) {
     throw new Error("Pack counts do not match the manifest.");
   }
 
-  await fetchChecked("NOTICES.md", manifest.checksums["NOTICES.md"]);
+  await fetchChecked(folder, "NOTICES.md", manifest.checksums["NOTICES.md"]);
 
   const blobs: { id: string; blob: Blob; hash: string }[] = [];
   for (const [index, asset] of required.entries()) {
     if (!asset.startsWith("audio/")) continue;
     const expected = manifest.checksums[asset];
-    const buffer = await fetchChecked(asset, expected);
+    const buffer = await fetchChecked(folder, asset, expected);
     const audioId = asset.replace("audio/", "").replace(".mp3", "");
     blobs.push({
       id: audioId,
@@ -164,12 +205,13 @@ export async function installFoundationPack(
     "rw",
     [db.packs, db.entries, db.senses, db.forms, db.audio, db.audioBlobs, db.profile],
     async () => {
-      await db.entries.clear();
-      await db.senses.clear();
-      await db.forms.clear();
-      await db.audio.clear();
-      await db.audioBlobs.clear();
-      await db.packs.clear();
+      const oldAudio = await db.audio.where("packId").equals(packId).toArray();
+      await db.entries.where("packId").equals(packId).delete();
+      await db.senses.where("packId").equals(packId).delete();
+      await db.forms.where("packId").equals(packId).delete();
+      await db.audio.where("packId").equals(packId).delete();
+      if (oldAudio.length) await db.audioBlobs.bulkDelete(oldAudio.map((item) => item.id));
+      await db.packs.delete(packId);
       await db.entries.bulkPut(entries);
       await db.senses.bulkPut(senses);
       await db.forms.bulkPut(forms);
@@ -180,8 +222,35 @@ export async function installFoundationPack(
     },
   );
 
-  onProgress({ phase: "ready", current: 1, total: 1, message: "Offline pack is ready." });
+  onProgress({ phase: "ready", current: 1, total: 1, message: `${manifest.name} is ready.` });
   return record;
+}
+
+export async function installFoundationPack(
+  onProgress: (progress: InstallProgress) => void,
+): Promise<ContentPackRecord> {
+  const catalog = await loadPackCatalog();
+  const required = catalog.find((item) => item.packId === REQUIRED_PACK_ID) ?? PACK_CATALOG[0];
+  return installPack(required.folder, onProgress);
+}
+
+export async function installPendingPacks(
+  pending: PackOffer[],
+  onProgress: (progress: InstallProgress) => void,
+): Promise<void> {
+  const catalog = await loadPackCatalog();
+  const targets = pending.length
+    ? pending
+    : [{ packId: REQUIRED_PACK_ID, name: "", installedVersion: null, availableVersion: "", status: "missing" as const }];
+  for (const item of targets) {
+    const folder = catalog.find((entry) => entry.packId === item.packId)?.folder;
+    if (!folder) continue;
+    await installPack(folder, onProgress);
+  }
+}
+
+export async function loadPackSummary() {
+  return summarizePackOffers(await loadPackOffers());
 }
 
 export async function requestPersistentStorage(): Promise<boolean | null> {

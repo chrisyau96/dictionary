@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { downloadJson, exportBackup, previewBackup, restoreBackup } from "../backup/io";
 import { AiSetupForm } from "../components/AiSetupForm";
 import { ScreenHeader } from "../components/ScreenHeader";
+import { loadPackSummary } from "../content/install";
+import type { PackUpdateSummary } from "../content/packs";
 import { db, ensureProfile } from "../db/database";
 import { go } from "../router";
 import { ACCENT_OPTIONS, applyAccent, type AccentId } from "../theme/accents";
@@ -20,8 +22,10 @@ export function SettingsView({ focus }: { focus?: string }) {
   const [profile, setProfile] = useState<ProfileRecord | null>(null);
   const [restoreNote, setRestoreNote] = useState("");
   const [restoreName, setRestoreName] = useState("");
+  const [packSummary, setPackSummary] = useState<PackUpdateSummary | null>(null);
   const restoreInput = useRef<HTMLInputElement>(null);
   const aiSection = useRef<HTMLElement>(null);
+  const packSection = useRef<HTMLElement>(null);
 
   useEffect(() => {
     void ensureProfile().then((next) => {
@@ -31,11 +35,16 @@ export function SettingsView({ focus }: { focus?: string }) {
   }, []);
 
   useEffect(() => {
-    if (focus !== "ai") return;
-    const node = aiSection.current;
+    void loadPackSummary()
+      .then(setPackSummary)
+      .catch(() => setPackSummary({ offers: [], pending: [], allCurrent: false }));
+  }, []);
+
+  useEffect(() => {
+    const node = focus === "ai" ? aiSection.current : focus === "pack" ? packSection.current : null;
     if (!node) return;
     node.scrollIntoView({ behavior: "smooth", block: "start" });
-  }, [focus, profile]);
+  }, [focus, profile, packSummary]);
 
   async function save(next: ProfileRecord) {
     setProfile(next);
@@ -128,14 +137,42 @@ export function SettingsView({ focus }: { focus?: string }) {
         <AiSetupForm />
       </section>
 
-      <section className="settings-section">
+      <section
+        className={`settings-section${focus === "pack" ? " is-anchored" : ""}`}
+        id="settings-pack"
+        ref={packSection}
+      >
         <h2>Offline pack</h2>
-        <p className="settings-copy">Download or refresh the word pack.</p>
-        <div className="center-actions">
-          <button type="button" className="primary block" onClick={() => go({ name: "install" })}>
-            Install or refresh pack
-          </button>
-        </div>
+        {packSummary == null ? (
+          <p className="settings-copy">Checking pack version…</p>
+        ) : packSummary.allCurrent ? (
+          <>
+            <p className="settings-copy">Newest version</p>
+            <p className="tiny helper-copy">
+              {packSummary.offers.map((item) => `${item.name} ${item.availableVersion}`).join(" · ")}
+            </p>
+          </>
+        ) : packSummary.pending.length ? (
+          <>
+            <p className="settings-copy">New package to download</p>
+            <p className="tiny helper-copy">
+              {packSummary.pending
+                .map((item) =>
+                  item.installedVersion
+                    ? `${item.name} ${item.installedVersion} → ${item.availableVersion}`
+                    : `${item.name} ${item.availableVersion}`,
+                )
+                .join(" · ")}
+            </p>
+            <div className="center-actions">
+              <button type="button" className="primary block" onClick={() => go({ name: "install" })}>
+                Download updates
+              </button>
+            </div>
+          </>
+        ) : (
+          <p className="settings-copy">Could not check pack version.</p>
+        )}
       </section>
 
       <section className="settings-section">

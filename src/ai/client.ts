@@ -10,13 +10,13 @@ export function hiddenWordPrompt(word: string): string {
     "Use simple HTML: p, strong, em, ul, ol, li, br.",
     "Use ul/ol lists for nearby words, synonyms, or numbered points. Nest lists instead of using markdown.",
     "No markdown markers, no empty list items, no preamble.",
-    "Always return at least one HTML paragraph with visible text.",
+    "If you cannot find an answer, return exactly <p>No findings.</p> and nothing else.",
   ].join(" ");
 }
 
 function nonempty(text: string | undefined): string {
   const value = text?.trim() ?? "";
-  if (!value) throw new Error(AI_USER_ERROR);
+  if (!value) return "<p>No findings.</p>";
   return value;
 }
 
@@ -50,7 +50,7 @@ export function extractGeminiText(payload: unknown): string {
   if (visible) return visible;
   const anyText = parts.map((part) => part.text ?? "").join("").trim();
   if (anyText) return anyText;
-  throw new Error(AI_USER_ERROR);
+  return "<p>No findings.</p>";
 }
 
 function corsHint(_provider: AiProviderId): string {

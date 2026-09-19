@@ -1,10 +1,19 @@
 import { useEffect, useState } from "react";
 import { ScreenHeader } from "../components/ScreenHeader";
-import { fetchManifest, installFoundationPack, requestPersistentStorage, type InstallProgress, type PackManifest } from "../content/install";
+import {
+  fetchManifest,
+  installPendingPacks,
+  loadPackSummary,
+  requestPersistentStorage,
+  type InstallProgress,
+  type PackManifest,
+} from "../content/install";
+import type { PackUpdateSummary } from "../content/packs";
 import { go } from "../router";
 
 export function InstallView() {
   const [manifest, setManifest] = useState<PackManifest | null>(null);
+  const [summary, setSummary] = useState<PackUpdateSummary | null>(null);
   const [progress, setProgress] = useState<InstallProgress | null>(null);
   const [error, setError] = useState("");
   const [persisted, setPersisted] = useState<boolean | null>(null);
@@ -13,13 +22,16 @@ export function InstallView() {
     fetchManifest()
       .then(setManifest)
       .catch((err: Error) => setError(err.message));
+    loadPackSummary()
+      .then(setSummary)
+      .catch(() => setSummary(null));
   }, []);
 
   async function run() {
     setError("");
     setProgress(null);
     try {
-      await installFoundationPack(setProgress);
+      await installPendingPacks(summary?.pending ?? [], setProgress);
       setPersisted(await requestPersistentStorage());
       go({ name: "today" });
     } catch (err) {
@@ -29,6 +41,9 @@ export function InstallView() {
   }
 
   const kb = manifest ? Math.round(manifest.byteSize / 1024) : 0;
+  const pending = summary?.pending ?? [];
+  const needsFirstInstall = pending.some((item) => !item.installedVersion);
+  const actionLabel = pending.length && !needsFirstInstall ? "Download updates" : "Download and verify pack";
 
   return (
     <section className="stack">
@@ -49,6 +64,11 @@ export function InstallView() {
             {manifest.senseCount} meanings · {manifest.entryCount} headwords · {manifest.audioCount} audio clips · about {kb} KB
           </p>
           <p className="tiny">{manifest.completeness.notes}</p>
+          {pending.length > 1 ? (
+            <p className="tiny">
+              {pending.length} packs will download together: {pending.map((item) => item.name).join(", ")}
+            </p>
+          ) : null}
         </div>
       ) : (
         <p className="muted">Reading pack details…</p>
@@ -67,9 +87,11 @@ export function InstallView() {
       {error ? <p className="danger">{error}</p> : null}
       <div className="center-actions">
         <button type="button" className="primary block" onClick={run} disabled={!manifest || Boolean(progress)}>
-          Download and verify pack
+          {actionLabel}
         </button>
-        <button type="button" className="ghost block" onClick={() => go({ name: "today" })}>Back to Today</button>
+        <button type="button" className="ghost block" onClick={() => go({ name: "today" })}>
+          Back to Today
+        </button>
       </div>
     </section>
   );

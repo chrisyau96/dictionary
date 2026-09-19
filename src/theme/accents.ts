@@ -27,4 +27,5 @@ export function applyAccent(accent: AccentId): void {
   const option = ACCENT_OPTIONS.find((item) => item.id === accent) ?? ACCENT_OPTIONS[0];
   const theme = document.querySelector('meta[name="theme-color"]');
   if (theme) theme.setAttribute("content", option.swatch);
+  void import("./appIcon").then((mod) => mod.tintFavicon(option.swatch)).catch(() => undefined);
 }

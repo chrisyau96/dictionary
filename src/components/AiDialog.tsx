@@ -4,11 +4,12 @@ import { hasAiReady, loadAiConfig, loadApiKey, saveAiConfig } from "../ai/storag
 import { DEFAULT_AI_PROMPTS, formatAiNote, rememberCommand, suggestedCommands } from "../ai/types";
 import { go } from "../router";
 import { appendWordNote } from "../study/session";
-import { PencilIcon, SettingsIcon } from "./icons";
+import { RefreshIcon, SettingsIcon } from "./icons";
 import { RichTextEditor } from "./RichText";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 const AI_FAIL = "An error occurred. Please try again.";
+const NO_FINDINGS = "<p>No findings.</p>";
 const SETUP_PLACEHOLDER = "please click the setting button to connect your AI tool";
 
 export function AiDialog({
@@ -93,8 +94,7 @@ export function AiDialog({
         ask: question,
       });
       const html = toSafeHtml(text);
-      if (noteIsEmpty(html)) throw new Error(AI_FAIL);
-      setAnswerHtml(html);
+      setAnswerHtml(noteIsEmpty(html) ? NO_FINDINGS : html);
       setAnswerTick((tick) => tick + 1);
       const nextRecent = rememberCommand(config.recentPrompts, nextCommand);
       await saveAiConfig({ ...config, recentPrompts: nextRecent });
@@ -114,6 +114,7 @@ export function AiDialog({
   }
 
   const showAnswer = busy || Boolean(answerHtml) || Boolean(error);
+  const canRefresh = !busy && Boolean(ask.trim()) && (Boolean(answerHtml) || Boolean(error));
 
   return (
     <div className="ai-overlay" role="dialog" aria-modal="true" aria-label={`AI for ${word}`} onClick={onClose}>
@@ -179,17 +180,18 @@ export function AiDialog({
           <div className="ai-answer" ref={answerRef}>
             <div className="ai-answer-head">
               <p className="ai-edit-hint">
-                {busy ? (
-                  "Working on an answer"
-                ) : error ? (
-                  error
-                ) : (
-                  <>
-                    <PencilIcon />
-                    You can edit this
-                  </>
-                )}
+                {busy ? "Working on an answer" : error ? error : ""}
               </p>
+              {canRefresh ? (
+                <button
+                  type="button"
+                  className="icon-btn ai-refresh"
+                  aria-label="Refresh answer"
+                  onClick={() => void send(ask, command)}
+                >
+                  <RefreshIcon />
+                </button>
+              ) : null}
             </div>
             {busy ? (
               <div className="ai-loading" aria-busy="true" aria-live="polite">
@@ -198,16 +200,14 @@ export function AiDialog({
                 <span className="ai-skel is-short" />
                 <p className="tiny">Thinking…</p>
               </div>
-            ) : error ? (
-              <p className="ai-fail">{error}</p>
-            ) : (
+            ) : error ? null : (
               <RichTextEditor resetKey={`ans-${answerTick}`} value={answerHtml} onChange={setAnswerHtml} />
             )}
             {!busy && !error && answerHtml ? (
-              <div className="split-actions">
+              <div className="ai-answer-actions">
                 <button
                   type="button"
-                  className={`primary${savedNote ? " is-noted" : ""}`}
+                  className={`primary block${savedNote ? " is-noted" : ""}`}
                   onClick={async () => {
                     await appendWordNote(senseId, entryId, formatAiNote(command, answerHtml));
                     setSavedNote(true);
@@ -217,15 +217,7 @@ export function AiDialog({
                 >
                   {savedNote ? "Added ✓" : "Add to note"}
                 </button>
-                <button type="button" className="ghost" onClick={() => void send(ask, command)}>
-                  Generate again
-                </button>
               </div>
-            ) : null}
-            {!busy && error ? (
-              <button type="button" className="ghost block" onClick={() => void send(ask, command)}>
-                Generate again
-              </button>
             ) : null}
             {savedNote ? <p className="tiny ai-note-signal">Added to your note.</p> : null}
           </div>

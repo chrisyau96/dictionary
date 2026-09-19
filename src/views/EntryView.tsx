@@ -7,6 +7,7 @@ import aiFabIcon from "../assets/ai-fab.png";
 import { NoteField } from "../components/NoteField";
 import { ScreenHeader } from "../components/ScreenHeader";
 import { db } from "../db/database";
+import { traditionalWithoutEnglish } from "../content/examples";
 import { wordListTab, type WordListTab } from "../progress/metrics";
 import { learnSense, loadSenseNotes } from "../study/session";
 import type { CardRecord, EntryRecord, ReviewEventRecord, SenseRecord, UserWordRecord } from "../types";
@@ -64,8 +65,17 @@ export function EntryView({ entryId, senseId }: { entryId: string; senseId?: str
 
   useEffect(() => {
     void load();
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+    const frame = window.requestAnimationFrame(() => {
+      window.scrollTo(0, 0);
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    });
+    return () => window.cancelAnimationFrame(frame);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [entryId]);
+  }, [entryId, senseId]);
 
   if (!entry) {
     return (
@@ -147,7 +157,7 @@ export function EntryView({ entryId, senseId }: { entryId: string; senseId?: str
                 {sense.examples.map((example) => (
                   <div className="example-card" key={example.id}>
                     <p>{emphasize(example.en, sense.collocations)}</p>
-                    <p className="muted">{example.tc}</p>
+                    <p className="muted">{traditionalWithoutEnglish(example.tc, sense.glossTc)}</p>
                   </div>
                 ))}
               </div>

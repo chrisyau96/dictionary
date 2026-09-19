@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { ScreenHeader } from "../components/ScreenHeader";
 import { db, ensureProfile } from "../db/database";
 import { computeProgress, type ProgressSnapshot } from "../progress/metrics";
-import { go } from "../router";
 
 const DOMAIN_LABELS: Record<string, string> = {
   everyday: "Everyday",
@@ -13,18 +12,57 @@ const DOMAIN_LABELS: Record<string, string> = {
   technology: "Tech",
 };
 
+function formatDay(day: string): string {
+  const parts = day.split("-");
+  const month = Number(parts[1]);
+  const date = Number(parts[2]);
+  if (!month || !date) return day;
+  return `${month}/${date}`;
+}
+
 function BarChart({ values, labels }: { values: number[]; labels: string[] }) {
   const max = Math.max(1, ...values);
   const width = 320;
-  const height = 92;
-  const gap = 3;
-  const barW = (width - gap * (values.length - 1)) / values.length;
+  const height = 148;
+  const padL = 24;
+  const padR = 8;
+  const padT = 10;
+  const padB = 28;
+  const plotW = width - padL - padR;
+  const plotH = height - padT - padB;
+  const gap = 2.2;
+  const barW = (plotW - gap * Math.max(0, values.length - 1)) / Math.max(1, values.length);
+  const yTicks = Array.from(new Set([0, Math.round(max / 2), max]));
+  const xTicks = labels
+    .map((_, index) => index)
+    .filter((index) => index === 0 || index === labels.length - 1 || (labels.length > 1 && (labels.length - 1 - index) % 7 === 0));
+
   return (
     <svg viewBox={`0 0 ${width} ${height}`} className="chart" role="img" aria-label="New words introduced by day">
+      {yTicks.map((tick) => {
+        const y = padT + plotH - (tick / max) * plotH;
+        return (
+          <g key={`y-${tick}`}>
+            <line className="chart-grid" x1={padL} x2={width - padR} y1={y} y2={y} />
+            <text className="chart-axis" x={padL - 4} y={y + 3} textAnchor="end">
+              {tick}
+            </text>
+          </g>
+        );
+      })}
       {values.map((value, index) => {
-        const h = (value / max) * 72;
-        const x = index * (barW + gap);
-        return <rect key={labels[index]} x={x} y={80 - h} width={barW} height={h} rx="2" fill="currentColor" />;
+        const h = (value / max) * plotH;
+        const x = padL + index * (barW + gap);
+        return <rect key={labels[index]} x={x} y={padT + plotH - h} width={Math.max(barW, 0.8)} height={h} rx="1.4" fill="currentColor" />;
+      })}
+      <line className="chart-grid" x1={padL} x2={width - padR} y1={padT + plotH} y2={padT + plotH} />
+      {xTicks.map((index) => {
+        const x = padL + index * (barW + gap) + barW / 2;
+        return (
+          <text key={`x-${labels[index]}`} className="chart-axis" x={x} y={height - 8} textAnchor="middle">
+            {formatDay(labels[index])}
+          </text>
+        );
       })}
     </svg>
   );
@@ -57,20 +95,17 @@ function HorizonBars({ rows }: { rows: ProgressSnapshot["coverage"] }) {
     <div className="horizon-list">
       {rows.map((row) => {
         const width = `${Math.round((row.total / max) * 100)}%`;
+        const learnt = row.reviewVerified + row.selfDeclared;
         const learning = row.total ? (row.learning / row.total) * 100 : 0;
-        const verified = row.total ? (row.reviewVerified / row.total) * 100 : 0;
-        const declared = row.total ? (row.selfDeclared / row.total) * 100 : 0;
-        const idle = row.total ? (row.notStarted / row.total) * 100 : 0;
+        const learntPct = row.total ? (learnt / row.total) * 100 : 0;
         return (
           <div key={row.domain} className="horizon-row">
             <span className="tiny">
               {DOMAIN_LABELS[row.domain]} · {row.total}
             </span>
             <div className="horizon-track" style={{ width }}>
-              <span style={{ width: `${verified}%` }} className="seg verified" />
+              <span style={{ width: `${learntPct}%` }} className="seg learnt" />
               <span style={{ width: `${learning}%` }} className="seg learning" />
-              <span style={{ width: `${declared}%` }} className="seg declared" />
-              <span style={{ width: `${idle}%` }} className="seg idle" />
             </div>
           </div>
         );
@@ -81,9 +116,7 @@ function HorizonBars({ rows }: { rows: ProgressSnapshot["coverage"] }) {
 
 function delayedLabel(stats: ProgressSnapshot["delayedRecall"]): string {
   if (stats.total === 0) return "—";
-  const text = `${stats.success}/${stats.total}`;
-  if (stats.total < 20) return `${text}`;
-  return text;
+  return `${stats.success}/${stats.total}`;
 }
 
 export function ProgressView() {
@@ -106,41 +139,42 @@ export function ProgressView() {
   if (!stats) return <p className="muted">Loading progress…</p>;
   const delayedSlice = stats.delayedByDay.slice(-range);
   const delayedValues = delayedSlice.map((row) => (row.total === 0 ? null : row.success / row.total));
+  const intro = stats.introductionsByDay.slice(-30);
 
   return (
     <section className="stack compact">
       <ScreenHeader eyebrow="This device" title="Progress" subtitle="What you actually practised." />
       <div className="kpi-grid">
-        <div className="stat">
+        <div className="stat" title="First introductions in the last 7 days">
           <b>{stats.newVocabulary7d}</b>
-          <span className="stat-label">New vocabulary · 7 days</span>
-          <span className="stat-desc">First introductions only</span>
+          <span className="stat-label">New · 7d</span>
         </div>
-        <div className="stat">
-          <b>{stats.reviewsCompletedToday}</b>
-          <span className="stat-label">Reviews completed today</span>
-          <span className="stat-desc">
-            {stats.reviewAttemptsToday !== stats.reviewsCompletedToday
+        <div
+          className="stat"
+          title={
+            stats.reviewAttemptsToday !== stats.reviewsCompletedToday
               ? `${stats.reviewAttemptsToday} attempts including retries`
-              : "Distinct cards, not extra saves"}
-          </span>
+              : "Distinct cards reviewed today"
+          }
+        >
+          <b>{stats.reviewsCompletedToday}</b>
+          <span className="stat-label">Reviews · today</span>
         </div>
-        <div className="stat">
+        <div
+          className="stat"
+          title={stats.delayedRecall.total < 20 ? "Delayed recall over 7 days. Limited evidence." : "Delayed recall successes / attempts over 7 days"}
+        >
           <b>{delayedLabel(stats.delayedRecall)}</b>
-          <span className="stat-label">Delayed recall · 7 days</span>
-          <span className="stat-desc">{stats.delayedRecall.total < 20 ? "Limited evidence" : "Failures included"}</span>
+          <span className="stat-label">Recall · 7d</span>
         </div>
-        <div className="stat">
+        <div className="stat" title="Remembered through review, not from saving a word">
           <b>{stats.rememberedThroughReview}</b>
-          <span className="stat-label">Remembered through review</span>
-          <span className="stat-desc">
-            {stats.selfDeclaredKnown ? `${stats.selfDeclaredKnown} self-declared known listed separately` : "Not inflated by saving"}
-          </span>
+          <span className="stat-label">Learnt</span>
         </div>
       </div>
       <div className="panel">
         <p className="example-index">New words by day</p>
-        <BarChart values={stats.introductionsByDay.slice(-30).map((row) => row.count)} labels={stats.introductionsByDay.slice(-30).map((row) => row.day)} />
+        <BarChart values={intro.map((row) => row.count)} labels={intro.map((row) => row.day)} />
       </div>
       <div className="panel">
         <div className="row">
@@ -165,30 +199,18 @@ export function ProgressView() {
         <HorizonBars rows={stats.coverage} />
         <p className="legend">
           <span>
-            <i className="dot verified" /> Verified
+            <i className="dot learnt" /> Learnt
           </span>
           <span>
             <i className="dot learning" /> Learning
-          </span>
-          <span>
-            <i className="dot declared" /> Marked known
-          </span>
-          <span>
-            <i className="dot idle" /> Saved, not started
           </span>
         </p>
       </div>
       {stats.takeaway ? (
         <div className="insight-card">
-          <p className="example-index">What the charts can say</p>
           <p>{stats.takeaway}</p>
         </div>
-      ) : (
-        <p className="tiny helper-copy">Rule {stats.ruleVersion}.</p>
-      )}
-      <button type="button" className="ghost block" onClick={() => go({ name: "words" })}>
-        Open My Words
-      </button>
+      ) : null}
     </section>
   );
 }
