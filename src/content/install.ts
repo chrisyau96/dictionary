@@ -241,7 +241,13 @@ export async function installPendingPacks(
   const catalog = await loadPackCatalog();
   const targets = pending.length
     ? pending
-    : [{ packId: REQUIRED_PACK_ID, name: "", installedVersion: null, availableVersion: "", status: "missing" as const }];
+    : catalog.map((item) => ({
+        packId: item.packId,
+        name: "",
+        installedVersion: null,
+        availableVersion: "",
+        status: "missing" as const,
+      }));
   for (const item of targets) {
     const folder = catalog.find((entry) => entry.packId === item.packId)?.folder;
     if (!folder) continue;

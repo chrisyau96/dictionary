@@ -68,6 +68,24 @@ describe("new-sense selection", () => {
     expect(picked.map((item) => item.id)).toEqual([]);
   });
 
+  it("does not auto-queue lookup senses that have no teaching examples", () => {
+    const profile = defaultProfile();
+    const picked = pickNewSenses(
+      [
+        sense("lookup", {
+          packId: "common-5000",
+          examples: [],
+          frequency: { form: "because", zipf: 6, commonness: 70, source: "wordfreq", sourceVersion: "3.1.1", scaleVersion: "v1", status: "measured" },
+        }),
+      ],
+      profile,
+      [],
+      new Set(),
+      5,
+    );
+    expect(picked).toEqual([]);
+  });
+
   it("does not rank solely by commonness", () => {
     const profile = { ...defaultProfile(), estimatedBand: "professional" as const };
     const picked = pickNewSenses(

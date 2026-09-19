@@ -2,7 +2,7 @@
 
 A vocabulary-learning + dictionary PWA. Study English you can use, look up installed meanings offline, and keep Hong Kong Traditional Chinese next to the English.
 
-The first pack is **Chris Workplace 1000**: about 1,000 meanings for shop/customer work, project talk, business messages, running a small business, everyday conversation, and practical technology. It is not a 20,000-word general dictionary. Absent words stay absent.
+The first pack is **Chris Workplace 1000**: about 1,000 meanings for shop/customer work, project talk, business messages, running a small business, everyday conversation, and practical technology. **Common English 5000** adds the most common English wordings for offline lookup (short open-data glosses, no teaching examples or pack audio). Today still picks new study words from the workplace pack. Absent words stay absent.
 
 ## Why this pack
 
@@ -53,7 +53,7 @@ npm install
 npm run dev
 ```
 
-Then open the URL printed in the terminal, usually `http://localhost:5173`, and tap **Download and verify pack**. A “persistent storage was not granted” note on localhost is a warning, not a failed install.
+Then open the URL printed in the terminal, usually `http://localhost:5173`, and tap **Download and verify packs**. A “persistent storage was not granted” note on localhost is a warning, not a failed install.
 
 ```bash
 npm test
@@ -67,6 +67,12 @@ npm run preview
 ```
 
 Install the preview over HTTPS or `localhost`, then use **Prepare offline use**. Airplane-mode proof still needs a real phone.
+
+Rebuild the common-English lookup pack (requires `wordfreq` and NLTK WordNet; CC-CEDICT is fetched into `scripts/.cache`, which is gitignored):
+
+```bash
+npm run pack:common5000
+```
 
 Rebuild the foundation pack (requires `wordfreq`, `espeak-ng`, and `ffmpeg`):
 
@@ -90,7 +96,8 @@ This is the app’s display convention (scale `v1`), not a language standard. `I
 - App code: MIT.
 - Teaching glosses, examples, and synonym notes: original material in this repo.
 - Frequency values: [wordfreq](https://github.com/rspeer/wordfreq) 3.1.1. Keep the pack notices if you redistribute those values.
-- Audio: generated with eSpeak NG `en-gb`, 32 kbit/s MP3. IPA is always kept.
+- Common English 5000 English glosses: Princeton WordNet 3.0. Chinese head-glosses: [CC-CEDICT](https://www.mdbg.net/chinese/dictionary?page=cc-cedict) (CC-BY-SA 4.0). See `public/packs/common-5000/NOTICES.md`.
+- Audio: generated with eSpeak NG `en-gb`, 32 kbit/s MP3. IPA is always kept. Common English 5000 has no pack audio; the device voice can still say the word.
 
 See `public/packs/foundation-50/NOTICES.md`.
 
@@ -102,9 +109,15 @@ https://chrisyau96.github.io/dictionary/
 
 There is no server and no cloud database. Learning records stay in the browser on your phone.
 
-GitHub Pages deploys from `main` after each push. Open the URL on your phone and tap **Download and verify pack**.
+GitHub Pages deploys from `main` after each push. Open the URL on your phone and tap **Download and verify packs**.
 
 Local `npm run dev` is unchanged (`http://localhost:5173`). The Pages build uses the `/dictionary/` base path.
+
+To ship a public Android app (Google Play), see `docs/ANDROID.md`. The publish command on a machine with Android Studio / SDK is:
+
+```bash
+VITE_BASE=/ npm run build && npx cap sync android && npx cap build android --androidreleasetype AAB --keystorepath /absolute/path/to/vocabai-release.jks --keystorepass 'YOUR_STORE_PASS' --keystorealias vocabai --keystorealiaspass 'YOUR_KEY_PASS'
+```
 
 ## Status
 

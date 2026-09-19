@@ -3,6 +3,10 @@
     {
       "packId": "chris-1000",
       "folder": "chris-1000"
+    },
+    {
+      "packId": "common-5000",
+      "folder": "common-5000"
     }
   ]
 }

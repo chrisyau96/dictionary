@@ -1,0 +1,4 @@
+storePassword=YOUR_STORE_PASS
+keyPassword=YOUR_KEY_PASS
+keyAlias=vocabai
+storeFile=/absolute/path/to/vocabai-release.jks

@@ -30,9 +30,13 @@ export function DictionaryView({ initialQuery }: { initialQuery: string }) {
   const normalized = useMemo(() => normalizeQuery(query), [query]);
 
   useEffect(() => {
-    void db.packs.where("status").equals("installed").first().then((pack) => {
-      if (pack) setPackLabel(`${pack.name} · installed`);
-    });
+    void db.packs
+      .where("status")
+      .equals("installed")
+      .toArray()
+      .then((packs) => {
+        if (packs.length) setPackLabel(`${packs.map((pack) => pack.name).join(" · ")} · installed`);
+      });
     void loadSenseNotes().then(setNotes);
   }, []);
 
@@ -56,7 +60,7 @@ export function DictionaryView({ initialQuery }: { initialQuery: string }) {
       return;
     }
     void db.senses.toArray().then((all) => {
-      setTopicSenses(all.filter((sense) => sense.domains.includes(browse)).slice(0, 24));
+      setTopicSenses(all.filter((sense) => sense.domains.includes(browse) && sense.examples.length > 0).slice(0, 24));
     });
   }, [browse]);
 
@@ -70,7 +74,7 @@ export function DictionaryView({ initialQuery }: { initialQuery: string }) {
           setQuery(event.target.value);
           go({ name: "dictionary", q: event.target.value });
         }}
-        placeholder="Try a workplace word, like address"
+        placeholder="Try a word, like because or address"
         autoCapitalize="none"
         autoCorrect="off"
         aria-label="Search installed words"

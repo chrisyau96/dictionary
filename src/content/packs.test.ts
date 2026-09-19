@@ -22,6 +22,17 @@ describe("offline pack updates", () => {
     expect(summary.pending).toHaveLength(2);
   });
 
+  it("keeps common-5000 in the same pending list as the workplace pack", () => {
+    const summary = summarizePackOffers([
+      offer({ installedVersion: "1.4.0", availableVersion: "1.4.0", status: "current" }),
+      offer({ packId: "common-5000", name: "Common English 5000", installedVersion: null, status: "missing", availableVersion: "1.0.0" }),
+    ]);
+    expect(summary.allCurrent).toBe(false);
+    expect(summary.pending).toEqual([
+      expect.objectContaining({ packId: "common-5000", status: "missing" }),
+    ]);
+  });
+
   it("treats matching installed versions as newest", () => {
     const summary = summarizePackOffers([
       offer({ installedVersion: "1.4.0", availableVersion: "1.4.0", status: "current" }),

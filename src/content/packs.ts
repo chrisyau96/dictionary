@@ -3,7 +3,10 @@ export interface PackCatalogItem {
   folder: string;
 }
 
-export const PACK_CATALOG: PackCatalogItem[] = [{ packId: "chris-1000", folder: "chris-1000" }];
+export const PACK_CATALOG: PackCatalogItem[] = [
+  { packId: "chris-1000", folder: "chris-1000" },
+  { packId: "common-5000", folder: "common-5000" },
+];
 export const REQUIRED_PACK_ID = "chris-1000";
 const DISMISS_KEY = "vocab-pack-update-dismissed";
 

@@ -1,0 +1,34 @@
+{
+  "packId": "common-5000",
+  "version": "1.0.0",
+  "schemaVersion": 1,
+  "name": "Common English 5000",
+  "accent": "en-GB",
+  "entryCount": 4558,
+  "senseCount": 4558,
+  "audioCount": 0,
+  "requiredAssets": [
+    "pack.json",
+    "NOTICES.md"
+  ],
+  "checksums": {
+    "pack.json": "5b69a313c3d81c01d984b716bdf0070d1986cadc60da0a9776c1d2f34d191a8f",
+    "NOTICES.md": "26cc488b152ceaae02487b5e19af38af38a3beeb9f422a15ac08545ab0e2d679"
+  },
+  "byteSize": 3355113,
+  "audioBytes": 0,
+  "completeness": {
+    "meanings": "complete",
+    "audio": "none",
+    "examples": "none",
+    "synonyms": "not_prepared",
+    "frequency": "measured-single-words",
+    "notes": "4558 lookup headwords from the wordfreq top 5,000. 420 already live in Chris Workplace 1000 so they were not duplicated. No audio clips. Today does not auto-queue these."
+  },
+  "licenses": [
+    "Frequency values: wordfreq 3.1.1.",
+    "English glosses: WordNet 3.0.",
+    "Chinese glosses: CC-CEDICT, CC-BY-SA 4.0.",
+    "No pack audio; device text-to-speech may be used."
+  ]
+}

@@ -10,3 +10,12 @@ __pycache__
 .python-version
 *.tsbuildinfo
 scripts/voices/*.onnx
+scripts/.cache
+android/local.properties
+android/.gradle
+android/**/build
+android/key.properties
+android/app/release
+*.jks
+*.keystore
+!android/app/debug.keystore
