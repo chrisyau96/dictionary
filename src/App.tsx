@@ -84,7 +84,7 @@ export function App() {
   if (!ready) return <p className="muted">Opening local records…</p>;
 
   const tab = currentTab(route);
-  const hideTabs = route.name === "review" || route.name === "install" || route.name === "entry" || route.name === "settings";
+  const hideTabs = route.name === "install";
   const hidePackBanner =
     packBannerHidden ||
     !packSummary?.pending.length ||

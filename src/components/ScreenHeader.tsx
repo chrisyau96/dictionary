@@ -2,6 +2,27 @@ import type { ReactNode } from "react";
 import { BackIcon } from "./icons";
 import { go, type Route } from "../router";
 
+function goBack(to: Route | "history") {
+  if (to === "history") window.history.back();
+  else go(to);
+}
+
+export function BackButton({
+  to,
+  label = "Back",
+  className = "back-btn",
+}: {
+  to: Route | "history";
+  label?: string;
+  className?: string;
+}) {
+  return (
+    <button type="button" className={className} aria-label={label} onClick={() => goBack(to)}>
+      <BackIcon />
+    </button>
+  );
+}
+
 export function ScreenHeader({
   title,
   back,
@@ -19,28 +40,14 @@ export function ScreenHeader({
 }) {
   return (
     <header className="page-header">
-      {back || right ? (
-        <div className="page-header-top">
-          {back ? (
-            <button
-              type="button"
-              className="icon-btn"
-              aria-label={backLabel}
-              onClick={() => {
-                if (back === "history") window.history.back();
-                else go(back);
-              }}
-            >
-              <BackIcon />
-            </button>
-          ) : (
-            <span />
-          )}
-          {right ? <div className="page-header-right">{right}</div> : null}
+      <div className="page-header-row">
+        {back ? <BackButton to={back} label={backLabel} /> : null}
+        <div className="page-header-main">
+          {eyebrow ? <p className="eyebrow">{eyebrow}</p> : null}
+          {title ? <h1 className="page-title">{title}</h1> : null}
         </div>
-      ) : null}
-      {eyebrow ? <p className="eyebrow">{eyebrow}</p> : null}
-      {title ? <h1 className="page-title">{title}</h1> : null}
+        {right ? <div className="page-header-right">{right}</div> : null}
+      </div>
       {subtitle ? <p className="lede">{subtitle}</p> : null}
     </header>
   );

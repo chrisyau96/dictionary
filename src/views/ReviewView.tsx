@@ -1,24 +1,102 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { PronunciationButtons } from "../components/AudioButton";
-import { ScreenHeader } from "../components/ScreenHeader";
-import { db, ensureProfile } from "../db/database";
+import { BackButton } from "../components/ScreenHeader";
+import { WordDetail } from "../components/WordDetail";
+import { answersMatch, buildClozeForSense, clozeCoreByKey, type ClozeExercise } from "../content/cloze";
 import { go } from "../router";
-import { previewRatingIntervals } from "../scheduler/schedule";
-import { buildToday, persistSessionIndex, productionBlank, questionFor, rateCard, undoLastReview, type QueueItem } from "../study/session";
+import { buildToday, persistSessionIndex, rateCard, type QueueItem } from "../study/session";
 
-const GRADE_HELP = [
-  { rating: 1 as const, key: "again", label: "Again", hint: "Forgot" },
-  { rating: 2 as const, key: "hard", label: "Hard", hint: "Hesitated" },
-  { rating: 3 as const, key: "good", label: "Good", hint: "Recalled" },
-  { rating: 4 as const, key: "easy", label: "Easy", hint: "Instant" },
-];
+type Phase = "meaning" | "cloze" | "detail";
+
+interface SessionResult {
+  word: string;
+  gotIt: boolean;
+  blanksCorrect: number;
+  blanksTotal: number;
+}
+
+function ReviewChrome({
+  index,
+  total,
+  children,
+}: {
+  index: number;
+  total: number;
+  children: ReactNode;
+}) {
+  return (
+    <section className="stack compact review-page">
+      <div className="review-chrome">
+        <BackButton to={{ name: "today" }} label="Exit revision" />
+        <div className="progress-bar" aria-label="Session progress">
+          <span style={{ width: `${Math.round((index / Math.max(1, total)) * 100)}%` }} />
+        </div>
+        <span className="tiny review-count">
+          {Math.min(index + 1, total)}/{total}
+        </span>
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function ClozePrompt({
+  exercise,
+  answers,
+  checked,
+  onChange,
+}: {
+  exercise: ClozeExercise;
+  answers: Record<string, string>;
+  checked: boolean;
+  onChange: (key: string, value: string) => void;
+}) {
+  return (
+    <p className="cloze-sentence">
+      {exercise.tokens.map((token, index) => {
+        if (token.type === "space") return <span key={`s${index}`}>{token.text}</span>;
+        if (!token.blank) {
+          return (
+            <span key={token.key}>
+              {token.leading}
+              {token.core}
+              {token.trailing}
+            </span>
+          );
+        }
+        const given = answers[token.key] ?? "";
+        const ok = checked ? answersMatch(token.core, given) : null;
+        return (
+          <span key={token.key} className="cloze-word">
+            {token.leading}
+            <input
+              className={`cloze-input${ok === true ? " is-correct" : ok === false ? " is-wrong" : ""}`}
+              value={given}
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
+              aria-label={`Blank ${token.core.length} letters`}
+              style={{ width: `${Math.max(3.2, token.core.length + 1.2)}ch` }}
+              onChange={(event) => onChange(token.key, event.target.value)}
+            />
+            {token.trailing}
+          </span>
+        );
+      })}
+    </p>
+  );
+}
 
 export function ReviewView() {
   const [queue, setQueue] = useState<QueueItem[]>([]);
   const [index, setIndex] = useState(0);
-  const [revealed, setRevealed] = useState(false);
+  const [phase, setPhase] = useState<Phase>("meaning");
   const [busy, setBusy] = useState(false);
+  const [loaded, setLoaded] = useState(false);
   const [sessionType, setSessionType] = useState<"scheduled" | "learn-new">("scheduled");
+  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [clozeChecked, setClozeChecked] = useState(false);
+  const [results, setResults] = useState<SessionResult[]>([]);
 
   useEffect(() => {
     void (async () => {
@@ -26,169 +104,210 @@ export function ReviewView() {
       setQueue(today.queue);
       setIndex(today.plan.session && !today.plan.session.completedAt ? today.plan.session.index : 0);
       setSessionType(today.plan.session?.sessionType ?? "scheduled");
-      setRevealed(false);
+      setPhase("meaning");
+      setLoaded(true);
     })();
   }, []);
 
   const item = queue[index];
+  const exercise = useMemo(() => (item ? buildClozeForSense(item.sense) : null), [item]);
+  const word = item ? item.sense.frequency.form || item.sense.id : "";
 
-  async function rate(rating: 1 | 2 | 3 | 4) {
-    if (!item || busy || !revealed) return;
+  function resetPrompt() {
+    setPhase("meaning");
+    setAnswers({});
+    setClozeChecked(false);
+  }
+
+  async function rate(gotIt: boolean) {
+    if (!item || busy || phase !== "detail" || !exercise) return;
     setBusy(true);
-    await rateCard(item.card.id, rating, new Date(), sessionType);
+    await rateCard(item.card.id, gotIt ? 3 : 1, new Date(), sessionType);
+    const blanksTotal = exercise.blankKeys.length;
+    const blanksCorrect = exercise.blankKeys.filter((key) => answersMatch(clozeCoreByKey(exercise, key), answers[key] ?? "")).length;
+    const nextResults = [
+      ...results,
+      { word: item.sense.frequency.form || word, gotIt, blanksCorrect, blanksTotal },
+    ];
+    setResults(nextResults);
     const nextIndex = index + 1;
     const done = nextIndex >= queue.length;
     await persistSessionIndex(nextIndex, done);
-    setRevealed(false);
+    resetPrompt();
     setIndex(nextIndex);
     setBusy(false);
-    const profile = await ensureProfile();
-    if (!profile.seenReviewHelp) await db.profile.put({ ...profile, seenReviewHelp: true });
   }
 
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
-      if (event.target instanceof HTMLElement && ["INPUT", "TEXTAREA"].includes(event.target.tagName)) return;
-      if (!revealed && (event.key === " " || event.key === "Enter")) {
-        event.preventDefault();
-        setRevealed(true);
+      if (event.target instanceof HTMLElement && ["INPUT", "TEXTAREA"].includes(event.target.tagName)) {
+        if (event.key === "Enter" && phase === "cloze") {
+          event.preventDefault();
+          if (!clozeChecked) setClozeChecked(true);
+          else setPhase("detail");
+        }
         return;
       }
-      const grade = { "1": 1, "2": 2, "3": 3, "4": 4 }[event.key] as 1 | 2 | 3 | 4 | undefined;
-      if (grade) void rate(grade);
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        if (phase === "meaning") setPhase("cloze");
+        else if (phase === "cloze" && !clozeChecked) setClozeChecked(true);
+        else if (phase === "cloze") setPhase("detail");
+        return;
+      }
+      if (phase === "detail" && (event.key === "1" || event.key.toLowerCase() === "f")) void rate(false);
+      if (phase === "detail" && (event.key === "2" || event.key === "3" || event.key.toLowerCase() === "g")) void rate(true);
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [revealed, busy, index, item, sessionType]);
+  }, [phase, clozeChecked, busy, item, sessionType, exercise, answers, results, index, queue.length]);
+
+  if (!loaded) return <p className="muted">Opening revision…</p>;
 
   if (!item) {
+    const gotIt = results.filter((row) => row.gotIt).length;
+    const forgot = results.length - gotIt;
+    if (!results.length) {
+      return (
+        <ReviewChrome index={0} total={0}>
+          <div className="empty-state">Nothing is waiting in this revision.</div>
+          <button type="button" className="primary block" onClick={() => go({ name: "today" })}>
+            Back to Today
+          </button>
+        </ReviewChrome>
+      );
+    }
     return (
-      <section className="stack compact">
-        <ScreenHeader title="Session complete" back={{ name: "today" }} backLabel="Exit practice" />
-        <div className="empty-state">
-          <strong>Session complete.</strong>
-          <br />
-          This batch is finished. Any cards that became due again are shown separately on Today.
+      <ReviewChrome index={results.length} total={results.length}>
+        <div className="results-hero">
+          <div className="results-mark" aria-hidden="true">
+            ✓
+          </div>
+          <p className="hero-kicker">Revision complete</p>
+          <h1 className="page-title">Congratulations</h1>
+          <p className="lede">
+            {gotIt === results.length
+              ? "You remembered every word in this batch."
+              : forgot === results.length
+                ? "This batch is done. These words will come back sooner."
+                : "You finished this revision. Keep the ones you forgot moving."}
+          </p>
+        </div>
+        <div className="kpi-grid">
+          <div className="stat">
+            <b>{results.length}</b>
+            <span className="stat-label">Words revised</span>
+          </div>
+          <div className="stat">
+            <b>{gotIt}</b>
+            <span className="stat-label">Got it</span>
+          </div>
+          <div className="stat">
+            <b>{forgot}</b>
+            <span className="stat-label">Forgot</span>
+          </div>
+          <div className="stat">
+            <b>
+              {results.reduce((sum, row) => sum + row.blanksCorrect, 0)}
+              <span className="stat-over">/{results.reduce((sum, row) => sum + row.blanksTotal, 0) || 0}</span>
+            </b>
+            <span className="stat-label">Blanks spelled</span>
+          </div>
+        </div>
+        <div className="panel results-list">
+          <p className="example-index">This session</p>
+          {results.map((row, resultIndex) => (
+            <div className="results-row" key={`${row.word}-${resultIndex}`}>
+              <strong>{row.word}</strong>
+              <span className={row.gotIt ? "pill" : "pill is-forgot"}>{row.gotIt ? "Got it" : "Forgot"}</span>
+            </div>
+          ))}
         </div>
         <button type="button" className="primary block" onClick={() => go({ name: "today" })}>
           Back to Today
         </button>
-      </section>
+      </ReviewChrome>
     );
   }
 
-  const question = questionFor(item.card.task, item.sense);
-  const showWord = item.card.task === "recognition";
-  const previews = revealed ? previewRatingIntervals(item.card) : null;
-  const word = item.sense.frequency.form || item.sense.id;
-  const blank = productionBlank(item.sense);
-  const example = item.sense.examples[0];
-
-  return (
-    <section className="stack compact">
-      <ScreenHeader
-        eyebrow={`Flashcards · ${index + 1}/${queue.length}`}
-        title={item.card.task === "recognition" ? "What does it mean?" : "What is the word?"}
-        subtitle={revealed ? "How well did you remember the front?" : "Think of the answer, then tap the card."}
-        back={{ name: "today" }}
-        backLabel="Exit practice"
-      />
-      <div className="progress-bar" aria-label="Session progress">
-        <span style={{ width: `${Math.round((index / queue.length) * 100)}%` }} />
-      </div>
-      <div
-        className={`flashcard${revealed ? " is-flipped" : ""}`}
-        role="button"
-        tabIndex={0}
-        onClick={() => setRevealed(true)}
-        onKeyDown={(event) => {
-          if (event.key === "Enter" || event.key === " ") {
-            event.preventDefault();
-            setRevealed(true);
-          }
-        }}
-        aria-label={revealed ? "Hide answer" : "Show answer"}
-      >
-        <div className="flash-face flash-front">
-          {showWord ? (
-            <>
-              <p className="prompt-word">
-                {word}
-                <span className="pos-inline">{item.sense.pos}</span>
-              </p>
-              <p>{question.prompt}</p>
-            </>
-          ) : (
-            <>
-              <p className="cue-sentence">{blank}</p>
-              <p>{item.sense.glossTc}</p>
-            </>
-          )}
-          <span className="flash-hint">Tap to flip</span>
-        </div>
-        <div className="flash-face flash-back">
-          <h2 className="prompt-word">
-            {word}
-            <span className="pos-inline">{item.sense.pos}</span>
-          </h2>
-          <p>{item.sense.glossEn}</p>
-          <p>{item.sense.glossTc}</p>
-          {item.sense.collocations.slice(0, 3).map((col, collocationIndex) => (
-            <span className={`phrase tone-${collocationIndex % 4}`} key={col}>
-              {col}
-            </span>
-          ))}
-          {example ? (
-            <p className="example-line">
-              {example.en}
-              <br />
-              <span className="muted">{example.tc}</span>
-            </p>
-          ) : null}
-          <div className="flash-audio" onClick={(event) => event.stopPropagation()}>
+  if (phase === "meaning") {
+    return (
+      <ReviewChrome index={index} total={queue.length}>
+        <div className="hero-card review-prompt">
+          <p className="hero-kicker">Remember the meaning</p>
+          <h1 className="headword">{word}</h1>
+          <p className="hero-sub">{item.sense.pos}</p>
+          <div className="pron-row">
+            <div className="pron-copy">
+              <span className="pron-label">Say it, then recall the meaning</span>
+            </div>
             <PronunciationButtons pronunciationId={item.sense.pronunciationId} fallbackText={word} allowed />
           </div>
         </div>
+        <button type="button" className="primary block" onClick={() => setPhase("cloze")}>
+          Check
+        </button>
+      </ReviewChrome>
+    );
+  }
+
+  if (phase === "cloze" && exercise) {
+    const correct = exercise.blankKeys.filter((key) => answersMatch(clozeCoreByKey(exercise, key), answers[key] ?? "")).length;
+    return (
+      <ReviewChrome index={index} total={queue.length}>
+        <div className="cloze-card">
+          <p className="hero-kicker">Fill in the blanks</p>
+          <p className="lede">Type the missing English words. Half of the sentence is blanked.</p>
+          <ClozePrompt
+            exercise={exercise}
+            answers={answers}
+            checked={clozeChecked}
+            onChange={(key, value) => setAnswers((current) => ({ ...current, [key]: value }))}
+          />
+          {exercise.hintTc ? <p className="muted cloze-hint">{exercise.hintTc}</p> : null}
+          {clozeChecked ? (
+            <p className="tiny helper-copy">
+              {correct}/{exercise.blankKeys.length} spelled correctly
+            </p>
+          ) : null}
+        </div>
+        <button
+          type="button"
+          className="primary block"
+          onClick={() => {
+            if (!clozeChecked) setClozeChecked(true);
+            else setPhase("detail");
+          }}
+        >
+          {clozeChecked ? "Show word" : "Check"}
+        </button>
+      </ReviewChrome>
+    );
+  }
+
+  return (
+    <ReviewChrome index={index} total={queue.length}>
+      {exercise ? (
+        <p className="tiny helper-copy">
+          {exercise.blankKeys.filter((key) => answersMatch(clozeCoreByKey(exercise, key), answers[key] ?? "")).length}/
+          {exercise.blankKeys.length} blanks correct · rate this word
+        </p>
+      ) : null}
+      <WordDetail
+        key={item.card.id}
+        entryId={item.sense.entryId}
+        senseId={item.sense.id}
+        showBack={false}
+        hideLearn
+      />
+      <div className="review-actions">
+        <button type="button" className="rating again" disabled={busy} onClick={() => void rate(false)}>
+          Forgot
+        </button>
+        <button type="button" className="rating good" disabled={busy} onClick={() => void rate(true)}>
+          Got it
+        </button>
       </div>
-      {revealed ? (
-        <>
-          <p className="tiny helper-copy">
-            Rate the moment before you flipped — FSRS, the same spaced-repetition method used by Anki.
-          </p>
-          <div className="rating-row">
-            {GRADE_HELP.map((grade) => (
-              <button
-                key={grade.key}
-                type="button"
-                className={`rating ${grade.key}`}
-                disabled={busy}
-                onClick={() => rate(grade.rating)}
-              >
-                {grade.label}
-                <small>{grade.hint}</small>
-                {previews ? <span className="rating-interval">{previews[grade.rating]}</span> : null}
-              </button>
-            ))}
-          </div>
-          <button
-            type="button"
-            className="text-btn"
-            onClick={async () => {
-              const ok = await undoLastReview();
-              if (ok) {
-                const nextIndex = Math.max(0, index - 1);
-                await persistSessionIndex(nextIndex, false);
-                setIndex(nextIndex);
-                setRevealed(false);
-              }
-            }}
-          >
-            Undo last rating
-          </button>
-        </>
-      ) : (
-        <p className="tiny helper-copy">Space flips the card. 1–4 rate Again, Hard, Good, Easy.</p>
-      )}
-    </section>
+    </ReviewChrome>
   );
 }

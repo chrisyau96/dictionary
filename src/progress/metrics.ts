@@ -25,6 +25,10 @@ export interface ProgressSnapshot {
   introductionsByDay: Array<{ day: string; count: number }>;
   delayedByDay: Array<{ day: string; success: number; total: number }>;
   coverage: Array<{ domain: DomainId; notStarted: number; learning: number; reviewVerified: number; selfDeclared: number; total: number }>;
+  learntCount: number;
+  learningCount: number;
+  learnStreak: number;
+  reviewStreak: number;
   takeaway: string | null;
   ruleVersion: string;
 }
@@ -129,6 +133,23 @@ function dayWindow(endDay: string, days: number): string[] {
   return keys;
 }
 
+export function shiftStudyDay(day: string, delta: number): string {
+  const [year, month, date] = day.split("-").map(Number);
+  return new Date(Date.UTC(year, month - 1, date + delta)).toISOString().slice(0, 10);
+}
+
+export function consecutiveStreak(activeDays: Iterable<string>, today: string): number {
+  const set = new Set(activeDays);
+  let cursor = set.has(today) ? today : shiftStudyDay(today, -1);
+  if (!set.has(cursor)) return 0;
+  let count = 0;
+  while (set.has(cursor)) {
+    count += 1;
+    cursor = shiftStudyDay(cursor, -1);
+  }
+  return count;
+}
+
 export function computeProgress(
   now: Date,
   timezone: string,
@@ -193,6 +214,29 @@ export function computeProgress(
     }
     return { domain, notStarted, learning, reviewVerified, selfDeclared, total: members.length };
   });
+  coverage.sort((a, b) => {
+    const aLearned = a.learning + a.reviewVerified + a.selfDeclared;
+    const bLearned = b.learning + b.reviewVerified + b.selfDeclared;
+    if (bLearned !== aLearned) return bLearned - aLearned;
+    return a.domain.localeCompare(b.domain);
+  });
+
+  let learntCount = 0;
+  let learningCount = 0;
+  for (const word of words) {
+    if (word.membership !== "active") continue;
+    const tab = wordListTab(word, events, cards, timezone);
+    if (tab === "learnt") learntCount += 1;
+    else if (tab === "learning") learningCount += 1;
+  }
+  const learnStreak = consecutiveStreak(
+    [...introductions.values()].map((item) => item.day),
+    today,
+  );
+  const reviewStreak = consecutiveStreak(
+    liveEvents(events).map((event) => event.studyDay),
+    today,
+  );
 
   const rec = delayed.filter((item) => item.event.task === "recognition");
   const prod = delayed.filter((item) => item.event.task === "production");
@@ -222,6 +266,10 @@ export function computeProgress(
     introductionsByDay,
     delayedByDay,
     coverage,
+    learntCount,
+    learningCount,
+    learnStreak,
+    reviewStreak,
     takeaway,
     ruleVersion: REVIEW_VERIFIED_RULE_VERSION,
   };

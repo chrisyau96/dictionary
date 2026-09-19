@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { computeProgress, wordListTab } from "./metrics";
+import { computeProgress, consecutiveStreak, wordListTab } from "./metrics";
 import { newCardRecord } from "../scheduler/schedule";
 import type { ReviewEventRecord, UserWordRecord } from "../types";
 
@@ -62,6 +62,8 @@ describe("progress KPIs", () => {
     expect(snapshot.selfDeclaredKnown).toBe(1);
     expect(snapshot.delayedRecall.total).toBe(1);
     expect(snapshot.delayedRecall.success).toBe(0);
+    expect(snapshot.learningCount).toBe(2);
+    expect(snapshot.learntCount).toBe(1);
   });
 
   it("shows an empty delayed-recall state when history is missing", () => {
@@ -133,5 +135,11 @@ describe("progress KPIs", () => {
     expect(everyday?.reviewVerified).toBe(0);
     expect(everyday?.selfDeclared).toBe(0);
     expect(everyday?.notStarted).toBe(1);
+  });
+
+  it("counts learn and revision strikes from consecutive days", () => {
+    expect(consecutiveStreak(["2026-09-03", "2026-09-04", "2026-09-05"], "2026-09-05")).toBe(3);
+    expect(consecutiveStreak(["2026-09-03", "2026-09-04"], "2026-09-05")).toBe(2);
+    expect(consecutiveStreak(["2026-09-01"], "2026-09-05")).toBe(0);
   });
 });

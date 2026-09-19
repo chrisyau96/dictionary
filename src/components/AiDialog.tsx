@@ -4,13 +4,13 @@ import { hasAiReady, loadAiConfig, loadApiKey, saveAiConfig } from "../ai/storag
 import { DEFAULT_AI_PROMPTS, formatAiNote, rememberCommand, suggestedCommands } from "../ai/types";
 import { go } from "../router";
 import { appendWordNote } from "../study/session";
+import { AiSetupForm } from "./AiSetupForm";
 import { RefreshIcon, SettingsIcon } from "./icons";
 import { RichTextEditor } from "./RichText";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 const AI_FAIL = "An error occurred. Please try again.";
 const NO_FINDINGS = "<p>No findings.</p>";
-const SETUP_PLACEHOLDER = "please click the setting button to connect your AI tool";
 
 export function AiDialog({
   word,
@@ -66,16 +66,12 @@ export function AiDialog({
   }
 
   async function send(nextAsk: string, nextCommand: string) {
-    if (!ready) {
-      openSettings();
-      return;
-    }
+    if (!ready) return;
     const question = nextAsk.trim();
     if (!question) return;
     const config = await loadAiConfig();
     if (!config) {
       setReady(false);
-      openSettings();
       return;
     }
     const apiKey = await loadApiKey(config.provider);
@@ -125,20 +121,31 @@ export function AiDialog({
             <h2 className="ai-word">{word}</h2>
           </div>
           <div className="ai-sheet-actions">
-            <button
-              type="button"
-              className="icon-btn ai-header-gear"
-              aria-label="Open API settings"
-              onClick={openSettings}
-            >
-              <SettingsIcon />
-            </button>
+            {ready ? (
+              <button
+                type="button"
+                className="icon-btn ai-header-gear"
+                aria-label="Open API settings"
+                onClick={openSettings}
+              >
+                <SettingsIcon />
+              </button>
+            ) : null}
             <button type="button" className="text-btn" onClick={onClose}>
               Close
             </button>
           </div>
         </div>
         {ready === null ? <p className="muted">Opening AI…</p> : null}
+        {ready === false ? (
+          <div className="ai-inline-setup">
+            <p className="example-index">Connect AI</p>
+            <p className="tiny helper-copy">Only this helper needs a key. Learning records stay on this device.</p>
+            <AiSetupForm compact onReady={() => setReady(true)} />
+          </div>
+        ) : null}
+        {ready ? (
+          <>
         <div className="ai-chips">
           {chips.map((label) => (
             <button
@@ -158,7 +165,7 @@ export function AiDialog({
           <textarea
             rows={3}
             value={ask}
-            placeholder={ready ? `Ask anything about “${word}”` : SETUP_PLACEHOLDER}
+            placeholder={`Ask anything about “${word}”`}
             onChange={(event) => setAsk(event.target.value)}
             onKeyDown={(event) => {
               if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) {
@@ -221,6 +228,8 @@ export function AiDialog({
             ) : null}
             {savedNote ? <p className="tiny ai-note-signal">Added to your note.</p> : null}
           </div>
+        ) : null}
+          </>
         ) : null}
       </div>
     </div>

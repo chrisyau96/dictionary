@@ -90,33 +90,45 @@ function LineChart({ values }: { values: Array<number | null> }) {
 }
 
 function HorizonBars({ rows }: { rows: ProgressSnapshot["coverage"] }) {
-  const max = Math.max(1, ...rows.map((row) => row.total));
+  const values = rows.map((row) => row.learning + row.reviewVerified + row.selfDeclared);
+  const max = Math.max(1, ...values);
+  const xTicks = Array.from(new Set([0, Math.round(max / 2), max]));
   return (
-    <div className="horizon-list">
+    <div className="horizon-chart">
       {rows.map((row) => {
-        const width = `${Math.round((row.total / max) * 100)}%`;
         const learnt = row.reviewVerified + row.selfDeclared;
-        const learning = row.total ? (row.learning / row.total) * 100 : 0;
-        const learntPct = row.total ? (learnt / row.total) * 100 : 0;
+        const value = learnt + row.learning;
+        const fill = (value / max) * 100;
+        const learntPct = value ? (learnt / value) * 100 : 0;
+        const learningPct = value ? (row.learning / value) * 100 : 0;
         return (
           <div key={row.domain} className="horizon-row">
-            <span className="tiny">
-              {DOMAIN_LABELS[row.domain]} · {row.total}
-            </span>
-            <div className="horizon-track" style={{ width }}>
-              <span style={{ width: `${learntPct}%` }} className="seg learnt" />
-              <span style={{ width: `${learning}%` }} className="seg learning" />
+            <span className="horizon-label">{DOMAIN_LABELS[row.domain]}</span>
+            <div className="horizon-plot">
+              <div className="horizon-track" style={{ width: `${fill}%` }}>
+                <span style={{ width: `${learntPct}%` }} className="seg learnt" />
+                <span style={{ width: `${learningPct}%` }} className="seg learning" />
+              </div>
             </div>
           </div>
         );
       })}
+      <div className="horizon-axis">
+        <span className="horizon-label" aria-hidden="true" />
+        <div className="horizon-plot horizon-x" aria-hidden="true">
+          {xTicks.map((tick, index) => (
+            <span
+              key={`x-${tick}`}
+              className={index === 0 ? "is-start" : index === xTicks.length - 1 ? "is-end" : "is-mid"}
+              style={{ left: `${(tick / max) * 100}%` }}
+            >
+              {tick}
+            </span>
+          ))}
+        </div>
+      </div>
     </div>
   );
-}
-
-function delayedLabel(stats: ProgressSnapshot["delayedRecall"]): string {
-  if (stats.total === 0) return "—";
-  return `${stats.success}/${stats.total}`;
 }
 
 export function ProgressView() {
@@ -145,31 +157,21 @@ export function ProgressView() {
     <section className="stack compact">
       <ScreenHeader eyebrow="This device" title="Progress" subtitle="What you actually practised." />
       <div className="kpi-grid">
-        <div className="stat" title="First introductions in the last 7 days">
-          <b>{stats.newVocabulary7d}</b>
-          <span className="stat-label">New · 7d</span>
-        </div>
-        <div
-          className="stat"
-          title={
-            stats.reviewAttemptsToday !== stats.reviewsCompletedToday
-              ? `${stats.reviewAttemptsToday} attempts including retries`
-              : "Distinct cards reviewed today"
-          }
-        >
-          <b>{stats.reviewsCompletedToday}</b>
-          <span className="stat-label">Reviews · today</span>
-        </div>
-        <div
-          className="stat"
-          title={stats.delayedRecall.total < 20 ? "Delayed recall over 7 days. Limited evidence." : "Delayed recall successes / attempts over 7 days"}
-        >
-          <b>{delayedLabel(stats.delayedRecall)}</b>
-          <span className="stat-label">Recall · 7d</span>
-        </div>
-        <div className="stat" title="Remembered through review, not from saving a word">
-          <b>{stats.rememberedThroughReview}</b>
+        <div className="stat" title="Words in Learnt">
+          <b>{stats.learntCount}</b>
           <span className="stat-label">Learnt</span>
+        </div>
+        <div className="stat" title="Words in Learning">
+          <b>{stats.learningCount}</b>
+          <span className="stat-label">Learning</span>
+        </div>
+        <div className="stat" title="Consecutive days you learned a new word">
+          <b>{stats.learnStreak}</b>
+          <span className="stat-label">Strike · new words</span>
+        </div>
+        <div className="stat" title="Consecutive days you completed a revision">
+          <b>{stats.reviewStreak}</b>
+          <span className="stat-label">Strike · revision</span>
         </div>
       </div>
       <div className="panel">
