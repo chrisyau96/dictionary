@@ -1330,13 +1330,13 @@ input, textarea, select {
 }
 .cloze-word { display: inline-flex; align-items: baseline; max-width: 100%; }
 .cloze-word.is-blank {
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 0.12rem;
 }
 .cloze-letters {
   display: inline-flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 0.16rem;
   max-width: 100%;
