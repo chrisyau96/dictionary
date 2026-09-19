@@ -1,45 +1,6 @@
 import { traditionalWithoutEnglish } from "./examples";
 import type { SenseRecord } from "../types";
 
-const STOP = new Set([
-  "a",
-  "an",
-  "and",
-  "are",
-  "as",
-  "at",
-  "be",
-  "been",
-  "but",
-  "by",
-  "for",
-  "from",
-  "had",
-  "has",
-  "have",
-  "if",
-  "in",
-  "into",
-  "is",
-  "it",
-  "its",
-  "not",
-  "of",
-  "on",
-  "or",
-  "so",
-  "than",
-  "that",
-  "the",
-  "then",
-  "this",
-  "to",
-  "too",
-  "was",
-  "were",
-  "with",
-]);
-
 export type ClozeToken =
   | { type: "space"; text: string }
   | {
@@ -72,38 +33,64 @@ function parseWord(raw: string): { leading: string; core: string; trailing: stri
 }
 
 function targetWords(sense: SenseRecord): string[] {
-  const bits = [sense.frequency.form, sense.frequency.form.replaceAll("-", " ")];
-  for (const col of sense.collocations) bits.push(col);
-  return bits
-    .flatMap((item) => item.split(/\s+/))
+  const form = (sense.frequency.form || "").trim();
+  if (!form) return [];
+  const whole = normalizeWord(form);
+  const parts = form
+    .replaceAll("-", " ")
+    .split(/\s+/)
     .map(normalizeWord)
-    .filter(Boolean);
+    .filter((item) => item.length >= 3 || item === whole);
+  return [...new Set([whole, ...parts].filter(Boolean))];
 }
 
-function scoreWord(core: string, targets: string[]): number {
+function isTargetCore(core: string, targets: string[]): boolean {
   const lower = normalizeWord(core);
-  if (!lower) return -1;
-  let score = core.length;
-  if (targets.some((target) => target && (lower === target || lower.includes(target) || target.includes(lower)))) {
-    score += 80;
-  }
-  if (!STOP.has(lower)) score += 12;
-  if (core.length >= 6) score += 6;
-  else if (core.length >= 4) score += 3;
-  return score;
+  if (!lower) return false;
+  return targets.some((target) => {
+    if (!target) return false;
+    if (lower === target) return true;
+    if (target.length < 3) return false;
+    const delta = Math.abs(lower.length - target.length);
+    if (delta > 3) return false;
+    return lower.startsWith(target) || target.startsWith(lower);
+  });
 }
 
 export function answersMatch(expected: string, given: string): boolean {
   return normalizeWord(expected) === normalizeWord(given);
 }
 
+export function letterHint(core: string): string {
+  const match = core.match(/\p{L}/u);
+  return match?.[0] ?? core.slice(0, 1);
+}
+
+export function isHintSlot(core: string, index: number): boolean {
+  const chars = [...core];
+  const ch = chars[index] ?? "";
+  if (index === 0) return true;
+  return !/\p{L}/u.test(ch);
+}
+
+export function seedClozeLetters(exercise: ClozeExercise): Record<string, string[]> {
+  const next: Record<string, string[]> = {};
+  for (const key of exercise.blankKeys) {
+    const core = clozeCoreByKey(exercise, key);
+    next[key] = [...core].map((ch, index) => (isHintSlot(core, index) ? ch : ""));
+  }
+  return next;
+}
+
+export function lettersAnswer(letters: string[] | undefined): string {
+  return (letters ?? []).join("");
+}
+
 export function buildCloze(sentence: string, targets: string[] = [], hintTc = ""): ClozeExercise {
   const pieces = sentence.split(/(\s+)/);
-  const wordIndexes: number[] = [];
   const tokens: ClozeToken[] = pieces.map((piece, index) => {
     if (/^\s+$/.test(piece) || piece === "") return { type: "space", text: piece };
     const parsed = parseWord(piece);
-    wordIndexes.push(index);
     return {
       type: "word",
       leading: parsed.leading,
@@ -114,26 +101,34 @@ export function buildCloze(sentence: string, targets: string[] = [], hintTc = ""
     };
   });
 
-  const wordTokens = tokens.filter((token): token is Extract<ClozeToken, { type: "word" }> => token.type === "word");
-  let blankCount = Math.floor(wordTokens.length * 0.5);
-  if (blankCount < 1 && wordTokens.length > 0) blankCount = 1;
-
-  const ranked = wordTokens
-    .map((token, order) => ({ token, order, score: scoreWord(token.core, targets) }))
-    .sort((a, b) => b.score - a.score || a.order - b.order)
-    .slice(0, blankCount);
-
-  const blankKeys = new Set(ranked.map((item) => item.token.key));
+  const blankKeys: string[] = [];
   for (const token of tokens) {
-    if (token.type === "word" && blankKeys.has(token.key)) token.blank = true;
+    if (token.type !== "word") continue;
+    if (!isTargetCore(token.core, targets)) continue;
+    token.blank = true;
+    blankKeys.push(token.key);
   }
 
-  return {
-    sentence,
-    hintTc,
-    tokens,
-    blankKeys: ranked.map((item) => item.token.key),
-  };
+  if (!blankKeys.length) {
+    const wording = targets[0] || sentence.split(/\s+/).find(Boolean) || "word";
+    return {
+      sentence,
+      hintTc,
+      tokens: [
+        {
+          type: "word",
+          leading: "",
+          core: wording,
+          trailing: "",
+          blank: true,
+          key: "b-wording",
+        },
+      ],
+      blankKeys: ["b-wording"],
+    };
+  }
+
+  return { sentence, hintTc, tokens, blankKeys };
 }
 
 export function buildClozeForSense(sense: SenseRecord): ClozeExercise {

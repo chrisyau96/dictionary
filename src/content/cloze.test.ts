@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { answersMatch, buildCloze, buildClozeForSense } from "./cloze";
+import { answersMatch, buildCloze, buildClozeForSense, isHintSlot, letterHint, lettersAnswer, seedClozeLetters } from "./cloze";
 import type { SenseRecord } from "../types";
 
 function sense(example: string, form = "deadline"): SenseRecord {
@@ -32,17 +32,17 @@ function sense(example: string, form = "deadline"): SenseRecord {
 }
 
 describe("cloze blanks", () => {
-  it("blanks half the words, rounded down, and prefers the target lemma", () => {
+  it("blanks only the target wording, not half the sentence", () => {
     const exercise = buildCloze("Please send the report before the deadline tomorrow.", ["deadline"]);
-    expect(exercise.blankKeys).toHaveLength(4);
     const blanked: string[] = [];
     for (const token of exercise.tokens) {
       if (token.type === "word" && token.blank) blanked.push(token.core);
     }
-    expect(blanked).toContain("deadline");
+    expect(blanked).toEqual(["deadline"]);
+    expect(exercise.blankKeys).toHaveLength(1);
   });
 
-  it("still blanks one word when rounding down would leave none", () => {
+  it("still blanks the wording when it is the only word", () => {
     const exercise = buildCloze("Hello", ["hello"]);
     expect(exercise.blankKeys).toHaveLength(1);
   });
@@ -53,15 +53,41 @@ describe("cloze blanks", () => {
     expect(hello).toMatchObject({ leading: "", trailing: ",", blank: true });
   });
 
+  it("gives the first letter as the hint", () => {
+    expect(letterHint("deadline")).toBe("d");
+    expect(letterHint("Apple")).toBe("A");
+    expect(isHintSlot("deadline", 0)).toBe(true);
+    expect(isHintSlot("deadline", 1)).toBe(false);
+  });
+
+  it("seeds answers with the letter hint", () => {
+    const exercise = buildCloze("We missed the deadline.", ["deadline"]);
+    const seeded = seedClozeLetters(exercise);
+    expect(seeded.b6?.[0]).toBe("d");
+    expect(seeded.b6?.slice(1).join("")).toBe("");
+    expect(lettersAnswer(seeded.b6)).toBe("d");
+  });
+
+  it("uses only the wording when the sentence does not contain it", () => {
+    const exercise = buildCloze("Hello there.", ["deadline"]);
+    expect(exercise.blankKeys).toEqual(["b-wording"]);
+    const cores = exercise.tokens.filter((token) => token.type === "word").map((token) => token.core);
+    expect(cores).toEqual(["deadline"]);
+  });
+
   it("compares answers without case or extra punctuation", () => {
     expect(answersMatch("Deadline", "deadline")).toBe(true);
     expect(answersMatch("don't", "dont")).toBe(false);
     expect(answersMatch("team", " group ")).toBe(false);
   });
 
-  it("uses the full English example on a sense", () => {
+  it("uses the full English example and blanks the wording on a sense", () => {
     const exercise = buildClozeForSense(sense("We cannot miss the deadline today."));
     expect(exercise.sentence).toBe("We cannot miss the deadline today.");
-    expect(exercise.blankKeys.length).toBe(Math.max(1, Math.floor(6 * 0.5)));
+    const blanked: string[] = [];
+    for (const token of exercise.tokens) {
+      if (token.type === "word" && token.blank) blanked.push(token.core);
+    }
+    expect(blanked).toEqual(["deadline"]);
   });
 });

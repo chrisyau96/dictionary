@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { ScreenHeader } from "../components/ScreenHeader";
 import { db, ensureProfile } from "../db/database";
+import { pickXTicks } from "../progress/chartTicks";
 import { computeProgress, type ProgressSnapshot } from "../progress/metrics";
 
 const DOMAIN_LABELS: Record<string, string> = {
@@ -23,19 +24,17 @@ function formatDay(day: string): string {
 function BarChart({ values, labels }: { values: number[]; labels: string[] }) {
   const max = Math.max(1, ...values);
   const width = 320;
-  const height = 124;
-  const padL = 24;
-  const padR = 8;
+  const height = 132;
+  const padL = 26;
+  const padR = 10;
   const padT = 10;
-  const padB = 24;
+  const padB = 32;
   const plotW = width - padL - padR;
   const plotH = height - padT - padB;
   const gap = 2.2;
   const barW = (plotW - gap * Math.max(0, values.length - 1)) / Math.max(1, values.length);
   const yTicks = Array.from(new Set([0, Math.round(max / 2), max]));
-  const xTicks = labels
-    .map((_, index) => index)
-    .filter((index) => index === 0 || index === labels.length - 1 || (labels.length > 1 && (labels.length - 1 - index) % 7 === 0));
+  const xTicks = pickXTicks(labels.length);
 
   return (
     <svg viewBox={`0 0 ${width} ${height}`} className="chart" role="img" aria-label="New words introduced by day">
@@ -58,33 +57,13 @@ function BarChart({ values, labels }: { values: number[]; labels: string[] }) {
       <line className="chart-grid" x1={padL} x2={width - padR} y1={padT + plotH} y2={padT + plotH} />
       {xTicks.map((index) => {
         const x = padL + index * (barW + gap) + barW / 2;
+        const anchor = index === 0 ? "start" : index === labels.length - 1 ? "end" : "middle";
         return (
-          <text key={`x-${labels[index]}`} className="chart-axis" x={x} y={height - 8} textAnchor="middle">
+          <text key={`x-${labels[index]}`} className="chart-axis" x={x} y={height - 8} textAnchor={anchor}>
             {formatDay(labels[index])}
           </text>
         );
       })}
-    </svg>
-  );
-}
-
-function LineChart({ values }: { values: Array<number | null> }) {
-  const width = 320;
-  const height = 92;
-  const points = values
-    .map((value, index) => {
-      if (value === null) return null;
-      const x = (index / Math.max(1, values.length - 1)) * width;
-      const y = 80 - value * 72;
-      return `${x},${y}`;
-    })
-    .filter((item): item is string => Boolean(item));
-  if (points.length < 2) {
-    return <div className="empty-state compact-empty">Not enough eligible delayed-recall events yet. No invented retention score.</div>;
-  }
-  return (
-    <svg viewBox={`0 0 ${width} ${height}`} className="chart" role="img" aria-label="Delayed recall trend">
-      <polyline fill="none" stroke="currentColor" strokeWidth="2.5" points={points.join(" ")} />
     </svg>
   );
 }
@@ -153,9 +132,7 @@ export function ProgressView() {
   }, []);
 
   if (!stats) return <p className="muted">Loading progress…</p>;
-  const delayedSlice = stats.delayedByDay.slice(-range);
-  const delayedValues = delayedSlice.map((row) => (row.total === 0 ? null : row.success / row.total));
-  const intro = stats.introductionsByDay.slice(-30);
+  const intro = stats.introductionsByDay.slice(-range);
 
   return (
     <section className="stack compact">
@@ -179,12 +156,8 @@ export function ProgressView() {
         </div>
       </div>
       <div className="panel">
-        <p className="example-index">New words by day</p>
-        <BarChart values={intro.map((row) => row.count)} labels={intro.map((row) => row.day)} />
-      </div>
-      <div className="panel">
         <div className="row">
-          <p className="example-index">Delayed recall</p>
+          <p className="example-index">New words by day</p>
           <div className="wrap">
             {([7, 30, 90] as const).map((item) => (
               <button key={item} type="button" className={range === item ? "chip active" : "chip"} onClick={() => setRange(item)}>
@@ -193,12 +166,7 @@ export function ProgressView() {
             ))}
           </div>
         </div>
-        <LineChart values={delayedValues} />
-        <p className="tiny">
-          {stats.delayedRecall.recognition.total || stats.delayedRecall.production.total
-            ? `Recognition ${stats.delayedRecall.recognition.success}/${stats.delayedRecall.recognition.total} · Production ${stats.delayedRecall.production.success}/${stats.delayedRecall.production.total}`
-            : "A delayed score needs eligible events after a real gap. First learning is not delayed recall."}
-        </p>
+        <BarChart values={intro.map((row) => row.count)} labels={intro.map((row) => row.day)} />
       </div>
       <div className="panel">
         <p className="example-index">Coverage by topic</p>

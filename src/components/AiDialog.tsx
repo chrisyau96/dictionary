@@ -2,10 +2,10 @@ import { completeChat } from "../ai/client";
 import { noteIsEmpty, toSafeHtml } from "../ai/html";
 import { hasAiReady, loadAiConfig, loadApiKey, saveAiConfig } from "../ai/storage";
 import { DEFAULT_AI_PROMPTS, formatAiNote, rememberCommand, suggestedCommands } from "../ai/types";
-import { go } from "../router";
 import { appendWordNote } from "../study/session";
 import { AiSetupForm } from "./AiSetupForm";
 import { RefreshIcon, SettingsIcon } from "./icons";
+import { BackButton } from "./ScreenHeader";
 import { RichTextEditor } from "./RichText";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -26,6 +26,7 @@ export function AiDialog({
   onNoted?: () => void;
 }) {
   const [ready, setReady] = useState<boolean | null>(null);
+  const [showSettings, setShowSettings] = useState(false);
   const [ask, setAsk] = useState("");
   const [command, setCommand] = useState("Ask");
   const [answerHtml, setAnswerHtml] = useState("");
@@ -35,6 +36,7 @@ export function AiDialog({
   const [recent, setRecent] = useState<string[]>([]);
   const [savedNote, setSavedNote] = useState(false);
   const answerRef = useRef<HTMLDivElement>(null);
+  const sheetRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     void (async () => {
@@ -46,18 +48,24 @@ export function AiDialog({
 
   useEffect(() => {
     function onKey(event: KeyboardEvent) {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") {
+        if (showSettings) {
+          setShowSettings(false);
+          return;
+        }
+        onClose();
+      }
     }
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
+  }, [onClose, showSettings]);
+
+  useEffect(() => {
+    if (!showSettings) return;
+    sheetRef.current?.scrollTo({ top: 0, behavior: "smooth" });
+  }, [showSettings]);
 
   const chips = useMemo(() => suggestedCommands(recent), [recent]);
-
-  function openSettings() {
-    onClose();
-    go({ name: "settings", focus: "ai" });
-  }
 
   function scrollToAnswer() {
     window.requestAnimationFrame(() => {
@@ -111,22 +119,26 @@ export function AiDialog({
 
   const showAnswer = busy || Boolean(answerHtml) || Boolean(error);
   const canRefresh = !busy && Boolean(ask.trim()) && (Boolean(answerHtml) || Boolean(error));
+  const inSettings = showSettings || ready === false;
 
   return (
     <div className="ai-overlay" role="dialog" aria-modal="true" aria-label={`AI for ${word}`} onClick={onClose}>
-      <div className="ai-sheet" onClick={(event) => event.stopPropagation()}>
+      <div className="ai-sheet" ref={sheetRef} onClick={(event) => event.stopPropagation()}>
         <div className="row">
-          <div>
-            <p className="example-index">AI</p>
-            <h2 className="ai-word">{word}</h2>
+          <div className="ai-sheet-heading">
+            {showSettings ? <BackButton onClick={() => setShowSettings(false)} label="Back to ask" /> : null}
+            <div>
+              <p className="example-index">{showSettings ? word : "AI"}</p>
+              <h2 className="ai-word">{showSettings ? "API setting" : word}</h2>
+            </div>
           </div>
           <div className="ai-sheet-actions">
-            {ready ? (
+            {ready && !showSettings ? (
               <button
                 type="button"
                 className="icon-btn ai-header-gear"
                 aria-label="Open API settings"
-                onClick={openSettings}
+                onClick={() => setShowSettings(true)}
               >
                 <SettingsIcon />
               </button>
@@ -137,98 +149,105 @@ export function AiDialog({
           </div>
         </div>
         {ready === null ? <p className="muted">Opening AI…</p> : null}
-        {ready === false ? (
-          <div className="ai-inline-setup">
-            <p className="example-index">Connect AI</p>
-            <p className="tiny helper-copy">Only this helper needs a key. Learning records stay on this device.</p>
-            <AiSetupForm compact onReady={() => setReady(true)} />
+        {inSettings ? (
+          <div className="ai-embedded-settings">
+            {ready === false ? <p className="example-index">Connect AI</p> : null}
+            <p className="tiny helper-copy">
+              Pick a default fast model and paste your own API key. Keys stay on this device. Learning records never leave it.
+            </p>
+            <AiSetupForm
+              compact
+              onReady={() => {
+                setReady(true);
+              }}
+            />
           </div>
         ) : null}
-        {ready ? (
+        {ready && !showSettings ? (
           <>
-        <div className="ai-chips">
-          {chips.map((label) => (
-            <button
-              key={label}
-              type="button"
-              className="chip"
-              disabled={busy}
-              title={label}
-              onClick={() => pickChip(label)}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-        <label>
-          Ask
-          <textarea
-            rows={3}
-            value={ask}
-            placeholder={`Ask anything about “${word}”`}
-            onChange={(event) => setAsk(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) {
-                event.preventDefault();
-                void send(ask, ask.trim() || "Ask");
-              }
-            }}
-          />
-        </label>
-        <button
-          type="button"
-          className="primary block"
-          disabled={busy}
-          onClick={() => void send(ask, ask.trim() || "Ask")}
-        >
-          {busy ? "Thinking…" : "Ask"}
-        </button>
-        {showAnswer ? (
-          <div className="ai-answer" ref={answerRef}>
-            <div className="ai-answer-head">
-              <p className="ai-edit-hint">
-                {busy ? "Working on an answer" : error ? error : ""}
-              </p>
-              {canRefresh ? (
+            <div className="ai-chips">
+              {chips.map((label) => (
                 <button
+                  key={label}
                   type="button"
-                  className="icon-btn ai-refresh"
-                  aria-label="Refresh answer"
-                  onClick={() => void send(ask, command)}
+                  className="chip"
+                  disabled={busy}
+                  title={label}
+                  onClick={() => pickChip(label)}
                 >
-                  <RefreshIcon />
+                  {label}
                 </button>
-              ) : null}
+              ))}
             </div>
-            {busy ? (
-              <div className="ai-loading" aria-busy="true" aria-live="polite">
-                <span className="ai-skel" />
-                <span className="ai-skel" />
-                <span className="ai-skel is-short" />
-                <p className="tiny">Thinking…</p>
-              </div>
-            ) : error ? null : (
-              <RichTextEditor resetKey={`ans-${answerTick}`} value={answerHtml} onChange={setAnswerHtml} />
-            )}
-            {!busy && !error && answerHtml ? (
-              <div className="ai-answer-actions">
-                <button
-                  type="button"
-                  className={`primary block${savedNote ? " is-noted" : ""}`}
-                  onClick={async () => {
-                    await appendWordNote(senseId, entryId, formatAiNote(command, answerHtml));
-                    setSavedNote(true);
-                    onNoted?.();
-                    window.setTimeout(() => setSavedNote(false), 1600);
-                  }}
-                >
-                  {savedNote ? "Added ✓" : "Add to note"}
-                </button>
+            <label>
+              Ask
+              <textarea
+                rows={3}
+                value={ask}
+                placeholder={`Ask anything about “${word}”`}
+                onChange={(event) => setAsk(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) {
+                    event.preventDefault();
+                    void send(ask, ask.trim() || "Ask");
+                  }
+                }}
+              />
+            </label>
+            <button
+              type="button"
+              className="primary block"
+              disabled={busy}
+              onClick={() => void send(ask, ask.trim() || "Ask")}
+            >
+              {busy ? "Thinking…" : "Ask"}
+            </button>
+            {showAnswer ? (
+              <div className="ai-answer" ref={answerRef}>
+                <div className="ai-answer-head">
+                  <p className="ai-edit-hint">
+                    {busy ? "Working on an answer" : error ? error : ""}
+                  </p>
+                  {canRefresh ? (
+                    <button
+                      type="button"
+                      className="icon-btn ai-refresh"
+                      aria-label="Refresh answer"
+                      onClick={() => void send(ask, command)}
+                    >
+                      <RefreshIcon />
+                    </button>
+                  ) : null}
+                </div>
+                {busy ? (
+                  <div className="ai-loading" aria-busy="true" aria-live="polite">
+                    <span className="ai-skel" />
+                    <span className="ai-skel" />
+                    <span className="ai-skel is-short" />
+                    <p className="tiny">Thinking…</p>
+                  </div>
+                ) : error ? null : (
+                  <RichTextEditor resetKey={`ans-${answerTick}`} value={answerHtml} onChange={setAnswerHtml} />
+                )}
+                {!busy && !error && answerHtml ? (
+                  <div className="ai-answer-actions">
+                    <button
+                      type="button"
+                      className={`primary block${savedNote ? " is-noted" : ""}`}
+                      onClick={async () => {
+                        await appendWordNote(senseId, entryId, formatAiNote(command, answerHtml));
+                        setSavedNote(true);
+                        onNoted?.();
+                        window.setTimeout(() => setSavedNote(false), 1600);
+                      }}
+                    >
+                      {savedNote ? "Added ✓" : "Add to note"}
+                    </button>
+                  </div>
+                ) : null}
+                {savedNote ? <p className="tiny ai-note-signal">Added to your note.</p> : null}
               </div>
             ) : null}
-            {savedNote ? <p className="tiny ai-note-signal">Added to your note.</p> : null}
-          </div>
-        ) : null}
           </>
         ) : null}
       </div>

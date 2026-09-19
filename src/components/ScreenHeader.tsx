@@ -9,15 +9,25 @@ function goBack(to: Route | "history") {
 
 export function BackButton({
   to,
+  onClick,
   label = "Back",
   className = "back-btn",
 }: {
-  to: Route | "history";
+  to?: Route | "history";
+  onClick?: () => void;
   label?: string;
   className?: string;
 }) {
   return (
-    <button type="button" className={className} aria-label={label} onClick={() => goBack(to)}>
+    <button
+      type="button"
+      className={className}
+      aria-label={label}
+      onClick={() => {
+        if (onClick) onClick();
+        else if (to) goBack(to);
+      }}
+    >
       <BackIcon />
     </button>
   );

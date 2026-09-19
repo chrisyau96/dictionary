@@ -1,12 +1,21 @@
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { PronunciationButtons } from "../components/AudioButton";
 import { BackButton } from "../components/ScreenHeader";
 import { WordDetail } from "../components/WordDetail";
-import { answersMatch, buildClozeForSense, clozeCoreByKey, type ClozeExercise } from "../content/cloze";
+import {
+  answersMatch,
+  buildClozeForSense,
+  clozeCoreByKey,
+  isHintSlot,
+  lettersAnswer,
+  seedClozeLetters,
+  type ClozeExercise,
+} from "../content/cloze";
 import { go } from "../router";
 import { buildToday, persistSessionIndex, rateCard, type QueueItem } from "../study/session";
 
 type Phase = "meaning" | "cloze" | "detail";
+type ClozeAnswers = Record<string, string[]>;
 
 interface SessionResult {
   word: string;
@@ -40,6 +49,120 @@ function ReviewChrome({
   );
 }
 
+function LetterSlots({
+  tokenKey,
+  core,
+  letters,
+  checked,
+  autoFocus,
+  onChange,
+}: {
+  tokenKey: string;
+  core: string;
+  letters: string[];
+  checked: boolean;
+  autoFocus?: boolean;
+  onChange: (next: string[]) => void;
+}) {
+  const refs = useRef<Array<HTMLInputElement | null>>([]);
+  const chars = [...core];
+  const given = lettersAnswer(letters);
+  const ok = checked ? answersMatch(core, given) : null;
+
+  function editableIndex(from: number, step: 1 | -1): number {
+    for (let i = from; i >= 0 && i < chars.length; i += step) {
+      if (!isHintSlot(core, i)) return i;
+    }
+    return -1;
+  }
+
+  function focusSlot(index: number) {
+    const node = refs.current[index];
+    if (!node) return;
+    node.focus();
+    node.select();
+  }
+
+  function fillFrom(index: number, raw: string) {
+    const incoming = [...raw].filter((ch) => /\p{L}|\p{N}/u.test(ch));
+    const next = chars.map((_, slot) => letters[slot] ?? (isHintSlot(core, slot) ? chars[slot] ?? "" : ""));
+    if (!incoming.length) {
+      if (!isHintSlot(core, index)) next[index] = "";
+      onChange(next);
+      return;
+    }
+    let cursor = index;
+    for (const ch of incoming) {
+      while (cursor < chars.length && isHintSlot(core, cursor)) cursor += 1;
+      if (cursor >= chars.length) break;
+      next[cursor] = ch;
+      cursor += 1;
+    }
+    onChange(next);
+    const following = editableIndex(cursor, 1);
+    if (following >= 0) focusSlot(following);
+  }
+
+  return (
+    <span className={`cloze-letters${ok === true ? " is-correct" : ok === false ? " is-wrong" : ""}`}>
+      {chars.map((ch, index) => {
+        if (isHintSlot(core, index)) {
+          const punct = !/\p{L}/u.test(ch);
+          return (
+            <span
+              key={`${tokenKey}-${index}`}
+              className={punct ? "cloze-punct" : "cloze-slot is-hint"}
+              aria-hidden={punct ? true : undefined}
+            >
+              {ch}
+            </span>
+          );
+        }
+        return (
+          <input
+            key={`${tokenKey}-${index}`}
+            ref={(node) => {
+              refs.current[index] = node;
+            }}
+            className="cloze-slot"
+            value={letters[index] ?? ""}
+            maxLength={1}
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
+            autoFocus={Boolean(autoFocus && index === editableIndex(0, 1))}
+            aria-label={`Letter ${index + 1} of ${core.length}`}
+            onChange={(event) => fillFrom(index, event.target.value)}
+            onPaste={(event) => {
+              event.preventDefault();
+              fillFrom(index, event.clipboardData.getData("text"));
+            }}
+            onKeyDown={(event) => {
+              if (event.key === "Backspace" && !(letters[index] ?? "")) {
+                event.preventDefault();
+                const prev = editableIndex(index - 1, -1);
+                if (prev < 0) return;
+                const next = [...letters];
+                next[prev] = "";
+                onChange(next);
+                focusSlot(prev);
+              } else if (event.key === "ArrowLeft") {
+                event.preventDefault();
+                const prev = editableIndex(index - 1, -1);
+                if (prev >= 0) focusSlot(prev);
+              } else if (event.key === "ArrowRight") {
+                event.preventDefault();
+                const following = editableIndex(index + 1, 1);
+                if (following >= 0) focusSlot(following);
+              }
+            }}
+          />
+        );
+      })}
+    </span>
+  );
+}
+
 function ClozePrompt({
   exercise,
   answers,
@@ -47,10 +170,11 @@ function ClozePrompt({
   onChange,
 }: {
   exercise: ClozeExercise;
-  answers: Record<string, string>;
+  answers: ClozeAnswers;
   checked: boolean;
-  onChange: (key: string, value: string) => void;
+  onChange: (key: string, value: string[]) => void;
 }) {
+  let focused = false;
   return (
     <p className="cloze-sentence">
       {exercise.tokens.map((token) => {
@@ -64,20 +188,18 @@ function ClozePrompt({
             </span>
           );
         }
-        const given = answers[token.key] ?? "";
-        const ok = checked ? answersMatch(token.core, given) : null;
+        const autoFocus = !focused && !checked;
+        focused = true;
         return (
           <span key={token.key} className="cloze-word is-blank">
             {token.leading}
-            <input
-              className={`cloze-input${ok === true ? " is-correct" : ok === false ? " is-wrong" : ""}`}
-              value={given}
-              autoCapitalize="none"
-              autoCorrect="off"
-              spellCheck={false}
-              aria-label="Missing word"
-              size={Math.max(4, token.core.length)}
-              onChange={(event) => onChange(token.key, event.target.value)}
+            <LetterSlots
+              tokenKey={token.key}
+              core={token.core}
+              letters={answers[token.key] ?? seedClozeLetters(exercise)[token.key] ?? []}
+              checked={checked}
+              autoFocus={autoFocus}
+              onChange={(value) => onChange(token.key, value)}
             />
             {token.trailing}
           </span>
@@ -87,6 +209,14 @@ function ClozePrompt({
   );
 }
 
+function clozeScore(exercise: ClozeExercise, answers: ClozeAnswers): { correct: number; total: number } {
+  const total = exercise.blankKeys.length;
+  const correct = exercise.blankKeys.filter((key) =>
+    answersMatch(clozeCoreByKey(exercise, key), lettersAnswer(answers[key])),
+  ).length;
+  return { correct, total };
+}
+
 export function ReviewView() {
   const [queue, setQueue] = useState<QueueItem[]>([]);
   const [index, setIndex] = useState(0);
@@ -94,7 +224,7 @@ export function ReviewView() {
   const [busy, setBusy] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [sessionType, setSessionType] = useState<"scheduled" | "learn-new">("scheduled");
-  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [answers, setAnswers] = useState<ClozeAnswers>({});
   const [clozeChecked, setClozeChecked] = useState(false);
   const [results, setResults] = useState<SessionResult[]>([]);
 
@@ -119,15 +249,20 @@ export function ReviewView() {
     setClozeChecked(false);
   }
 
+  function startCloze() {
+    if (exercise) setAnswers(seedClozeLetters(exercise));
+    setClozeChecked(false);
+    setPhase("cloze");
+  }
+
   async function rate(gotIt: boolean) {
     if (!item || busy || phase !== "detail" || !exercise) return;
     setBusy(true);
     await rateCard(item.card.id, gotIt ? 3 : 1, new Date(), sessionType);
-    const blanksTotal = exercise.blankKeys.length;
-    const blanksCorrect = exercise.blankKeys.filter((key) => answersMatch(clozeCoreByKey(exercise, key), answers[key] ?? "")).length;
+    const score = clozeScore(exercise, answers);
     const nextResults = [
       ...results,
-      { word: item.sense.frequency.form || word, gotIt, blanksCorrect, blanksTotal },
+      { word: item.sense.frequency.form || word, gotIt, blanksCorrect: score.correct, blanksTotal: score.total },
     ];
     setResults(nextResults);
     const nextIndex = index + 1;
@@ -150,7 +285,7 @@ export function ReviewView() {
       }
       if (event.key === "Enter" || event.key === " ") {
         event.preventDefault();
-        if (phase === "meaning") setPhase("cloze");
+        if (phase === "meaning") startCloze();
         else if (phase === "cloze" && !clozeChecked) setClozeChecked(true);
         else if (phase === "cloze") setPhase("detail");
         return;
@@ -244,7 +379,7 @@ export function ReviewView() {
             <PronunciationButtons pronunciationId={item.sense.pronunciationId} fallbackText={word} allowed />
           </div>
         </div>
-        <button type="button" className="primary block" onClick={() => setPhase("cloze")}>
+        <button type="button" className="primary block" onClick={startCloze}>
           Check
         </button>
       </ReviewChrome>
@@ -252,12 +387,12 @@ export function ReviewView() {
   }
 
   if (phase === "cloze" && exercise) {
-    const correct = exercise.blankKeys.filter((key) => answersMatch(clozeCoreByKey(exercise, key), answers[key] ?? "")).length;
+    const score = clozeScore(exercise, answers);
     return (
       <ReviewChrome index={index} total={queue.length}>
         <div className="cloze-card">
           <p className="hero-kicker">Fill in the blanks</p>
-          <p className="lede">Type the missing English words from the example sentence.</p>
+          <p className="lede">Type the missing letters. The first letter is given.</p>
           <ClozePrompt
             exercise={exercise}
             answers={answers}
@@ -267,7 +402,7 @@ export function ReviewView() {
           {exercise.hintTc ? <p className="muted cloze-hint">{exercise.hintTc}</p> : null}
           {clozeChecked ? (
             <p className="tiny helper-copy">
-              {correct}/{exercise.blankKeys.length} spelled correctly
+              {score.correct}/{score.total} spelled correctly
             </p>
           ) : null}
         </div>
@@ -285,12 +420,12 @@ export function ReviewView() {
     );
   }
 
+  const detailScore = exercise ? clozeScore(exercise, answers) : null;
   return (
     <ReviewChrome index={index} total={queue.length}>
-      {exercise ? (
+      {detailScore ? (
         <p className="tiny helper-copy">
-          {exercise.blankKeys.filter((key) => answersMatch(clozeCoreByKey(exercise, key), answers[key] ?? "")).length}/
-          {exercise.blankKeys.length} blanks correct · rate this word
+          {detailScore.correct}/{detailScore.total} blanks correct · rate this word
         </p>
       ) : null}
       <WordDetail
