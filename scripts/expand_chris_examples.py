@@ -257,37 +257,78 @@ def meaning_label(gloss_tc: str) -> str:
     return text or "這個意思"
 
 
+def generated_tc_for_en(en: str) -> str | None:
+    text = en.strip()
+    if text.startswith("Please ") and text.endswith(" before we close."):
+        return "關門前請先處理這件事。"
+    if text.startswith("Can you ") and text.endswith(" for the afternoon team?"):
+        return "你可以替下午的同事處理嗎？"
+    if text.startswith("We should ") and text.endswith(" after the briefing."):
+        return "簡報後我們應該處理這件事。"
+    if text.startswith("I will ") and text.endswith(" once the queue is shorter."):
+        return "排隊短一點，我就會處理。"
+    if text.startswith("Today's notes mention ") and text.endswith("."):
+        return "今天的備註提到這個用法。"
+    if text.startswith("A customer asked about ") and text.endswith("."):
+        return "有顧客問及這個用法。"
+    if text.startswith("Write ") and text.endswith(" on the whiteboard."):
+        return "把這個說法寫在白板上。"
+    if text.startswith("The briefing covered ") and text.endswith("."):
+        return "簡報談到這個用法。"
+    if text.startswith("We can ") and text.endswith(" this after the next customer."):
+        return "服務下一位顧客後，我們可以處理這件事。"
+    if text.startswith("Do not forget to ") and text.endswith(" before you leave."):
+        return "離開前不要忘記處理這件事。"
+    if text.startswith("Keep the wording ") and text.endswith(" in the shop notice."):
+        return "店舖告示的用字要保持清楚。"
+    if text.startswith("The ") and text.endswith(" option is clearer for staff."):
+        return "對同事來說，這個做法更清楚。"
+    if text.startswith("Put ") and text.endswith(" on the afternoon list."):
+        return "把這個項目寫進下午清單。"
+    if text.startswith("The team asked how ") and " works here:" in text:
+        return "同事問這裡這個怎麼用。"
+    if text.startswith("Keep a note of ") and text.endswith(" beside the till."):
+        return "把這個記在收銀機旁。"
+    if text.startswith("Ask a colleague if ") and text.endswith(" is needed today."):
+        return "問同事今天是否需要這個。"
+    if text.startswith("Check ") and text.endswith(" before the evening handover."):
+        return "晚班交接前先核對這個。"
+    return None
+
+
 def tc_without_latin(tc: str, gloss_tc: str) -> str:
-    meaning = meaning_label(gloss_tc)
-    text = re.sub(r"「[^」]*[A-Za-z][^」]*」", meaning, tc or "")
+    replacements = (("WhatsApp", "即時訊息"), ("PDF", "文件"))
+    text = tc or ""
+    for english, chinese in replacements:
+        text = text.replace(english, chinese)
+    text = re.sub(r"「[^」]*[A-Za-z][^」]*」", "這個用法", text)
     text = re.sub(r"[A-Za-z][A-Za-z0-9+.#]*", "", text)
     text = text.replace("「」", "")
     text = re.sub(r"\s+", "", text)
     text = re.sub(r"[，,]{2,}", "，", text)
     if not re.search(r"[\u4e00-\u9fff]", text):
-        return f"這是指{meaning}。"
+        return "這是指這個用法。"
     return text
 
 
-def collocation_pair(col: str, lemma: str, pos: str, salt: str, gloss_tc: str) -> tuple[str, str]:
+def collocation_pair(col: str, lemma: str, pos: str, salt: str, _gloss_tc: str) -> tuple[str, str]:
     phrase = usable_phrase(col)
-    meaning = meaning_label(gloss_tc)
     if is_verb_phrase(col, pos, lemma):
         return pick(
             [
-                (f"Please {phrase} before we close.", f"關門前請先{meaning}。"),
-                (f"Can you {phrase} for the afternoon team?", f"你可以替下午的同事{meaning}嗎？"),
-                (f"We should {phrase} after the briefing.", f"簡報後我們應該{meaning}。"),
-                (f"I will {phrase} once the queue is shorter.", f"排隊短一點，我就會{meaning}。"),
+                (f"Please {phrase} before we close.", "關門前請先處理這件事。"),
+                (f"Can you {phrase} for the afternoon team?", "你可以替下午的同事處理嗎？"),
+                (f"We should {phrase} after the briefing.", "簡報後我們應該處理這件事。"),
+                (f"I will {phrase} once the queue is shorter.", "排隊短一點，我就會處理。"),
             ],
             salt,
         )
     return pick(
         [
-            (f"Today's notes mention {phrase}.", f"今天的備註提到{meaning}。"),
-            (f"A customer asked about {phrase}.", f"有顧客問及{meaning}。"),
-            (f"Write {phrase} on the whiteboard.", f"把{meaning}寫在白板上。"),
-            (f"The briefing covered {phrase}.", f"簡報談到{meaning}。"),
+            (f"Today's notes mention {phrase}.", "今天的備註提到這個用法。"),
+            (f"A customer asked about {phrase}.", "有顧客問及這個用法。"),
+            (f"Write {phrase} on the whiteboard.", "把這個說法寫在白板上。"),
+            (f"The briefing covered {phrase}.", "簡報談到這個用法。"),
         ],
         salt,
     )
@@ -295,26 +336,27 @@ def collocation_pair(col: str, lemma: str, pos: str, salt: str, gloss_tc: str) -
 
 def filler_pair(lemma: str, gloss_tc: str, pos: str, salt: str) -> tuple[str, str]:
     meaning = meaning_label(gloss_tc)
+    label = meaning if len(meaning) <= 8 else "這個意思"
     if pos == "verb":
         return pick(
             [
-                (f"We can {lemma} this after the next customer.", f"服務下一位顧客後，我們可以{meaning}。"),
-                (f"Do not forget to {lemma} before you leave.", f"離開前不要忘記{meaning}。"),
+                (f"We can {lemma} this after the next customer.", "服務下一位顧客後，我們可以處理這件事。"),
+                (f"Do not forget to {lemma} before you leave.", "離開前不要忘記處理這件事。"),
             ],
             salt,
         )
     if pos == "adjective":
         return pick(
             [
-                (f"Keep the wording {lemma} in the shop notice.", f"店舖告示的用字要保持「{meaning}」。"),
-                (f"The {lemma} option is clearer for staff.", f"對同事來說，{meaning}的做法更清楚。"),
+                (f"Keep the wording {lemma} in the shop notice.", f"店舖告示的用字要保持「{label}」。"),
+                (f"The {lemma} option is clearer for staff.", f"對同事來說，{label}的做法更清楚。"),
             ],
             salt,
         )
     return pick(
         [
-            (f"Put {lemma} on the afternoon list.", f"把{meaning}寫進下午清單。"),
-            (f"The team asked how {lemma} works here: {gloss_tc}", f"同事問這裡的{meaning}怎麼用。"),
+            (f"Put {lemma} on the afternoon list.", f"把{label}寫進下午清單。"),
+            (f"The team asked how {lemma} works here: {gloss_tc}", f"同事問這裡的{label}怎麼用。"),
         ],
         salt,
     )
@@ -361,7 +403,8 @@ def pad_examples(sense: dict) -> list[dict]:
         if not key or key in seen:
             return
         seen.add(key)
-        pool.append(make_example(sense["id"], en, tc_without_latin(tc, gloss_tc), domain, len(pool) + 1))
+        next_tc = generated_tc_for_en(en) or tc_without_latin(tc, gloss_tc)
+        pool.append(make_example(sense["id"], en, next_tc, domain, len(pool) + 1))
 
     for item in sense.get("examples") or []:
         en = str(item.get("en", "")).strip()
@@ -378,11 +421,10 @@ def pad_examples(sense: dict) -> list[dict]:
             continue
         add(*collocation_pair(col, lemma, pos, f"{sense['id']}:{col}", gloss_tc))
 
-    meaning = meaning_label(gloss_tc)
     extras = [
-        (f"Keep a note of {lemma} beside the till.", f"把{meaning}記在收銀機旁。"),
-        (f"Ask a colleague if {lemma} is needed today.", f"問同事今天是否需要{meaning}。"),
-        (f"Check {lemma} before the evening handover.", f"晚班交接前先核對{meaning}。"),
+        (f"Keep a note of {lemma} beside the till.", "把這個記在收銀機旁。"),
+        (f"Ask a colleague if {lemma} is needed today.", "問同事今天是否需要這個。"),
+        (f"Check {lemma} before the evening handover.", "晚班交接前先核對這個。"),
     ]
     extra_i = 0
     while len(pool) < 5:

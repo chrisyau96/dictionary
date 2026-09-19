@@ -1974,10 +1974,10 @@
     "audio/p-usb.mp3": "7d31aa481505efe30b9f7c398bc82f358ebb54586182ee24f5fd604dbf4b8cf8",
     "audio/p-battery.mp3": "34f7422c6814bba2060cd89d9c2efd69de4d28a9e148bfa594315b56c3cbb3da",
     "audio/p-signal.mp3": "8d6a7459fc00f1d7a66e444b7d5d5b1d3a250aa335032bd13e04289cb072f319",
-    "pack.json": "797975c2022496224c48588651c088d7c7313c07b12cc4d846cdbf804dbc5818",
+    "pack.json": "33f281ff9c0f2f5ffc3150398affff913a5e40649a7822e76e905a98e8858248",
     "NOTICES.md": "7c54a2a836e9ee5d02823a7a58a5ff610b9192bdbfade43b1eb2d86e4f3b4f51"
   },
-  "byteSize": 6664239,
+  "byteSize": 6604920,
   "audioBytes": 4700381,
   "completeness": {
     "meanings": "complete",
